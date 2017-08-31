@@ -1,20 +1,21 @@
 package server.room.lobby;
 
-import server.user.SimpleUser;
+import java.io.Serializable;
+import server.user.User;
 
-public class LobbyUser {
+public class LobbyUser implements Serializable{
 
-    private SimpleUser user;
+    private User user;
     private String spaceshipSelected;
     private boolean confirmed;
 
-    public LobbyUser(SimpleUser user, String spaceshipSelected, boolean confirmed) {
+    public LobbyUser(User user, String spaceshipSelected, boolean confirmed) {
         this.user = user;
         this.spaceshipSelected = spaceshipSelected;
         this.confirmed = confirmed;
     }
 
-    public SimpleUser getUser() {
+    public User getUser() {
         return this.user;
     }
 

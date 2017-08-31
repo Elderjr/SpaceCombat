@@ -66,10 +66,11 @@ public class Room {
         return this.maxPlayersPerTeam;
     }
 
-    public void update() {
+    public boolean update() {
         if (this.battleManager != null) {
-            this.battleManager.update();
+            return this.battleManager.update();
         }
+        return false;
     }
 
     public void removeUser(User user) {

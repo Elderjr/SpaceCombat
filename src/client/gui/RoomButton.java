@@ -21,6 +21,16 @@ public class RoomButton extends Button{
         this.room = room;
     }
     
+    
+    public SimpleRoom getRoom(){
+        return this.room;
+    }
+    
+    public void updateValues(SimpleRoom room){
+        this.room.setState(room.getState());
+        this.room.setTotalPlayers(room.getTotalPlayers());
+    }
+    
     @Override
     public void render(GraphicsContext gc){
         super.render(gc);

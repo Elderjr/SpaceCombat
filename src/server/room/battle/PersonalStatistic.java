@@ -6,7 +6,7 @@
 package server.room.battle;
 
 import java.io.Serializable;
-import server.user.SimpleUser;
+import server.user.User;
 
 /**
  *
@@ -14,7 +14,7 @@ import server.user.SimpleUser;
  */
 public class PersonalStatistic implements Serializable {
 
-    private SimpleUser user;
+    private User user;
     private String spaceshipName;
     private int deaths;
     private int kills;
@@ -23,7 +23,7 @@ public class PersonalStatistic implements Serializable {
     private int healTaken;
     private int heal;
 
-    public PersonalStatistic(SimpleUser user, String spaceshipName) {
+    public PersonalStatistic(User user, String spaceshipName) {
         this.user = user;
         this.spaceshipName = spaceshipName;
         this.deaths = 0;
@@ -34,7 +34,7 @@ public class PersonalStatistic implements Serializable {
         this.heal = 0;
     }
 
-    public SimpleUser getSimpleUser(){
+    public User getSimpleUser(){
         return this.user;
     }
     

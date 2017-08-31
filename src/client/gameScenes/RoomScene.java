@@ -16,29 +16,27 @@ import client.input.Input;
 import client.windows.GameContext;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.rmi.RemoteException;
 import javafx.scene.paint.Color;
+import javax.swing.JOptionPane;
 import server.data.RoomData;
 import server.room.SimpleRoom;
+import server.user.User;
 
 public final class RoomScene extends GameScene {
 
-    private static final int maxRoomsPerPage = 8;
+    private static final int ROOMS_PER_PAGE = 2;
     private RoomData roomData;
-    private Thread roomThread;
-    private List<RoomButton> roomButtons;
+    private RoomButton pageButtons[];
+    private long lastUpdate;
     private int currentPage;
 
     public RoomScene(GameContext context) {
         super(context);
         initComponents();
-        this.roomData = ClientNetwork.getInstance().getRooms();
-        this.roomButtons = new LinkedList<>();
+        this.pageButtons = new RoomButton[ROOMS_PER_PAGE];
         this.currentPage = 1;
-        initThread();
+        this.lastUpdate = 0;
     }
 
     public void initComponents() {
@@ -46,69 +44,73 @@ public final class RoomScene extends GameScene {
             @Override
             public void doAction() {
                 if (currentPage > 1) {
-                    currentPage--;
+                    updatePageButtons(currentPage - 1);
                 }
             }
         });
         Button btNextPage = new Button(400, 200, ">", 30, 30, new ActionPerfomed() {
             @Override
             public void doAction() {
-                if ((currentPage + 1) * maxRoomsPerPage < roomButtons.size()) {
-                    currentPage++;
-                }
+                updatePageButtons(currentPage + 1);
 
             }
         });
-        addComponents(btNextPage, btPreviousPage);
-    }
-
-    public void initThread() {
-        this.roomThread = new Thread(new Runnable() {
+        Button btCreateRoom = new Button(500, 200, "Create Room", 60, 30, new ActionPerfomed() {
             @Override
-            public void run() {
-                while (true) {
-                    try {
-                        roomData = ClientNetwork.getInstance().getRooms();
-                        createRoomButtons();
-                        Thread.sleep(10000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(RoomScene.class.getName()).log(Level.SEVERE, null, ex);
+            public void doAction() {
+                String roomName = JOptionPane.showInputDialog("Room Name");
+                int playerPerTeam = Integer.parseInt(JOptionPane.showInputDialog("Players Per Team"));
+                long time = Long.parseLong(JOptionPane.showInputDialog("Match Time (m): ")) * 60000;
+                try {
+                    SimpleRoom room = ClientNetwork.getInstance().createRoom(playerPerTeam, time, roomName);
+                    if (room != null) {
+                        changeScene(new LobbyScene(getContext(), room));
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Error in create room");
                     }
+                } catch (RemoteException ex) {
+                    changeScene(new MainScene(getContext(), true));
                 }
             }
         });
-        this.roomThread.start();
+        addComponents(btNextPage, btPreviousPage, btCreateRoom);
     }
 
-    private void createRoomButtons() {
-        synchronized (roomButtons) {
+    public void updatePageButtons(int page) {
+        if (this.roomData != null) {
+            int init = (page - 1) * ROOMS_PER_PAGE;
+            int end = init + ROOMS_PER_PAGE;
+            int index = 0;
+            int cont = 0;
             int x = 50;
             int y = 50;
-            int count = 0;
-            roomButtons.clear();
-            for (SimpleRoom r : this.roomData.getRooms()) {
-                roomButtons.add(new RoomButton(x, y, r, new ActionPerfomed() {
-                    @Override
-                    public void doAction() {
-                        SimpleRoom room = ClientNetwork.getInstance().enterRoom(r.getId());
-                        roomThread.stop();
-                        changeScene(new LobbyScene(getContext(), room));
+            for (int i = init; i < end; i++) {
+                this.pageButtons[index] = null;
+                if (i < roomData.getRooms().size()) {
+                    SimpleRoom room = roomData.getRooms().get(i);
+                    this.pageButtons[index] = new RoomButton(x, y, room, new ActionPerfomed() {
+                        @Override
+                        public void doAction() {
+                            try {
+                                ClientNetwork.getInstance().enterRoom(room.getId());
+                                changeScene(new LobbyScene(getContext(), room));
+                            } catch (RemoteException ex) {
+                                changeScene(new MainScene(getContext(), true));
+                            }
+                        }
+                    });
+                    cont++;
+                    if (cont % 2 == 0) {
+                        x = 50;
+                        y += 120;
+                    } else {
+                        x += 120;
                     }
-                }));
-                count++;
-                if (count == maxRoomsPerPage) {
-                    x = 50;
-                    y = 50;
-                    count = 0;
-                } else if (count % 2 == 0) {
-                    y += 120;
-                    x = 50;
-                } else {
-                    x += 120;
                 }
+                index++;
             }
+            this.currentPage = page;
         }
-
     }
 
     @Override
@@ -117,11 +119,16 @@ public final class RoomScene extends GameScene {
         renderComponents(gc);
         gc.setFill(Color.GREEN);
         gc.fillText("" + currentPage, 380, 200);
-        synchronized (roomButtons) {
-            int init = (currentPage - 1) * maxRoomsPerPage;
-            int end = init + maxRoomsPerPage;
-            for (int i = init; i < end && i < roomButtons.size(); i++) {
-                roomButtons.get(i).render(gc);
+        for (RoomButton bt : this.pageButtons) {
+            if (bt != null) {
+                bt.render(gc);
+            }
+        }
+        if (this.roomData != null) {
+            int y = 30;
+            for (User user : this.roomData.getOnlineUsers()) {
+                gc.fillText(user.getUsername(), 400, y);
+                y += 40;
             }
         }
     }
@@ -129,17 +136,26 @@ public final class RoomScene extends GameScene {
     @Override
     public void update(Input input) {
         super.update(input);
-        synchronized (roomButtons) {
-            int init = (currentPage - 1) * maxRoomsPerPage;
-            int end = init + maxRoomsPerPage;
-            if (input.getMouseState() == Input.MOUSE_PRESSED) {
-                for (int i = init; i < end && i < roomButtons.size(); i++) {
-                    roomButtons.get(i).mousePressed(input.getMouseX(), input.getMouseY());
+        if (input.getMouseState() == Input.MOUSE_PRESSED) {
+            for (RoomButton bt : this.pageButtons) {
+                if (bt != null) {
+                    bt.mousePressed(input.getMouseX(), input.getMouseY());
                 }
-            } else if (input.getMouseState() == Input.MOUSE_RELEASED) {
-                for (int i = init; i < end && i < roomButtons.size(); i++) {
-                    roomButtons.get(i).mouseReleased();
+            }
+        } else if (input.getMouseState() == Input.MOUSE_RELEASED) {
+            for (RoomButton bt : this.pageButtons) {
+                if (bt != null) {
+                    bt.mouseReleased();
                 }
+            }
+        }
+        if (System.currentTimeMillis() - this.lastUpdate >= 1000) { //10s
+            try {
+                this.roomData = ClientNetwork.getInstance().getRooms();
+                updatePageButtons(this.currentPage);
+                this.lastUpdate = System.currentTimeMillis();
+            } catch (RemoteException ex) {
+                changeScene(new MainScene(getContext(), true));
             }
         }
     }

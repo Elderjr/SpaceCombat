@@ -6,7 +6,7 @@ import java.awt.Point;
 import client.commands.ClientCommands;
 import server.room.battle.BattleListener;
 import server.serverConstants.ServerConstants;
-import server.user.SimpleUser;
+import server.user.User;
 
 public abstract class Spaceship extends Actor implements Moviment {
 
@@ -17,7 +17,7 @@ public abstract class Spaceship extends Actor implements Moviment {
     private boolean useSkill;
     private boolean useShot;
 
-    private final SimpleUser pilot;
+    private final User pilot;
     private final int maxHP;
     private final int movimentSpeed;
     private int team;
@@ -26,7 +26,7 @@ public abstract class Spaceship extends Actor implements Moviment {
     protected long shotFired; //armazena quando o usuário atirou
     protected long skillFired; //armazena quando o usuário usou skill
 
-    public Spaceship(BattleListener room, Point location, int team, String actorType, int maxHP, int movimentSpeed, int initialDirection, SimpleUser pilot) {
+    public Spaceship(BattleListener room, Point location, int team, String actorType, int maxHP, int movimentSpeed, int initialDirection, User pilot) {
         super(room, location, SIZE, team, actorType, initialDirection);
         this.maxHP = maxHP;
         this.hp = maxHP;
@@ -44,7 +44,7 @@ public abstract class Spaceship extends Actor implements Moviment {
 
     public abstract boolean canUseSkill();
 
-    public SimpleUser getPilot(){
+    public User getPilot(){
         return this.pilot;
     }
     

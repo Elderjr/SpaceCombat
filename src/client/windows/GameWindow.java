@@ -1,13 +1,12 @@
 package client.windows;
 
-import static javafx.application.Application.launch;
+
 import client.gameScenes.GameScene;
 import client.gameScenes.MainScene;
 import client.input.Input;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -20,6 +19,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import server.ServerEngine;
+import static javafx.application.Application.launch;
 
 public class GameWindow extends Application implements GameContext {
 

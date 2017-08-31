@@ -5,6 +5,10 @@
  */
 package client.network;
 
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import server.IServer;
 import server.ServerEngine;
 import server.data.BattleData;
@@ -31,71 +35,73 @@ public class ClientNetwork {
 
     private ClientNetwork() {
         this.server = ServerEngine.getInstance();
-        User sara = this.server.login("sara", "123");
-        SimpleRoom room = this.server.createRoom(sara.getId(), 1, 3000, "Sara ama Elder");
-        this.server.changeConfirm(sara.getId(), room.getId());
         this.user = null;
     }
 
-    public boolean login(String username, String password) {
-        System.out.println("hi");
+    public boolean connect(String host) {
+        try {
+            Registry registry = LocateRegistry.getRegistry(host);
+            this.server = (IServer) registry.lookup("SpaceCombat");
+            return true;
+        } catch (RemoteException | NotBoundException ex) {
+            return false;
+        } 
+    }
+
+    public boolean login(String username, String password) throws RemoteException {
         this.user = server.login(username, password);
         return this.user != null;
     }
 
-    public RoomData getRooms() {
+    public RoomData getRooms() throws RemoteException {
         return this.server.getRooms(this.user.getId());
     }
 
-    public SimpleRoom createRoom(int maxPlayers, long matchTime, String name) {
+    public SimpleRoom createRoom(int maxPlayers, long matchTime, String name) throws RemoteException {
         return this.server.createRoom(this.user.getId(), maxPlayers, matchTime, name);
     }
 
-    public SimpleRoom enterRoom(long roomId) {
+    public SimpleRoom enterRoom(long roomId) throws RemoteException {
         return this.server.enterRoom(this.user.getId(), roomId);
     }
 
-    public void exitRoom(long roomId) {
+    public void exitRoom(long roomId) throws RemoteException {
         this.server.exitRoom(this.user.getId(), roomId);
     }
 
-    public void changeConfirm(long roomId) {
+    public void changeConfirm(long roomId) throws RemoteException {
         this.server.changeConfirm(this.user.getId(), roomId);
     }
 
-    public void changeTeam(long roomId) {
+    public void changeTeam(long roomId) throws RemoteException {
         this.server.changeTeam(this.user.getId(), roomId);
     }
 
-    public void changeSpacechip(long roomId, String actorType) {
+    public void changeSpacechip(long roomId, String actorType) throws RemoteException {
         this.server.changeSpaceship(this.user.getId(), roomId, actorType);
     }
 
-    public LobbyData getLobbyData(long roomId) {
+    public LobbyData getLobbyData(long roomId) throws RemoteException {
         return this.server.getLobbyData(this.user.getId(), roomId);
     }
 
-    public BattleData getBattleData(long roomId) {
+    public BattleData getBattleData(long roomId) throws RemoteException {
         return this.server.getBattleData(this.user.getId(), roomId);
     }
-    
-    public BattleStatistic getBattleStatistic(long roomId){
+
+    public BattleStatistic getBattleStatistic(long roomId) throws RemoteException {
         return this.server.getBattleStatistic(this.user.getId(), roomId);
     }
 
-    public void useShot(long roomId){
+    public void useShot(long roomId) throws RemoteException {
         this.server.useShot(this.user.getId(), roomId);
     }
-    
-    public void useSkill(long roomId){
+
+    public void useSkill(long roomId) throws RemoteException {
         this.server.useSkill(this.user.getId(), roomId);
     }
-    
-    public void move(long roomId, int direction){
+
+    public void move(long roomId, int direction) throws RemoteException {
         this.server.move(this.user.getId(), roomId, direction);
-    }
-    
-    public boolean connect(String ip) {
-        return true;
     }
 }

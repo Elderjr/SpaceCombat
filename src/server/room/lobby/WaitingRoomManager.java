@@ -1,6 +1,7 @@
 package server.room.lobby;
 
 import java.util.HashMap;
+import server.ServerEngine;
 
 import server.actors.ActorsTypes;
 import server.data.LobbyData;
@@ -28,12 +29,12 @@ public class WaitingRoomManager {
 
     public boolean addUser(User user) {
         if (blueTeam.size() < room.getMaxPlayersPerTeam() || redTeam.size() < room.getMaxPlayersPerTeam()) {
-            if (blueTeam.size() >= redTeam.size()) {
-                System.out.println("User " + user.getId() + " entered in red team (room " + room.getId() + ")");
-                redTeam.put(user.getId(), new LobbyUser(user.getSimpleUser(), ActorsTypes.SPACESHIP_ASSAULTER, false));
-            } else {
-                blueTeam.put(user.getId(), new LobbyUser(user.getSimpleUser(), ActorsTypes.SPACESHIP_ASSAULTER, false));
+            if (redTeam.size() >= blueTeam.size()) {
                 System.out.println("User " + user.getId() + " entered in blue team (room " + room.getId() + ")");
+                blueTeam.put(user.getId(), new LobbyUser(user, ActorsTypes.SPACESHIP_ASSAULTER, false));
+            } else {
+                redTeam.put(user.getId(), new LobbyUser(user, ActorsTypes.SPACESHIP_ASSAULTER, false));
+                System.out.println("User " + user.getId() + " entered in red team (room " + room.getId() + ")");
             }
             room.getSimpleRoom().incrementTotalPlayers();
             return true;
@@ -75,6 +76,9 @@ public class WaitingRoomManager {
     public void removeUser(long userId) {
         blueTeam.remove(userId);
         redTeam.remove(userId);
+        if(blueTeam.size() + redTeam.size() == 0){
+            ServerEngine.getInstance().removeRoom(this.room.getId());
+        }
     }
 
     private boolean isReady() {

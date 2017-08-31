@@ -49,7 +49,7 @@ public class BattleRoomManager implements BattleListener {
                     location, ServerConstants.BLUE_TEAM, ClientCommands.RIGHT, entry.getValue().getUser());
             this.actorsManager.addSpaceship(spaceship);
             this.spaceships.put(entry.getKey(), spaceship);
-            this.battleStatistic.addUser(entry.getValue().getUser(), entry.getValue().getSpaceshipSelected());
+            this.battleStatistic.addUser(entry.getValue().getUser(), entry.getValue().getSpaceshipSelected(), ServerConstants.BLUE_TEAM);
             location.y += 50;
         }
 
@@ -60,7 +60,7 @@ public class BattleRoomManager implements BattleListener {
                     location, ServerConstants.RED_TEAM, ClientCommands.LEFT, entry.getValue().getUser());
             this.actorsManager.addSpaceship(spaceship);
             this.spaceships.put(entry.getKey(), spaceship);
-            this.battleStatistic.addUser(entry.getValue().getUser(), entry.getValue().getSpaceshipSelected());
+            this.battleStatistic.addUser(entry.getValue().getUser(), entry.getValue().getSpaceshipSelected(), ServerConstants.RED_TEAM);
             location.y += 50;
         }
     }
@@ -149,7 +149,7 @@ public class BattleRoomManager implements BattleListener {
         return this.battleStatistic;
     }
 
-    public void update() {
+    public boolean update() {
         if (this.currentMatchTime > 0) {
             this.currentMatchTime = room.getMatchTime() - (System.currentTimeMillis() - this.startedAt);
             this.actorsManager.update();
@@ -161,9 +161,10 @@ public class BattleRoomManager implements BattleListener {
                 } else {
                     this.battleStatistic.setWinner(ServerConstants.DRAW);
                 }
-                room.setState(2);
+                return true;
             }
         }
+        return false;
     }
 
 }

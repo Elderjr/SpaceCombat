@@ -4,14 +4,14 @@ import java.awt.Point;
 
 import client.commands.ClientCommands;
 import server.room.battle.BattleListener;
-import server.user.SimpleUser;
+import server.user.User;
 
 public class Supporter extends Spaceship {
 
     private static final int MOVIMENT_SPEED = 7;
     private static final int MAX_HP = 100;
 
-    public Supporter(BattleListener room, Point location, int team, int initialDirection, SimpleUser user) {
+    public Supporter(BattleListener room, Point location, int team, int initialDirection, User user) {
         super(room, location, team, ActorsTypes.SPACESHIP_SUPPORTER, MAX_HP, MOVIMENT_SPEED, initialDirection, user);
     }
 

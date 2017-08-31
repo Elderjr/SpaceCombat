@@ -32,6 +32,10 @@ public class SimpleRoom implements Serializable{
         return this.state;
     }
 
+    public void setTotalPlayers(int totalPlayers){
+        this.totalPlayers = totalPlayers;
+    }
+    
     public void incrementTotalPlayers() {
         this.totalPlayers++;
     }
@@ -54,5 +58,18 @@ public class SimpleRoom implements Serializable{
     
     public int getTotalPlayers(){
         return this.totalPlayers;
+    }
+    
+    @Override
+    public int hashCode(){
+        return this.totalPlayers;
+    }
+    
+    @Override
+    public boolean equals(Object obj){
+        if(obj instanceof SimpleRoom){
+            return ((SimpleRoom) obj).id == this.id;
+        }
+        return false;
     }
 }

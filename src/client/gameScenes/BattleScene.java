@@ -18,6 +18,7 @@ import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;
 import client.sprite.Sprite;
 import client.util.Util;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -46,17 +47,22 @@ public final class BattleScene extends GameScene {
         this.battleThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                data = ClientNetwork.getInstance().getBattleData(room.getId());
-                while (true) {
-                    try {
-                        Thread.sleep(100);
-                        synchronized (data) {
-                            data = ClientNetwork.getInstance().getBattleData(room.getId());
+                try {
+                    data = ClientNetwork.getInstance().getBattleData(room.getId());
+                    while (data != null) {
+                        try {
+                            Thread.sleep(100);
+                            synchronized (data) {
+                                data = ClientNetwork.getInstance().getBattleData(room.getId());
+                            }
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(RoomScene.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(RoomScene.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                } catch (RemoteException ex) {
+                    changeScene(new MainScene(getContext(), true));
                 }
+
             }
         });
         this.battleThread.start();
@@ -74,7 +80,7 @@ public final class BattleScene extends GameScene {
                 Animation animation = new Animation(simpleActor.getLocation().x,
                         simpleActor.getLocation().y,
                         sprite, (int) simpleActor.getSize().getWidth() / 2,
-                        (int) simpleActor.getSize().getHeight()/ 2);
+                        (int) simpleActor.getSize().getHeight() / 2);
                 animation.setSpriteDirection(simpleActor.getDirection());
                 this.animations.put(simpleActor.getId(), animation);
             }
@@ -121,44 +127,58 @@ public final class BattleScene extends GameScene {
     }
 
     private void processKeysPressed(Input input) {
-        if (input.containsKey(KeyCode.W.getName()) && input.containsKey(KeyCode.D.getName())) {
-            ClientNetwork.getInstance().move(room.getId(), ClientCommands.UP_RIGHT);
-        } else if (input.containsKey(KeyCode.W.getName()) && input.containsKey(KeyCode.A.getName())) {
-            ClientNetwork.getInstance().move(room.getId(), ClientCommands.UP_LEFT);
-        } else if (input.containsKey(KeyCode.S.getName()) && input.containsKey(KeyCode.D.getName())) {
-            ClientNetwork.getInstance().move(room.getId(), ClientCommands.DOWN_RIGHT);
-        } else if (input.containsKey(KeyCode.S.getName()) && input.containsKey(KeyCode.A.getName())) {
-            ClientNetwork.getInstance().move(room.getId(), ClientCommands.DOWN_LEFT);
-        } else if (input.containsKey(KeyCode.W.getName())) {
-            ClientNetwork.getInstance().move(room.getId(), ClientCommands.UP);
-        } else if (input.containsKey(KeyCode.A.getName())) {
-            ClientNetwork.getInstance().move(room.getId(), ClientCommands.LEFT);
-        } else if (input.containsKey(KeyCode.S.getName())) {
-            ClientNetwork.getInstance().move(room.getId(), ClientCommands.DOWN);
-        } else if (input.containsKey(KeyCode.D.getName())) {
-            ClientNetwork.getInstance().move(room.getId(), ClientCommands.RIGHT);
+        try {
+            if (input.containsKey(KeyCode.W.getName()) && input.containsKey(KeyCode.D.getName())) {
+                ClientNetwork.getInstance().move(room.getId(), ClientCommands.UP_RIGHT);
+            } else if (input.containsKey(KeyCode.W.getName()) && input.containsKey(KeyCode.A.getName())) {
+                ClientNetwork.getInstance().move(room.getId(), ClientCommands.UP_LEFT);
+            } else if (input.containsKey(KeyCode.S.getName()) && input.containsKey(KeyCode.D.getName())) {
+                ClientNetwork.getInstance().move(room.getId(), ClientCommands.DOWN_RIGHT);
+            } else if (input.containsKey(KeyCode.S.getName()) && input.containsKey(KeyCode.A.getName())) {
+                ClientNetwork.getInstance().move(room.getId(), ClientCommands.DOWN_LEFT);
+            } else if (input.containsKey(KeyCode.W.getName())) {
+                ClientNetwork.getInstance().move(room.getId(), ClientCommands.UP);
+            } else if (input.containsKey(KeyCode.A.getName())) {
+                ClientNetwork.getInstance().move(room.getId(), ClientCommands.LEFT);
+            } else if (input.containsKey(KeyCode.S.getName())) {
+                ClientNetwork.getInstance().move(room.getId(), ClientCommands.DOWN);
+            } else if (input.containsKey(KeyCode.D.getName())) {
+                ClientNetwork.getInstance().move(room.getId(), ClientCommands.RIGHT);
+            }
+            if (input.containsKey(KeyCode.J.getName())) {
+                ClientNetwork.getInstance().useShot(room.getId());
+            }
+            if (input.containsKey(KeyCode.K.getName())) {
+                ClientNetwork.getInstance().useSkill(room.getId());
+            }
+        } catch (RemoteException ex) {
+            this.battleThread.stop();
+            changeScene(new MainScene(getContext(), true));
         }
-        if (input.containsKey(KeyCode.J.getName())) {
-            ClientNetwork.getInstance().useShot(room.getId());
-        }
-        if (input.containsKey(KeyCode.K.getName())) {
-            ClientNetwork.getInstance().useSkill(room.getId());
-        }
+
     }
 
     @Override
     public void update(Input input) {
         super.update(input);
         processKeysPressed(input);
-        if (data != null) {
-            synchronized (data) {
-                if (data.getMatchTime() > 0) {
-                    updateAnimations(data.getActors());
-                } else {
-                    changeScene(new StatisticScene(getContext(), ClientNetwork.getInstance().getBattleStatistic(room.getId())));
+        try {
+            if (data != null) {
+                synchronized (data) {
+                    if (data.getMatchTime() > 0) {
+                        updateAnimations(data.getActors());
+                    } else {
+                        changeScene(new StatisticScene(getContext(), ClientNetwork.getInstance().getBattleStatistic(room.getId())));
+                    }
                 }
+            } else {
+                changeScene(new StatisticScene(getContext(), ClientNetwork.getInstance().getBattleStatistic(room.getId())));
             }
+        } catch (RemoteException ex) {
+            this.battleThread.stop();
+            changeScene(new MainScene(getContext(), true));
         }
+
     }
 
 }

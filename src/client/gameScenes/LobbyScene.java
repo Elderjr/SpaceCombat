@@ -9,7 +9,6 @@ package client.gameScenes;
  *
  * @author elderjr
  */
-
 import client.gui.ActionPerfomed;
 import client.gui.Animation;
 import client.gui.Button;
@@ -18,6 +17,7 @@ import client.windows.GameContext;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;
+import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import server.actors.ActorsTypes;
@@ -28,7 +28,7 @@ import server.serverConstants.ServerConstants;
 
 public final class LobbyScene extends GameScene {
 
-    private SimpleRoom room;
+    private final SimpleRoom room;
     private LobbyData data;
     private Thread roomThread;
     private Animation assaulterSpaceship[];
@@ -65,25 +65,41 @@ public final class LobbyScene extends GameScene {
         this.raptorSpaceship[1] = new Animation(476, 450,
                 ExternalFileLoader.getInstance().getSprite(
                         ActorsTypes.SPACESHIP_RAPTOR, ServerConstants.RED_TEAM));
-        
+
         Button btSelectAssaulter = new Button(100, 530, "Assaulter", 100, 40, new ActionPerfomed() {
             @Override
             public void doAction() {
-                ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_ASSAULTER);
+                try {
+                    ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_ASSAULTER);
+                } catch (RemoteException ex) {
+                    roomThread.stop();
+                    changeScene(new MainScene(getContext(), true));
+                }
+
             }
         });
-        
+
         Button btSelectSupporter = new Button(264, 530, "Supporter", 100, 40, new ActionPerfomed() {
             @Override
             public void doAction() {
-                ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_SUPPORTER);
+                try {
+                    ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_SUPPORTER);
+                } catch (RemoteException ex) {
+                    roomThread.stop();
+                    changeScene(new MainScene(getContext(), true));
+                }
             }
         });
-        
+
         Button btSelectRaptor = new Button(412, 530, "Raptor", 100, 40, new ActionPerfomed() {
             @Override
             public void doAction() {
-                ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_RAPTOR);
+                try {
+                    ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_RAPTOR);
+                } catch (RemoteException ex) {
+                    roomThread.stop();
+                    changeScene(new MainScene(getContext(), true));
+                }
             }
         });
         addComponents(this.assaulterSpaceship[0], this.assaulterSpaceship[1]);
@@ -96,35 +112,66 @@ public final class LobbyScene extends GameScene {
         Button btChangeConfirm = new Button(164, 400, "Change Confirm", 120, 50, new ActionPerfomed() {
             @Override
             public void doAction() {
-                ClientNetwork.getInstance().changeConfirm(room.getId());
+                try {
+                    ClientNetwork.getInstance().changeConfirm(room.getId());
+                } catch (RemoteException ex) {
+                    roomThread.stop();
+                    changeScene(new MainScene(getContext(), true));
+                }
             }
         });
         Button btChangeTeam = new Button(290, 400, "Change Team", 120, 50, new ActionPerfomed() {
             @Override
             public void doAction() {
-                ClientNetwork.getInstance().changeTeam(room.getId());
+                try {
+                    ClientNetwork.getInstance().changeTeam(room.getId());
+                } catch (RemoteException ex) {
+                    roomThread.stop();
+                    changeScene(new MainScene(getContext(), true));
+                }
+
             }
         });
-        addComponents(btChangeConfirm, btChangeTeam);
+        Button btBack = new Button(400, 400, "Back", 120, 50, new ActionPerfomed() {
+            @Override
+            public void doAction() {
+                try {
+                    ClientNetwork.getInstance().exitRoom(room.getId());
+                    changeScene(new RoomScene(getContext()));
+                } catch (RemoteException ex) {
+                    changeScene(new MainScene(getContext(), true));
+                } finally {
+                    roomThread.stop();
+                }
+            }
+        });
+        addComponents(btChangeConfirm, btChangeTeam, btBack);
     }
 
     public void initThread() {
         this.roomThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                data = ClientNetwork.getInstance().getLobbyData(room.getId());
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
+                try {
+                    data = ClientNetwork.getInstance().getLobbyData(room.getId());
+                    while (true) {
                         synchronized (data) {
                             data = ClientNetwork.getInstance().getLobbyData(room.getId());
                         }
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(RoomScene.class.getName()).log(Level.SEVERE, null, ex);
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            ex.printStackTrace();
+                        }
                     }
+                } catch (RemoteException ex) {
+                    changeScene(new MainScene(getContext(), true));
+                    ex.printStackTrace();
                 }
             }
-        });
+        }
+        );
+
         this.roomThread.start();
     }
 
