@@ -1,0 +1,65 @@
+package server.actors;
+
+import java.awt.Dimension;
+import java.awt.Point;
+
+import client.commands.ClientCommands;
+import server.room.battle.BattleListener;
+import server.serverConstants.ServerConstants;
+
+public class Shot extends Skill implements Moviment {
+
+    public static final Dimension SIZE = new Dimension(32, 32);
+    private static final int SPEED = 9;
+    private static final int DAMAGE = 100; //5
+    public static final int COOLDOWN = 2000; //400ms
+
+    public Shot(BattleListener room, Point location, Spaceship source, int currentDirection) {
+        super(room, location, SIZE, source, DAMAGE, currentDirection, ActorsTypes.SHOT);
+    }
+
+    @Override
+    public void update() {
+        move(getCurrentDirection());
+    }
+
+    @Override
+    public void move(int direction) {
+        int x = this.getLocation().x;
+        int y = this.getLocation().y;
+        if (direction == ClientCommands.UP) {
+            y -= SPEED;
+        } else if (direction == ClientCommands.UP_LEFT) {
+            y -= SPEED;
+            x -= SPEED;
+        } else if (direction == ClientCommands.UP_RIGHT) {
+            y -= SPEED;
+            x += SPEED;
+        } else if (direction == ClientCommands.DOWN) {
+            y += SPEED;
+        } else if (direction == ClientCommands.DOWN_LEFT) {
+            y += SPEED;
+            x -= SPEED;
+        } else if (direction == ClientCommands.DOWN_RIGHT) {
+            y += SPEED;
+            x += SPEED;
+        } else if (direction == ClientCommands.LEFT) {
+            x -= SPEED;
+        } else if (direction == ClientCommands.RIGHT) {
+            x += SPEED;
+        }
+        if (!(x > ServerConstants.MAP_WIDTH || x < 0 || y > ServerConstants.MAP_HEIGHT || y < 0)) {
+            updateLocation(x, y);
+        } else {
+            getBattleListener().removeSkill(this);
+        }
+    }
+
+    @Override
+    public void onColision(Spaceship spaceship) {
+        if (spaceship.getTeam() != this.getTeam()) {
+            spaceship.receiveDamage(this);
+            getBattleListener().removeSkill(this);
+        }
+    }
+}
