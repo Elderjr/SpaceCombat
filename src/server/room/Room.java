@@ -1,14 +1,14 @@
 package server.room;
 
+import server.data.User;
 import java.util.HashMap;
 import server.actors.Skill;
 import server.actors.Spaceship;
 import server.data.BattleData;
 import server.data.LobbyData;
-import server.room.battle.BattleRoomManager;
-import server.room.lobby.LobbyUser;
+import server.room.battle.BattleManager;
+import server.data.LobbyUser;
 import server.room.lobby.WaitingRoomManager;
-import server.user.User;
 
 public class Room {
 
@@ -18,7 +18,7 @@ public class Room {
     private final int maxPlayersPerTeam;
     private final String name;
     private WaitingRoomManager waitingManager;
-    private BattleRoomManager battleManager;
+    private BattleManager battleManager;
     private int state;
     private SimpleRoom simpleRoom;
 
@@ -41,7 +41,7 @@ public class Room {
         return this.waitingManager;
     }
     
-    public BattleRoomManager getBattleRoomManager(){
+    public BattleManager getBattleRoomManager(){
         return this.battleManager;
     }
     
@@ -55,7 +55,7 @@ public class Room {
     }
 
     public void startBattle(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam) {
-        this.battleManager = new BattleRoomManager(this, blueTeam, redTeam);
+        this.battleManager = new BattleManager(blueTeam, redTeam, this.matchTime);
     }
 
     public long getMatchTime() {

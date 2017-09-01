@@ -3,7 +3,6 @@ package server.data;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import server.actors.SimpleActor;
 
 public class BattleData implements Serializable {
 

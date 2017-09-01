@@ -23,9 +23,5 @@ public interface BattleListener {
     
     public void deathNotification(Spaceship dead, Spaceship killer);
 
-    public void removeUser(long userId);
-
-    public void addSkill(Skill skill);
-
-    public void removeSkill(Skill skill);
+    public void removeUser(long userId);      
 }

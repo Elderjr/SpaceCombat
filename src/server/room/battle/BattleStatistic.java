@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import server.serverConstants.ServerConstants;
-import server.user.User;
+import server.data.User;
 
 /**
  *
@@ -17,8 +17,8 @@ import server.user.User;
  */
 public class BattleStatistic implements Serializable{
     
-    private HashMap<Long, PersonalStatistic> blueTeam;
-    private HashMap<Long, PersonalStatistic> redTeam;
+    private final HashMap<Long, PersonalStatistic> blueTeam;
+    private final HashMap<Long, PersonalStatistic> redTeam;
     private int winner;
     
     public BattleStatistic(){

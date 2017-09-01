@@ -1,9 +1,5 @@
 package client.gameScenes;
 
-
-
-
-
 import client.windows.GameContext;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -14,50 +10,54 @@ import client.gui.*;
 import client.network.ClientNetwork;
 import java.rmi.RemoteException;
 import javax.swing.JOptionPane;
+import server.exceptions.NotLoggedException;
 
 public final class MainScene extends GameScene {
+
+    public static final String CONNECTION_ERROR = "Erro na Conexao";
+    public static final String NOTLOGGED_ERROR = "Login Expirado";
 
     private Image background;
     private Font titleFont;
     private Button btGameStart;
-    private boolean error;
-    
+    private String msgError;
+
     public MainScene(GameContext context) {
         super(context);
+        this.msgError = null;
         initComponents();
     }
-    
-    public MainScene(GameContext context, boolean error){
+
+    public MainScene(GameContext context, String msgError) {
         this(context);
-        this.error = error;
+        this.msgError = msgError;
     }
 
-    public void initComponents(){
-        this.background = new Image("client/images/main_screen.png" );
+    public void initComponents() {
+        this.background = new Image("client/images/main_screen.png");
         this.titleFont = Font.font("Times New Roman", FontWeight.BOLD, 48);
         this.btGameStart = new Button(100, 100, "Game Start", 100, 100, new ActionPerfomed() {
             @Override
-            public void doAction() {          
-                try{
+            public void doAction() {
+                try {
                     boolean connectionSuccess = ClientNetwork.getInstance().connect("127.0.0.1");
-                    if(connectionSuccess){
+                    if (connectionSuccess) {
                         String username = JOptionPane.showInputDialog("Username:");
-                        ClientNetwork.getInstance().login(username, "123");    
-                        changeScene(new RoomScene(getContext()));    
-                    }else{
-                        System.out.println("Connection error");
-                        error = true;
+                        ClientNetwork.getInstance().login(username, "123");
+                        changeScene(new RoomScene(getContext()));
+                    } else {
+                        msgError = CONNECTION_ERROR;
                     }
                 } catch (RemoteException ex) {
-                    error = true;
+                    msgError = CONNECTION_ERROR;
                 }
             }
         });
         addComponent(btGameStart);
     }
-    
+
     @Override
-    public void render(GraphicsContext gc){
+    public void render(GraphicsContext gc) {
         super.render(gc);
         gc.drawImage(this.background, 0, 0);
         gc.setFill(Color.RED);
@@ -66,11 +66,10 @@ public final class MainScene extends GameScene {
         gc.setFont(this.titleFont);
         gc.fillText("SPACE COMBAT", 210, 50);
         gc.strokeText("SPACE COMBAT", 210, 50);
-        if(error){
-            gc.fillText("Erro na conexao", 210, 200);
-            gc.strokeText("Erro na conexao", 210, 200);
+        if (msgError != null) {
+            gc.fillText(msgError, 210, 200);
+            gc.strokeText(msgError, 210, 200);
         }
         this.renderComponents(gc);
     }
 }
-

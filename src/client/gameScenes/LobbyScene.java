@@ -23,7 +23,8 @@ import java.util.logging.Logger;
 import server.actors.ActorsTypes;
 import server.data.LobbyData;
 import server.room.SimpleRoom;
-import server.room.lobby.LobbyUser;
+import server.data.LobbyUser;
+import server.exceptions.NotLoggedException;
 import server.serverConstants.ServerConstants;
 
 public final class LobbyScene extends GameScene {
@@ -73,7 +74,9 @@ public final class LobbyScene extends GameScene {
                     ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_ASSAULTER);
                 } catch (RemoteException ex) {
                     roomThread.stop();
-                    changeScene(new MainScene(getContext(), true));
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
 
             }
@@ -86,7 +89,9 @@ public final class LobbyScene extends GameScene {
                     ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_SUPPORTER);
                 } catch (RemoteException ex) {
                     roomThread.stop();
-                    changeScene(new MainScene(getContext(), true));
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
         });
@@ -98,7 +103,9 @@ public final class LobbyScene extends GameScene {
                     ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_RAPTOR);
                 } catch (RemoteException ex) {
                     roomThread.stop();
-                    changeScene(new MainScene(getContext(), true));
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
         });
@@ -116,7 +123,9 @@ public final class LobbyScene extends GameScene {
                     ClientNetwork.getInstance().changeConfirm(room.getId());
                 } catch (RemoteException ex) {
                     roomThread.stop();
-                    changeScene(new MainScene(getContext(), true));
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
         });
@@ -127,7 +136,9 @@ public final class LobbyScene extends GameScene {
                     ClientNetwork.getInstance().changeTeam(room.getId());
                 } catch (RemoteException ex) {
                     roomThread.stop();
-                    changeScene(new MainScene(getContext(), true));
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
 
             }
@@ -139,7 +150,9 @@ public final class LobbyScene extends GameScene {
                     ClientNetwork.getInstance().exitRoom(room.getId());
                     changeScene(new RoomScene(getContext()));
                 } catch (RemoteException ex) {
-                    changeScene(new MainScene(getContext(), true));
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 } finally {
                     roomThread.stop();
                 }
@@ -165,8 +178,10 @@ public final class LobbyScene extends GameScene {
                         }
                     }
                 } catch (RemoteException ex) {
-                    changeScene(new MainScene(getContext(), true));
-                    ex.printStackTrace();
+                    roomThread.stop();
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
         }

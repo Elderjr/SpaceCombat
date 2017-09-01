@@ -6,48 +6,39 @@ import java.awt.Point;
 import client.commands.ClientCommands;
 import server.room.battle.BattleListener;
 import server.serverConstants.ServerConstants;
-import server.user.User;
+import server.data.User;
 
 public abstract class Spaceship extends Actor implements Moviment {
 
-    private static Dimension SIZE = new Dimension(64, 64);
-
-    /* Controladores */
-    private int directionToMove;
-    private boolean useSkill;
-    private boolean useShot;
+    private static Dimension SIZE = new Dimension(64, 64);    
+    protected long shotFired; //armazena quando o usuário atirou
+    protected long skillFired; //armazena quando o usuário usou skill
 
     private final User pilot;
     private final int maxHP;
     private final int movimentSpeed;
-    private int team;
+    private final int team;
     private int hp;
-
-    protected long shotFired; //armazena quando o usuário atirou
-    protected long skillFired; //armazena quando o usuário usou skill
 
     public Spaceship(BattleListener room, Point location, int team, String actorType, int maxHP, int movimentSpeed, int initialDirection, User pilot) {
         super(room, location, SIZE, team, actorType, initialDirection);
         this.maxHP = maxHP;
         this.hp = maxHP;
         this.team = team;
-        this.directionToMove = -1;
-        this.useShot = false;
-        this.useSkill = false;
         this.shotFired = 0;
         this.skillFired = 0;
         this.movimentSpeed = movimentSpeed;
         this.pilot = pilot;
     }
 
-    public abstract void useSkill();
+    public abstract Skill useSkill();
 
     public abstract boolean canUseSkill();
 
-    public User getPilot(){
+    public User getPilot() {
         return this.pilot;
     }
-    
+
     public int getHP() {
         return this.hp;
     }
@@ -58,11 +49,11 @@ public abstract class Spaceship extends Actor implements Moviment {
 
     public void receiveDamage(Skill skill) {
         int damageTaken = 0;
-        if(this.hp <= skill.getDamage()){
+        if (this.hp <= skill.getDamage()) {
             damageTaken = this.hp;
             this.hp = 0;
             getBattleListener().deathNotification(this, skill.getSource());
-        }else{
+        } else {
             damageTaken = skill.getDamage();
             this.hp -= skill.getDamage();
         }
@@ -71,64 +62,49 @@ public abstract class Spaceship extends Actor implements Moviment {
 
     public void receiveHeal(Skill skill) {
         int healTaken = 0;
-        if(this.hp + skill.getDamage() > this.maxHP){
+        if (this.hp + skill.getDamage() > this.maxHP) {
             healTaken = this.maxHP - this.hp;
             this.hp = this.maxHP;
-        }else{
+        } else {
             healTaken = skill.getDamage();
             this.hp += skill.getDamage();
         }
         getBattleListener().healNotification(this, skill.getSource(), healTaken);
     }
 
-    public void setDirectionToMove(int direction) {
-        this.directionToMove = direction;
-    }
-
-    public void setUseSkillToTrue() {
-        if (canUseSkill()) {
-            this.useSkill = true;
-        }
-    }
-
-    public void setUseShotToTrue() {
-        if (canUseShot()) {
-            this.useShot = true;
-        }
-    }
-
     public boolean canUseShot() {
         return System.currentTimeMillis() - shotFired >= Shot.COOLDOWN;
     }
 
-    private void shoot() {
-        Point shotLocation = new Point(this.getLocation().x, this.getLocation().y);
-        if (getCurrentDirection() == ClientCommands.UP) {
-            shotLocation.y -= this.getSize().getHeight() / 2;
-        } else if (getCurrentDirection() == ClientCommands.DOWN) {
-            shotLocation.y += this.getSize().getHeight() / 2;
-        } else if (getCurrentDirection() == ClientCommands.LEFT) {
-            shotLocation.x -= this.getSize().getWidth() / 2;
-        } else if (getCurrentDirection() == ClientCommands.RIGHT) {
-            shotLocation.x += this.getSize().getWidth() / 2;
-        } else if (getCurrentDirection() == ClientCommands.UP_LEFT) {
-            shotLocation.y -= this.getSize().getHeight() / 2;
-            shotLocation.x -= this.getSize().getWidth() / 2;
-        } else if (getCurrentDirection() == ClientCommands.UP_RIGHT) {
-            shotLocation.y -= this.getSize().getHeight() / 2;
-            shotLocation.x += this.getSize().getWidth() / 2;
-        } else if (getCurrentDirection() == ClientCommands.DOWN_RIGHT) {
-            shotLocation.y += this.getSize().getHeight() / 2;
-            shotLocation.x += this.getSize().getWidth() / 2;
-        } else if (getCurrentDirection() == ClientCommands.DOWN_LEFT) {
-            shotLocation.y += this.getSize().getHeight() / 2;
-            shotLocation.x -= this.getSize().getWidth() / 2;
+    public Skill shoot() {
+        if (canUseShot()) {
+            Point shotLocation = new Point(this.getLocation().x, this.getLocation().y);
+            if (getCurrentDirection() == ClientCommands.UP) {
+                shotLocation.y -= this.getSize().getHeight() / 2;
+            } else if (getCurrentDirection() == ClientCommands.DOWN) {
+                shotLocation.y += this.getSize().getHeight() / 2;
+            } else if (getCurrentDirection() == ClientCommands.LEFT) {
+                shotLocation.x -= this.getSize().getWidth() / 2;
+            } else if (getCurrentDirection() == ClientCommands.RIGHT) {
+                shotLocation.x += this.getSize().getWidth() / 2;
+            } else if (getCurrentDirection() == ClientCommands.UP_LEFT) {
+                shotLocation.y -= this.getSize().getHeight() / 2;
+                shotLocation.x -= this.getSize().getWidth() / 2;
+            } else if (getCurrentDirection() == ClientCommands.UP_RIGHT) {
+                shotLocation.y -= this.getSize().getHeight() / 2;
+                shotLocation.x += this.getSize().getWidth() / 2;
+            } else if (getCurrentDirection() == ClientCommands.DOWN_RIGHT) {
+                shotLocation.y += this.getSize().getHeight() / 2;
+                shotLocation.x += this.getSize().getWidth() / 2;
+            } else if (getCurrentDirection() == ClientCommands.DOWN_LEFT) {
+                shotLocation.y += this.getSize().getHeight() / 2;
+                shotLocation.x -= this.getSize().getWidth() / 2;
+            }
+            this.shotFired = System.currentTimeMillis();
+            return new Shot(getBattleListener(), shotLocation, this, getCurrentDirection());
+        }else{
+            return null;
         }
-        Shot shot = new Shot(getBattleListener(), shotLocation, this, getCurrentDirection());
-        getBattleListener().addSkill(shot);
-        this.shotFired = System.currentTimeMillis();
-        this.useShot = false;
-
     }
 
     @Override
@@ -160,20 +136,10 @@ public abstract class Spaceship extends Actor implements Moviment {
             updateLocation(x, y);
         }
         setCurrentDirection(direction);
-        setDirectionToMove(-1);
     }
 
     @Override
-    public void update() {
-        if (directionToMove != -1) {
-            move(directionToMove);
-        }
-        if (useShot) {
-            shoot();
-        }
-        if (useSkill) {
-            useSkill();
-            this.useSkill = false;
-        }
+    public boolean update() {
+        return false;
     }
 }

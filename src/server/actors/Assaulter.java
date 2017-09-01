@@ -5,7 +5,7 @@ import java.awt.Point;
 import client.commands.ClientCommands;
 import server.room.Room;
 import server.room.battle.BattleListener;
-import server.user.User;
+import server.data.User;
 
 public class Assaulter extends Spaceship {
 
@@ -17,7 +17,7 @@ public class Assaulter extends Spaceship {
     }
 
     @Override
-    public void useSkill() {
+    public Skill useSkill() {
         if (canUseSkill()) {
             Point skillLocation = new Point(this.getLocation().x, this.getLocation().y);
             if (getCurrentDirection() == ClientCommands.UP) {
@@ -42,8 +42,10 @@ public class Assaulter extends Spaceship {
                 skillLocation.x -= this.getSize().getWidth() / 2;
             }
             AssaulterSkill skill = new AssaulterSkill(getBattleListener(), skillLocation, this, getCurrentDirection());
-            getBattleListener().addSkill(skill);
             this.skillFired = System.currentTimeMillis();
+            return skill;
+        }else{
+            return null;
         }
     }
 

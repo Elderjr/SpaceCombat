@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 
-import server.room.lobby.LobbyUser;
 
 public class LobbyData implements Serializable {
 

@@ -4,7 +4,7 @@ import java.awt.Point;
 
 import client.commands.ClientCommands;
 import server.room.battle.BattleListener;
-import server.user.User;
+import server.data.User;
 
 public class Supporter extends Spaceship {
 
@@ -16,34 +16,35 @@ public class Supporter extends Spaceship {
     }
 
     @Override
-    public void useSkill() {
-
-        Point skillLocation = new Point(this.getLocation().x, this.getLocation().y);
-        if (getCurrentDirection() == ClientCommands.UP) {
-            skillLocation.y += this.getSize().getHeight();
-        } else if (getCurrentDirection() == ClientCommands.DOWN) {
-            skillLocation.y -= this.getSize().getHeight();
-        } else if (getCurrentDirection() == ClientCommands.LEFT) {
-            skillLocation.x += this.getSize().getWidth();
-        } else if (getCurrentDirection() == ClientCommands.RIGHT) {
-            skillLocation.x -= this.getSize().getWidth();
-        } else if (getCurrentDirection() == ClientCommands.UP_LEFT) {
-            skillLocation.x += this.getSize().getWidth();
-            skillLocation.y += this.getSize().getHeight();
-        } else if (getCurrentDirection() == ClientCommands.UP_RIGHT) {
-            skillLocation.y += this.getSize().getHeight();
-            skillLocation.x -= this.getSize().getWidth();
-        } else if (getCurrentDirection() == ClientCommands.DOWN_RIGHT) {
-            skillLocation.y -= this.getSize().getHeight();
-            skillLocation.x -= this.getSize().getWidth();
-        } else if (getCurrentDirection() == ClientCommands.DOWN_LEFT) {
-            skillLocation.x += this.getSize().getWidth();
-            skillLocation.y -= this.getSize().getHeight();
+    public Skill useSkill() {
+        if (canUseSkill()) {
+            Point skillLocation = new Point(this.getLocation().x, this.getLocation().y);
+            if (getCurrentDirection() == ClientCommands.UP) {
+                skillLocation.y += this.getSize().getHeight();
+            } else if (getCurrentDirection() == ClientCommands.DOWN) {
+                skillLocation.y -= this.getSize().getHeight();
+            } else if (getCurrentDirection() == ClientCommands.LEFT) {
+                skillLocation.x += this.getSize().getWidth();
+            } else if (getCurrentDirection() == ClientCommands.RIGHT) {
+                skillLocation.x -= this.getSize().getWidth();
+            } else if (getCurrentDirection() == ClientCommands.UP_LEFT) {
+                skillLocation.x += this.getSize().getWidth();
+                skillLocation.y += this.getSize().getHeight();
+            } else if (getCurrentDirection() == ClientCommands.UP_RIGHT) {
+                skillLocation.y += this.getSize().getHeight();
+                skillLocation.x -= this.getSize().getWidth();
+            } else if (getCurrentDirection() == ClientCommands.DOWN_RIGHT) {
+                skillLocation.y -= this.getSize().getHeight();
+                skillLocation.x -= this.getSize().getWidth();
+            } else if (getCurrentDirection() == ClientCommands.DOWN_LEFT) {
+                skillLocation.x += this.getSize().getWidth();
+                skillLocation.y -= this.getSize().getHeight();
+            }
+            SupporterSkill skill = new SupporterSkill(getBattleListener(), skillLocation, this);
+            this.skillFired = System.currentTimeMillis();
+            return skill;
         }
-        SupporterSkill skill = new SupporterSkill(getBattleListener(), skillLocation, this);
-        getBattleListener().addSkill(skill);
-        this.skillFired = System.currentTimeMillis();
-
+        return null;
     }
 
     @Override

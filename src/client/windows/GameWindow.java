@@ -19,7 +19,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import server.ServerEngine;
-import static javafx.application.Application.launch;
 
 public class GameWindow extends Application implements GameContext {
 
@@ -27,8 +26,8 @@ public class GameWindow extends Application implements GameContext {
     private GameScene gameScene;
     private Input input;
 
-    public static void main(String[] args) {
-        launch(args);
+    public static void start() {
+        launch();
     }
 
     public void start(Stage stage) {

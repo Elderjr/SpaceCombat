@@ -1,12 +1,13 @@
 package server.room.lobby;
 
+import server.data.LobbyUser;
 import java.util.HashMap;
 import server.ServerEngine;
 
 import server.actors.ActorsTypes;
 import server.data.LobbyData;
 import server.room.Room;
-import server.user.User;
+import server.data.User;
 
 public class WaitingRoomManager {
 

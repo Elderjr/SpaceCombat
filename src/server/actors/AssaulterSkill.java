@@ -20,13 +20,10 @@ public class AssaulterSkill extends Skill implements Moviment {
     }
 
     @Override
-    public void update() {
-        if (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0 || getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0) {
-            getBattleListener().removeSkill(this);
-        } else {
-            move(getCurrentDirection());
-        }
-
+    public boolean update() {
+        move(getCurrentDirection());
+        return (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0 
+                || getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0);
     }
 
     @Override
@@ -54,15 +51,15 @@ public class AssaulterSkill extends Skill implements Moviment {
         } else if (direction == ClientCommands.RIGHT) {
             x += SPEED;
         }
-        this.getLocation().x = x;
-        this.getLocation().y = y;
+        updateLocation(x, y);
     }
 
     @Override
-    public void onColision(Spaceship spaceship) {
+    public boolean onColision(Spaceship spaceship) {
         if (spaceship.getTeam() != this.getTeam()) {
             spaceship.receiveDamage(this);
-            getBattleListener().removeSkill(this);
+            return true;
         }
+        return false;
     }
 }

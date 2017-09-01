@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import server.room.SimpleRoom;
-import server.user.User;
 
 public class RoomData implements Serializable {
 

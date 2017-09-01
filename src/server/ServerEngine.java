@@ -16,7 +16,10 @@ import server.data.RoomData;
 import server.room.Room;
 import server.room.SimpleRoom;
 import server.room.battle.BattleStatistic;
-import server.user.User;
+import server.data.User;
+import server.exceptions.NotLoggedException;
+import server.room.battle.PersonalStatistic;
+import server.serverConstants.ServerConstants;
 import server.user.UserDAO;
 
 public class ServerEngine implements IServer {
@@ -64,7 +67,7 @@ public class ServerEngine implements IServer {
     }
 
     @Override
-    public SimpleRoom createRoom(long playerId, int playersPerTeam, long totalMatchTime, String name) throws RemoteException {
+    public SimpleRoom createRoom(long playerId, int playersPerTeam, long totalMatchTime, String name) throws RemoteException, NotLoggedException {
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         long roomId = -1;
         if (loggedUser != null) {
@@ -78,13 +81,12 @@ public class ServerEngine implements IServer {
             loggedUser.updateLastCommand();
             return room.getSimpleRoom();
         } else {
-            System.out.println("User " + playerId + " not logged");
-            return null;
+            throw new NotLoggedException();
         }
     }
 
     @Override
-    public SimpleRoom enterRoom(long playerId, long roomId) throws RemoteException {
+    public SimpleRoom enterRoom(long playerId, long roomId) throws RemoteException, NotLoggedException {
         Room room = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (room != null && loggedUser != null) {
@@ -94,140 +96,181 @@ public class ServerEngine implements IServer {
             if (success) {
                 return room.getSimpleRoom();
             }
-        } else {
-            System.out.println("Fail to enter in room (Room or logged user not found)");
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
         return null;
     }
 
     @Override
-    public void exitRoom(long playerId, long roomId) throws RemoteException {
+    public void exitRoom(long playerId, long roomId) throws RemoteException, NotLoggedException {
         Room r = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (r != null && loggedUser != null) {
             System.out.println("User " + playerId + " exited room " + roomId);
             r.removeUser(loggedUser.getUser());
             loggedUser.updateLastCommand();
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
     }
 
     @Override
-    public void changeConfirm(long playerId, long roomId) throws RemoteException {
+    public void changeConfirm(long playerId, long roomId) throws RemoteException, NotLoggedException {
         Room room = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (room != null && loggedUser != null) {
             room.getWaitingRoomManager().changeConfirm(playerId);
             System.out.println("User " + playerId + " change confirm in room " + roomId);
             loggedUser.updateLastCommand();
-        } else {
-            System.out.println("Fail to change confirm in room (Room or logged user not found)");
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
     }
 
     @Override
-    public void changeSpaceship(long playerId, long roomId, String actorType) throws RemoteException {
+    public void changeSpaceship(long playerId, long roomId, String actorType) throws RemoteException, NotLoggedException {
         Room r = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (r != null && loggedUser != null) {
             r.getWaitingRoomManager().changeSpaceship(playerId, actorType);
             loggedUser.updateLastCommand();
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
     }
 
     @Override
-    public void changeTeam(long playerId, long roomId) throws RemoteException {
+    public void changeTeam(long playerId, long roomId) throws RemoteException, NotLoggedException {
         Room r = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (r != null && loggedUser != null) {
             r.getWaitingRoomManager().changeTeam(playerId);
             loggedUser.updateLastCommand();
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
     }
 
     @Override
-    public RoomData getRooms(long playerId) throws RemoteException {
+    public RoomData getRooms(long playerId) throws RemoteException, NotLoggedException {
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (loggedUser != null) {
             loggedUser.updateLastCommand();
             return this.roomsData;
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
         return null;
     }
 
     @Override
-    public void move(long playerId, long roomId, int direction) throws RemoteException {
+    public void move(long playerId, long roomId, int direction) throws RemoteException, NotLoggedException {
         Room r = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (r != null && loggedUser != null) {
             r.getBattleRoomManager().move(playerId, direction);
             loggedUser.updateLastCommand();
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
     }
 
     @Override
-    public void useShot(long playerId, long roomId) throws RemoteException {
+    public void useShot(long playerId, long roomId) throws RemoteException, NotLoggedException {
         Room r = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (r != null && loggedUser != null) {
-            r.getBattleRoomManager().useShot(playerId);
+            r.getBattleRoomManager().shoot(playerId);
             loggedUser.updateLastCommand();
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
     }
 
     @Override
-    public void useSkill(long playerId, long roomId) throws RemoteException {
+    public void useSkill(long playerId, long roomId) throws RemoteException, NotLoggedException {
         Room r = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (r != null && loggedUser != null) {
             r.getBattleRoomManager().useSkill(playerId);
             loggedUser.updateLastCommand();
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
     }
 
     @Override
-    public LobbyData getLobbyData(long playerId, long roomId) throws RemoteException {
+    public LobbyData getLobbyData(long playerId, long roomId) throws RemoteException, NotLoggedException {
         Room r = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (r != null && loggedUser != null) {
             loggedUser.updateLastCommand();
             return r.getWaitingRoomManager().getLobbyData();
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
         return null;
     }
 
     @Override
-    public BattleData getBattleData(long playerId, long roomId) throws RemoteException {
+    public BattleData getBattleData(long playerId, long roomId) throws RemoteException, NotLoggedException {
         Room r = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (r != null && loggedUser != null) {
             loggedUser.updateLastCommand();
             return r.getBattleRoomManager().getBattleData(playerId);
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
         return null;
     }
 
     @Override
-    public BattleStatistic getBattleStatistic(long playerId, long roomId) throws RemoteException {
-        Room r = this.rooms.get(roomId);
+    public BattleStatistic getBattleStatistic(long playerId, long roomId) throws RemoteException, NotLoggedException {
+        BattleStatistic statistics = this.roomsStatistics.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
-        if (r != null && loggedUser != null) {
+        if (statistics != null && loggedUser != null) {
             loggedUser.updateLastCommand();
-            return this.roomsStatistics.get(roomId);
+            return statistics;
+        } else if (loggedUser == null) {
+            throw new NotLoggedException();
         }
         return null;
     }
 
     private void endRoom(long roomId) {
         Room r = this.rooms.get(roomId);
-        this.roomsStatistics.put(r.getId(), r.getBattleRoomManager().getBattleStatistic());
-        this.roomsData.removeRoom(r.getSimpleRoom());
-        this.rooms.remove(roomId);
+        if (r != null) {
+            BattleStatistic statistics = r.getBattleRoomManager().getBattleStatistic();
+            this.roomsStatistics.put(r.getId(), statistics);
+            boolean blueWins = statistics.getWinner() == ServerConstants.BLUE_TEAM;
+            boolean redWins = statistics.getWinner() == ServerConstants.RED_TEAM;
+            boolean draw = statistics.getWinner() == ServerConstants.DRAW;
+            for (PersonalStatistic statistic : statistics.getBlueTeam()) {
+                UserDAO.updateStatistic(statistic, blueWins, draw);
+            }
+            for (PersonalStatistic statistic : statistics.getRedTeam()) {
+                UserDAO.updateStatistic(statistic, redWins, draw);
+            }
+            removeRoom(r.getId());
+        }
     }
 
     public void removeRoom(long roomId) {
         Room r = this.rooms.get(roomId);
         this.roomsData.removeRoom(r.getSimpleRoom());
         this.rooms.remove(roomId);
+    }
+
+    private void disconnectUser(User user) {
+        this.roomsData.removeUser(user);
+        for (Room r : this.rooms.values()) {
+            r.getWaitingRoomManager().removeUser(user.getId());
+            if (r.getBattleRoomManager() != null) {
+                r.getBattleRoomManager().removeUser(user.getId());
+            }
+        }
     }
 
     public void update() {
@@ -242,7 +285,7 @@ public class ServerEngine implements IServer {
             loggedUser = iterator.next();
             if (loggedUser.isDisconnected(10000)) {
                 System.out.println(loggedUser.getUser().getUsername() + " disconnected");;
-                this.roomsData.removeUser(loggedUser.getUser());
+                disconnectUser(loggedUser.getUser());
                 iterator.remove();
             }
         }
@@ -259,10 +302,9 @@ public class ServerEngine implements IServer {
         }
     }
 
-    public static void main(String args[]) {
+    public static void start(String host) {
         try {
             //String host = JOptionPane.showInputDialog("Ip server: ");
-            String host = "127.0.0.1";
             System.out.println("Criando servidor (RMI)");
             System.setProperty("java.rmi.server.hostname", host);
             ServerEngine obj = ServerEngine.getInstance();

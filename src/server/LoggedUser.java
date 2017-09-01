@@ -1,6 +1,6 @@
 package server;
 
-import server.user.User;
+import server.data.User;
 
 public class LoggedUser {
 

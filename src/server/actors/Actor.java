@@ -1,20 +1,19 @@
 package server.actors;
 
+import server.data.SimpleActor;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.geom.Dimension2D;
-
-import server.room.Room;
 import server.room.battle.BattleListener;
 
 public abstract class Actor {
 
-    private BattleListener room;
-    private Point location;
-    private Dimension size;
-    private SimpleActor simpleActor;
-    private long id;
-    private int team;
+    private final BattleListener room;
+    private final Point location;
+    private final Dimension size;
+    private final String actorType;
+    private final long id;
+    private final int team;
+    private final SimpleActor simpleActor;
     private int currentDirection;
 
     public Actor(BattleListener room, Point location, Dimension size, int team, String actorType, int currentDirection) {
@@ -22,12 +21,13 @@ public abstract class Actor {
         this.location = location;
         this.size = size;
         this.team = team;
+        this.actorType = actorType;
         this.id = room.createsActorId();
         this.currentDirection = currentDirection;
         this.simpleActor = new SimpleActor(location, size, id, actorType, currentDirection, team);
     }
 
-    public abstract void update();
+    public abstract boolean update();
 
     public long getId() {
         return this.id;
@@ -36,14 +36,9 @@ public abstract class Actor {
     public SimpleActor getSimpleActor() {
         return this.simpleActor;
     }
-    
+
     public Point getLocation() {
         return this.location;
-    }
-
-    public void updateLocation(int x, int y) {
-        this.location.x = x;
-        this.location.y = y;
     }
 
     protected int getCurrentDirection() {
@@ -54,16 +49,6 @@ public abstract class Actor {
         return this.size;
     }
 
-    protected void setCurrentDirection(int direction) {        
-        this.currentDirection = direction;
-        this.simpleActor.setDirection(direction);
-    }
-
-    public void setTeam(int team) {
-        this.team = team;
-        this.simpleActor.setTeam(team);
-    }
-
     public int getTeam() {
         return this.team;
     }
@@ -71,4 +56,14 @@ public abstract class Actor {
     protected BattleListener getBattleListener() {
         return this.room;
     }
+
+    public void updateLocation(int x, int y) {
+        this.location.setLocation(x, y);
+    }
+
+    protected void setCurrentDirection(int direction) {
+        this.currentDirection = direction;
+        this.simpleActor.setDirection(direction);
+    }
+
 }

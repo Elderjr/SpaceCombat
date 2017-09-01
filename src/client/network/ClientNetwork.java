@@ -5,10 +5,9 @@
  */
 package client.network;
 
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import server.IServer;
 import server.ServerEngine;
 import server.data.BattleData;
@@ -16,7 +15,8 @@ import server.data.LobbyData;
 import server.data.RoomData;
 import server.room.SimpleRoom;
 import server.room.battle.BattleStatistic;
-import server.user.User;
+import server.data.User;
+import server.exceptions.NotLoggedException;
 
 /**
  *
@@ -25,7 +25,6 @@ import server.user.User;
 public class ClientNetwork {
 
     private static final ClientNetwork instance = new ClientNetwork();
-
     private IServer server;
     private User user;
 
@@ -34,11 +33,19 @@ public class ClientNetwork {
     }
 
     private ClientNetwork() {
-        this.server = ServerEngine.getInstance();
-        this.user = null;
+        try {
+            this.server = ServerEngine.getInstance();
+            User user = this.login("sara", "123");
+            SimpleRoom room = this.createRoom(1, 10000, "meu amor");
+            this.server.changeConfirm(this.user.getId(), room.getId());
+        } catch (RemoteException | NotLoggedException ex) {
+            Logger.getLogger(ClientNetwork.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public boolean connect(String host) {
+        /*
         try {
             Registry registry = LocateRegistry.getRegistry(host);
             this.server = (IServer) registry.lookup("SpaceCombat");
@@ -46,62 +53,64 @@ public class ClientNetwork {
         } catch (RemoteException | NotBoundException ex) {
             return false;
         } 
+         */
+        return true;
     }
 
-    public boolean login(String username, String password) throws RemoteException {
+    public User login(String username, String password) throws RemoteException {
         this.user = server.login(username, password);
-        return this.user != null;
+        return this.user;
     }
 
-    public RoomData getRooms() throws RemoteException {
+    public RoomData getRooms() throws RemoteException, NotLoggedException {
         return this.server.getRooms(this.user.getId());
     }
 
-    public SimpleRoom createRoom(int maxPlayers, long matchTime, String name) throws RemoteException {
+    public SimpleRoom createRoom(int maxPlayers, long matchTime, String name) throws RemoteException, NotLoggedException {
         return this.server.createRoom(this.user.getId(), maxPlayers, matchTime, name);
     }
 
-    public SimpleRoom enterRoom(long roomId) throws RemoteException {
+    public SimpleRoom enterRoom(long roomId) throws RemoteException, NotLoggedException {
         return this.server.enterRoom(this.user.getId(), roomId);
     }
 
-    public void exitRoom(long roomId) throws RemoteException {
+    public void exitRoom(long roomId) throws RemoteException, NotLoggedException {
         this.server.exitRoom(this.user.getId(), roomId);
     }
 
-    public void changeConfirm(long roomId) throws RemoteException {
+    public void changeConfirm(long roomId) throws RemoteException, NotLoggedException {
         this.server.changeConfirm(this.user.getId(), roomId);
     }
 
-    public void changeTeam(long roomId) throws RemoteException {
+    public void changeTeam(long roomId) throws RemoteException, NotLoggedException {
         this.server.changeTeam(this.user.getId(), roomId);
     }
 
-    public void changeSpacechip(long roomId, String actorType) throws RemoteException {
+    public void changeSpacechip(long roomId, String actorType) throws RemoteException, NotLoggedException {
         this.server.changeSpaceship(this.user.getId(), roomId, actorType);
     }
 
-    public LobbyData getLobbyData(long roomId) throws RemoteException {
+    public LobbyData getLobbyData(long roomId) throws RemoteException, NotLoggedException {
         return this.server.getLobbyData(this.user.getId(), roomId);
     }
 
-    public BattleData getBattleData(long roomId) throws RemoteException {
+    public BattleData getBattleData(long roomId) throws RemoteException, NotLoggedException {
         return this.server.getBattleData(this.user.getId(), roomId);
     }
 
-    public BattleStatistic getBattleStatistic(long roomId) throws RemoteException {
+    public BattleStatistic getBattleStatistic(long roomId) throws RemoteException, NotLoggedException {
         return this.server.getBattleStatistic(this.user.getId(), roomId);
     }
 
-    public void useShot(long roomId) throws RemoteException {
+    public void useShot(long roomId) throws RemoteException, NotLoggedException {
         this.server.useShot(this.user.getId(), roomId);
     }
 
-    public void useSkill(long roomId) throws RemoteException {
+    public void useSkill(long roomId) throws RemoteException, NotLoggedException {
         this.server.useSkill(this.user.getId(), roomId);
     }
 
-    public void move(long roomId, int direction) throws RemoteException {
+    public void move(long roomId, int direction) throws RemoteException, NotLoggedException {
         this.server.move(this.user.getId(), roomId, direction);
     }
 }

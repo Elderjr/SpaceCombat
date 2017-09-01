@@ -3,7 +3,7 @@ package server.actors;
 import java.awt.Point;
 
 import server.room.battle.BattleListener;
-import server.user.User;
+import server.data.User;
 
 
 public class SpaceshipFactory {

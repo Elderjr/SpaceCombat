@@ -19,8 +19,10 @@ public class Shot extends Skill implements Moviment {
     }
 
     @Override
-    public void update() {
+    public boolean update() {
         move(getCurrentDirection());
+        return (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0 || 
+                getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0);
     }
 
     @Override
@@ -48,18 +50,15 @@ public class Shot extends Skill implements Moviment {
         } else if (direction == ClientCommands.RIGHT) {
             x += SPEED;
         }
-        if (!(x > ServerConstants.MAP_WIDTH || x < 0 || y > ServerConstants.MAP_HEIGHT || y < 0)) {
-            updateLocation(x, y);
-        } else {
-            getBattleListener().removeSkill(this);
-        }
+        updateLocation(x, y);
     }
 
     @Override
-    public void onColision(Spaceship spaceship) {
+    public boolean onColision(Spaceship spaceship) {
         if (spaceship.getTeam() != this.getTeam()) {
             spaceship.receiveDamage(this);
-            getBattleListener().removeSkill(this);
+            return true;
         }
+        return false;
     }
 }

@@ -15,7 +15,7 @@ public abstract class Skill extends Actor {
         this.source = source;
     }
 
-    public abstract void onColision(Spaceship spaceship);
+    public abstract boolean onColision(Spaceship spaceship);
 
     public Spaceship getSource(){
         return this.source;

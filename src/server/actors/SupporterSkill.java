@@ -19,15 +19,17 @@ public class SupporterSkill extends Skill {
     }
 
     @Override
-    public void update() {
-
+    public boolean update() {
+        return (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0 
+                || getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0);
     }
 
     @Override
-    public void onColision(Spaceship spaceship) {
+    public boolean onColision(Spaceship spaceship) {
         if (spaceship.getTeam() == this.getTeam()) {
-            spaceship.receiveHeal(this);
-            getBattleListener().removeSkill(this);
+            spaceship.receiveHeal(this);            
+            return true;
         }
+        return false;
     }
 }

@@ -1,4 +1,4 @@
-package server.actors;
+package server.data;
 
 import java.awt.Point;
 import java.awt.geom.Dimension2D;

@@ -10,6 +10,7 @@ package client.gameScenes;
  * @author elderjr
  */
 import client.commands.ClientCommands;
+import static client.gameScenes.MainScene.NOTLOGGED_ERROR;
 import client.gui.Animation;
 import client.input.Input;
 import client.windows.GameContext;
@@ -25,8 +26,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
-import server.actors.SimpleActor;
+import server.data.SimpleActor;
 import server.data.BattleData;
+import server.exceptions.NotLoggedException;
 import server.room.SimpleRoom;
 
 public final class BattleScene extends GameScene {
@@ -60,7 +62,10 @@ public final class BattleScene extends GameScene {
                         }
                     }
                 } catch (RemoteException ex) {
-                    changeScene(new MainScene(getContext(), true));
+                    battleThread.stop();
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
 
             }
@@ -153,7 +158,9 @@ public final class BattleScene extends GameScene {
             }
         } catch (RemoteException ex) {
             this.battleThread.stop();
-            changeScene(new MainScene(getContext(), true));
+            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+        } catch (NotLoggedException ex) {
+            changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
         }
 
     }
@@ -175,8 +182,10 @@ public final class BattleScene extends GameScene {
                 changeScene(new StatisticScene(getContext(), ClientNetwork.getInstance().getBattleStatistic(room.getId())));
             }
         } catch (RemoteException ex) {
-            this.battleThread.stop();
-            changeScene(new MainScene(getContext(), true));
+            battleThread.stop();
+            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+        } catch (NotLoggedException ex) {
+            changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
         }
 
     }

@@ -4,7 +4,7 @@ import java.awt.Point;
 
 import client.commands.ClientCommands;
 import server.room.battle.BattleListener;
-import server.user.User;
+import server.data.User;
 
 public class Raptor extends Spaceship {
 
@@ -16,34 +16,35 @@ public class Raptor extends Spaceship {
     }
 
     @Override
-    public void useSkill() {
-
-        Point skillLocation = new Point(this.getLocation().x, this.getLocation().y);
-        if (this.getCurrentDirection() == ClientCommands.UP) {
-            skillLocation.y += this.getSize().getHeight();
-        } else if (this.getCurrentDirection() == ClientCommands.DOWN) {
-            skillLocation.y -= this.getSize().getHeight();
-        } else if (this.getCurrentDirection() == ClientCommands.LEFT) {
-            skillLocation.x += this.getSize().getWidth();
-        } else if (this.getCurrentDirection() == ClientCommands.RIGHT) {
-            skillLocation.x -= this.getSize().getWidth();
-        } else if (this.getCurrentDirection() == ClientCommands.UP_LEFT) {
-            skillLocation.x += this.getSize().getWidth();
-            skillLocation.y += this.getSize().getHeight();
-        } else if (this.getCurrentDirection() == ClientCommands.UP_RIGHT) {
-            skillLocation.y += this.getSize().getHeight();
-            skillLocation.x -= this.getSize().getWidth();
-        } else if (this.getCurrentDirection() == ClientCommands.DOWN_RIGHT) {
-            skillLocation.y -= this.getSize().getHeight();
-            skillLocation.x -= this.getSize().getWidth();
-        } else if (this.getCurrentDirection() == ClientCommands.DOWN_LEFT) {
-            skillLocation.x += this.getSize().getWidth();
-            skillLocation.y -= this.getSize().getHeight();
+    public Skill useSkill() {
+        if (canUseSkill()) {
+            Point skillLocation = new Point(this.getLocation().x, this.getLocation().y);
+            if (this.getCurrentDirection() == ClientCommands.UP) {
+                skillLocation.y += this.getSize().getHeight();
+            } else if (this.getCurrentDirection() == ClientCommands.DOWN) {
+                skillLocation.y -= this.getSize().getHeight();
+            } else if (this.getCurrentDirection() == ClientCommands.LEFT) {
+                skillLocation.x += this.getSize().getWidth();
+            } else if (this.getCurrentDirection() == ClientCommands.RIGHT) {
+                skillLocation.x -= this.getSize().getWidth();
+            } else if (this.getCurrentDirection() == ClientCommands.UP_LEFT) {
+                skillLocation.x += this.getSize().getWidth();
+                skillLocation.y += this.getSize().getHeight();
+            } else if (this.getCurrentDirection() == ClientCommands.UP_RIGHT) {
+                skillLocation.y += this.getSize().getHeight();
+                skillLocation.x -= this.getSize().getWidth();
+            } else if (this.getCurrentDirection() == ClientCommands.DOWN_RIGHT) {
+                skillLocation.y -= this.getSize().getHeight();
+                skillLocation.x -= this.getSize().getWidth();
+            } else if (this.getCurrentDirection() == ClientCommands.DOWN_LEFT) {
+                skillLocation.x += this.getSize().getWidth();
+                skillLocation.y -= this.getSize().getHeight();
+            }
+            RaptorSkill skill = new RaptorSkill(getBattleListener(), skillLocation, this);
+            this.skillFired = System.currentTimeMillis();
+            return skill;
         }
-        RaptorSkill skill = new RaptorSkill(getBattleListener(), skillLocation, this);
-        getBattleListener().addSkill(skill);
-        this.skillFired = System.currentTimeMillis();
-
+        return null;
     }
 
     @Override

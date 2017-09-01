@@ -21,7 +21,8 @@ import javafx.scene.paint.Color;
 import javax.swing.JOptionPane;
 import server.data.RoomData;
 import server.room.SimpleRoom;
-import server.user.User;
+import server.data.User;
+import server.exceptions.NotLoggedException;
 
 public final class RoomScene extends GameScene {
 
@@ -69,7 +70,9 @@ public final class RoomScene extends GameScene {
                         JOptionPane.showMessageDialog(null, "Error in create room");
                     }
                 } catch (RemoteException ex) {
-                    changeScene(new MainScene(getContext(), true));
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
         });
@@ -95,7 +98,9 @@ public final class RoomScene extends GameScene {
                                 ClientNetwork.getInstance().enterRoom(room.getId());
                                 changeScene(new LobbyScene(getContext(), room));
                             } catch (RemoteException ex) {
-                                changeScene(new MainScene(getContext(), true));
+                                changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                            } catch (NotLoggedException ex) {
+                                changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                             }
                         }
                     });
@@ -155,7 +160,9 @@ public final class RoomScene extends GameScene {
                 updatePageButtons(this.currentPage);
                 this.lastUpdate = System.currentTimeMillis();
             } catch (RemoteException ex) {
-                changeScene(new MainScene(getContext(), true));
+                changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+            } catch (NotLoggedException ex) {
+                changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
             }
         }
     }

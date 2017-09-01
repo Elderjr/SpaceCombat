@@ -43,10 +43,10 @@ public final class StatisticScene extends GameScene {
     public void render(GraphicsContext gc) {
         super.render(gc);
         renderComponents(gc);
-        if(statistic.getWinner() == ServerConstants.BLUE_WINNER){
+        if(statistic.getWinner() == ServerConstants.BLUE_TEAM){
             gc.setFill(Color.BLUE);
             gc.fillText("BLUE WINNER", 10, 10);
-        }else if(statistic.getWinner() == ServerConstants.RED_WINNER){
+        }else if(statistic.getWinner() == ServerConstants.RED_TEAM){
             gc.setFill(Color.RED);
             gc.fillText("RED WINNER", 10, 10);
         }else if(statistic.getWinner() == ServerConstants.DRAW){
@@ -64,7 +64,7 @@ public final class StatisticScene extends GameScene {
         int y = 50;
         gc.setFill(Color.BLUE);
         for (PersonalStatistic statistic : statistic.getBlueTeam()) {
-            gc.fillText("" + statistic.getSimpleUser().getUsername() + " (" + statistic.getSpaceshipName() + ")", 30, 30 + y);
+            gc.fillText("" + statistic.getUser().getUsername() + " (" + statistic.getSpaceshipName() + ")", 30, 30 + y);
             gc.fillText("" + statistic.getKills(), 230, 30 + y);
             gc.fillText("" + statistic.getDeaths(), 330, 30 + y);
             gc.fillText("" + statistic.getDamage(), 430, 30 + y);
@@ -75,7 +75,7 @@ public final class StatisticScene extends GameScene {
         }
         gc.setFill(Color.RED);
         for (PersonalStatistic statistic : statistic.getRedTeam()) {
-            gc.fillText("" + statistic.getSimpleUser().getUsername() + " (" + statistic.getSpaceshipName() + ")", 30, 30 + y);
+            gc.fillText("" + statistic.getUser().getUsername() + " (" + statistic.getSpaceshipName() + ")", 30, 30 + y);
             gc.fillText("" + statistic.getKills(), 230, 30 + y);
             gc.fillText("" + statistic.getDeaths(), 330, 30 + y);
             gc.fillText("" + statistic.getDamage(), 430, 30 + y);

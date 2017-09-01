@@ -1,7 +1,6 @@
-package server.room.lobby;
+package server.data;
 
 import java.io.Serializable;
-import server.user.User;
 
 public class LobbyUser implements Serializable{
 

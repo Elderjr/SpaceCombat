@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 
 import server.room.battle.BattleListener;
+import server.serverConstants.ServerConstants;
 
 public class RaptorSkill extends Skill {
 
@@ -16,16 +17,18 @@ public class RaptorSkill extends Skill {
     }
 
     @Override
-    public void update() {
-
+    public boolean update() {
+        return (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0 
+                || getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0);
     }
 
     @Override
-    public void onColision(Spaceship spaceship) {
+    public boolean onColision(Spaceship spaceship) {
         if (spaceship.getTeam() != this.getTeam()) {
-            spaceship.receiveDamage(this);
-            getBattleListener().removeSkill(this);
+            spaceship.receiveDamage(this);            
+            return true;
         }
+        return false;
     }
 
 }
