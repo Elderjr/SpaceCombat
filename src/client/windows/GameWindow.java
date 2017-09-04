@@ -1,8 +1,8 @@
 package client.windows;
 
-
+import client.gameScenes.GameContext;
 import client.gameScenes.GameScene;
-import client.gameScenes.MainScene;
+import client.gameScenes.LoadingScene;
 import client.input.Input;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -18,6 +18,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import server.ServerEngine;
 
 public class GameWindow extends Application implements GameContext {
@@ -27,6 +29,17 @@ public class GameWindow extends Application implements GameContext {
     private Input input;
 
     public static void start() {
+
+        try {
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception ex) {
+            // If Nimbus is not available, you can set the GUI to another look and feel.
+        }
         launch();
     }
 
@@ -79,7 +92,7 @@ public class GameWindow extends Application implements GameContext {
     private void initGame(Group root) {
         canvas = new Canvas(800, 600);
         root.getChildren().add(canvas);
-        this.gameScene = new MainScene(this);
+        this.gameScene = new LoadingScene(this);
         initGameLoop(canvas.getGraphicsContext2D());
     }
 

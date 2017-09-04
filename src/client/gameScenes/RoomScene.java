@@ -13,12 +13,11 @@ import client.gui.ActionPerfomed;
 import client.gui.Button;
 import client.gui.RoomButton;
 import client.input.Input;
-import client.windows.GameContext;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
+import client.windows.RoomForm;
 import java.rmi.RemoteException;
 import javafx.scene.paint.Color;
-import javax.swing.JOptionPane;
 import server.data.RoomData;
 import server.room.SimpleRoom;
 import server.data.User;
@@ -59,20 +58,20 @@ public final class RoomScene extends GameScene {
         Button btCreateRoom = new Button(500, 200, "Create Room", 60, 30, new ActionPerfomed() {
             @Override
             public void doAction() {
-                String roomName = JOptionPane.showInputDialog("Room Name");
-                int playerPerTeam = Integer.parseInt(JOptionPane.showInputDialog("Players Per Team"));
-                long time = Long.parseLong(JOptionPane.showInputDialog("Match Time (m): ")) * 60000;
-                try {
-                    SimpleRoom room = ClientNetwork.getInstance().createRoom(playerPerTeam, time, roomName);
-                    if (room != null) {
+                RoomForm roomForm = new RoomForm(null, true);
+                roomForm.setVisible(true);
+                if(roomForm.getRoomName() != null){
+                    try {
+                        SimpleRoom room = ClientNetwork.getInstance().createRoom(
+                                roomForm.getMaxPlayersPerTeam(),
+                                roomForm.getMatchTime(),
+                                roomForm.getRoomName());
                         changeScene(new LobbyScene(getContext(), room));
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Error in create room");
+                    } catch (RemoteException ex) {
+                        changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                    } catch (NotLoggedException ex) {
+                        changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                     }
-                } catch (RemoteException ex) {
-                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-                } catch (NotLoggedException ex) {
-                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
         });

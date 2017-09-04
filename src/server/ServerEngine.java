@@ -5,11 +5,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import server.data.BattleData;
 import server.data.LobbyData;
 import server.data.RoomData;
@@ -20,16 +18,17 @@ import server.data.User;
 import server.exceptions.NotLoggedException;
 import server.room.battle.PersonalStatistic;
 import server.serverConstants.ServerConstants;
-import server.user.UserDAO;
+import server.dao.UserDAO;
+import server.data.GeneralStatistics;
 
 public class ServerEngine implements IServer {
 
-    private static ServerEngine instance = new ServerEngine();
+    private static final ServerEngine instance = new ServerEngine();
 
-    private HashMap<Long, LoggedUser> loggedUsers;
-    private HashMap<Long, Room> rooms;
-    private HashMap<Long, BattleStatistic> roomsStatistics;
-    private RoomData roomsData;
+    private final HashMap<Long, LoggedUser> loggedUsers;
+    private final HashMap<Long, Room> rooms;
+    private final HashMap<Long, BattleStatistic> roomsStatistics;
+    private final RoomData roomsData;
 
     private ServerEngine() {
         this.roomsData = new RoomData();
@@ -47,23 +46,52 @@ public class ServerEngine implements IServer {
 
     }
 
+    public boolean addLoggedUser(User user) {
+        try {
+            GeneralStatistics userStatistic = UserDAO.getUserStatistics(user.getId());
+            this.loggedUsers.put(user.getId(), new LoggedUser(user, userStatistic));
+            this.roomsData.addUser(user);
+            return true;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
     @Override
-    public boolean register(String username, String password) throws RemoteException {
-        return false;
+    public User register(String username, String password) throws RemoteException {
+        System.out.println("Register requested: " + username + " " + password);
+        try {
+            User user = UserDAO.registerUser(username, password);
+            boolean success = addLoggedUser(user);
+            if (success) {
+                return user;
+            }
+        } catch (SQLException ex) {
+            System.out.println("Register Fail");
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     @Override
     public User login(String username, String password) throws RemoteException {
         System.out.println("Login requested: " + username + " " + password);
-        User user = UserDAO.login(username, password);
-        if (user != null && !loggedUsers.containsKey(user.getId())) {
-            System.out.println("Login success");
-            this.loggedUsers.put(user.getId(), new LoggedUser(user));
-            this.roomsData.addUser(user);
-        } else {
-            System.out.println("Login fail");
+        try {
+            User user = UserDAO.login(username, password);
+            if (user != null && !loggedUsers.containsKey(user.getId())) {
+                System.out.println("Login success");
+                boolean success = addLoggedUser(user);
+                if (success) {
+                    return user;
+                }
+            }
+            return user;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        return user;
+        System.out.println("retornei nulo");
+        return null;
     }
 
     @Override
@@ -247,11 +275,24 @@ public class ServerEngine implements IServer {
             boolean blueWins = statistics.getWinner() == ServerConstants.BLUE_TEAM;
             boolean redWins = statistics.getWinner() == ServerConstants.RED_TEAM;
             boolean draw = statistics.getWinner() == ServerConstants.DRAW;
-            for (PersonalStatistic statistic : statistics.getBlueTeam()) {
-                UserDAO.updateStatistic(statistic, blueWins, draw);
-            }
-            for (PersonalStatistic statistic : statistics.getRedTeam()) {
-                UserDAO.updateStatistic(statistic, redWins, draw);
+            try {
+                for (PersonalStatistic statistic : statistics.getBlueTeam()) {
+                    LoggedUser loggedUser = this.loggedUsers.get(statistic.getUser().getId());
+                    if(loggedUser != null){
+                        loggedUser.incrementStatisticsValues(statistic, blueWins, draw);
+                    }
+                    UserDAO.updateStatistic(statistic, blueWins, draw);
+                }
+                for (PersonalStatistic statistic : statistics.getRedTeam()) {
+                    LoggedUser loggedUser = this.loggedUsers.get(statistic.getUser().getId());
+                    if(loggedUser != null){
+                        loggedUser.incrementStatisticsValues(statistic, blueWins, draw);
+                    }
+                    loggedUser.incrementStatisticsValues(statistic, redWins, draw);
+                    UserDAO.updateStatistic(statistic, redWins, draw);
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
             removeRoom(r.getId());
         }
@@ -313,15 +354,20 @@ public class ServerEngine implements IServer {
             //Register the remote object with a Java RMI registry
             Registry registry = LocateRegistry.getRegistry();
             registry.bind("SpaceCombat", stub);
-            System.out.println("Server Ready");
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    obj.mainLoop();
-                }
-            }).start();
+            System.out.println("Checking database");
+            try {
+                UserDAO.createUserTable();
+                System.out.println("Server Ready");
+                obj.mainLoop();
+            } catch (SQLException ex) {
+                System.out.println("An error occured in user table");
+                ex.printStackTrace();
+                System.exit(0);
+            }
         } catch (RemoteException | AlreadyBoundException ex) {
-            Logger.getLogger(ServerEngine.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("An error occured when creating a remote server");
+            ex.printStackTrace();
+            System.exit(0);
         }
     }
 }

@@ -3,7 +3,6 @@ package client.gameScenes;
 import client.gui.Component;
 import client.gui.ComponentManager;
 import client.input.Input;
-import client.windows.GameContext;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import server.serverConstants.ServerConstants;

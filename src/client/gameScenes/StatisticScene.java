@@ -12,7 +12,6 @@ package client.gameScenes;
 import client.gui.ActionPerfomed;
 import client.gui.Button;
 import client.input.Input;
-import client.windows.GameContext;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import server.room.battle.BattleStatistic;

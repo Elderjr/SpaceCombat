@@ -13,7 +13,6 @@ import client.commands.ClientCommands;
 import static client.gameScenes.MainScene.NOTLOGGED_ERROR;
 import client.gui.Animation;
 import client.input.Input;
-import client.windows.GameContext;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;

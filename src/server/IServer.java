@@ -14,7 +14,7 @@ public interface IServer extends Remote{
 
     public void ping() throws RemoteException;
     
-    public boolean register(String username, String password) throws RemoteException;
+    public User register(String username, String password) throws RemoteException;
 
     public User login(String username, String password) throws RemoteException;
 

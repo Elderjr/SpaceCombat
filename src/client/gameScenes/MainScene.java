@@ -1,6 +1,5 @@
 package client.gameScenes;
 
-import client.windows.GameContext;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -8,9 +7,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import client.gui.*;
 import client.network.ClientNetwork;
+import client.windows.LoginForm;
 import java.rmi.RemoteException;
 import javax.swing.JOptionPane;
-import server.exceptions.NotLoggedException;
 
 public final class MainScene extends GameScene {
 
@@ -39,17 +38,10 @@ public final class MainScene extends GameScene {
         this.btGameStart = new Button(100, 100, "Game Start", 100, 100, new ActionPerfomed() {
             @Override
             public void doAction() {
-                try {
-                    boolean connectionSuccess = ClientNetwork.getInstance().connect("127.0.0.1");
-                    if (connectionSuccess) {
-                        String username = JOptionPane.showInputDialog("Username:");
-                        ClientNetwork.getInstance().login(username, "123");
-                        changeScene(new RoomScene(getContext()));
-                    } else {
-                        msgError = CONNECTION_ERROR;
-                    }
-                } catch (RemoteException ex) {
-                    msgError = CONNECTION_ERROR;
+                LoginForm loginForm = new LoginForm(null, true);
+                loginForm.setVisible(true);
+                if(loginForm.getUser() != null){
+                    changeScene(new RoomScene(getContext()));
                 }
             }
         });

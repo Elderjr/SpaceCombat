@@ -6,20 +6,31 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import javafx.scene.image.Image;
-import server.actors.ActorsTypes;
 import server.serverConstants.ServerConstants;
 
 public class ExternalFileLoader {
 
     private static ExternalFileLoader instance = new ExternalFileLoader();
     private HashMap<String, Spritesheet> spritesheets;
+    private HashMap<String, Image> images;
 
     private ExternalFileLoader() {
         this.spritesheets = new HashMap<>();
+        this.images = new HashMap<>();
     }
 
     public static ExternalFileLoader getInstance() {
         return instance;
+    }
+
+    public Image getImage(String imageName) {
+        if (this.images.containsKey(imageName)) {
+            return this.images.get(imageName);
+        } else {
+            Image image = loadImage(imageName);
+            this.images.put(imageName, image);
+            return image;
+        }
     }
 
     public Sprite getSprite(String actorType, int team) {
@@ -44,6 +55,10 @@ public class ExternalFileLoader {
             }
             return spritesheet;
         }
+    }
+
+    private Image loadImage(String imageName) {
+        return new Image(imageName);
     }
 
     private Spritesheet loadSpritesheet(String spritesheetName) {

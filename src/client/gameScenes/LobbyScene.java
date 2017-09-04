@@ -13,7 +13,6 @@ import client.gui.ActionPerfomed;
 import client.gui.Animation;
 import client.gui.Button;
 import client.input.Input;
-import client.windows.GameContext;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;

@@ -57,6 +57,11 @@ public class ClientNetwork {
         return true;
     }
 
+    public User register(String username, String password) throws RemoteException {
+        this.user = server.register(username, password);
+        return this.user;
+    }
+
     public User login(String username, String password) throws RemoteException {
         this.user = server.login(username, password);
         return this.user;
