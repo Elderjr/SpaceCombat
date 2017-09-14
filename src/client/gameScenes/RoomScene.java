@@ -11,13 +11,22 @@ package client.gameScenes;
  */
 import client.gui.ActionPerfomed;
 import client.gui.Button;
+import client.gui.ImageButton;
 import client.gui.RoomButton;
 import client.input.Input;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
+import client.sprite.ExternalFileLoader;
 import client.windows.RoomForm;
 import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import server.data.GeneralStatistics;
 import server.data.RoomData;
 import server.room.SimpleRoom;
 import server.data.User;
@@ -25,7 +34,15 @@ import server.exceptions.NotLoggedException;
 
 public final class RoomScene extends GameScene {
 
-    private static final int ROOMS_PER_PAGE = 2;
+    private static final Font DEFAULT_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
+            FontPosture.REGULAR, 20);
+    private static final Font NUMBER_PAGE_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
+            FontPosture.REGULAR, 40);
+ 
+    private static final int ROOMS_PER_PAGE = 4;
+    private final User user;
+    private final Image background;
+    private GeneralStatistics generalStatistics;
     private RoomData roomData;
     private RoomButton pageButtons[];
     private long lastUpdate;
@@ -34,13 +51,24 @@ public final class RoomScene extends GameScene {
     public RoomScene(GameContext context) {
         super(context);
         initComponents();
+        this.user = ClientNetwork.getInstance().getUser();
+        this.background = ExternalFileLoader.getInstance().getImage("client/images/background.jpg");
         this.pageButtons = new RoomButton[ROOMS_PER_PAGE];
         this.currentPage = 1;
         this.lastUpdate = 0;
+        try {
+            this.generalStatistics = ClientNetwork.getInstance().getGeneralStatistics();
+        } catch (RemoteException ex) {
+            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+        } catch (NotLoggedException ex) {
+            changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
+        }
     }
 
     public void initComponents() {
-        Button btPreviousPage = new Button(340, 200, "<", 30, 30, new ActionPerfomed() {
+        Image defaultImage = ExternalFileLoader.getInstance().getImage("client/images/left_button.png");
+        Image onClickImage = ExternalFileLoader.getInstance().getImage("client/images/left_button_on_click.png");
+        Button btPreviousPage = new ImageButton(250, 330, defaultImage, onClickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 if (currentPage > 1) {
@@ -48,19 +76,21 @@ public final class RoomScene extends GameScene {
                 }
             }
         });
-        Button btNextPage = new Button(400, 200, ">", 30, 30, new ActionPerfomed() {
+        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/right_button.png");
+        onClickImage = ExternalFileLoader.getInstance().getImage("client/images/right_button_on_click.png");
+        Button btNextPage = new ImageButton(350 + btPreviousPage.getWidth(), 330, defaultImage, onClickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 updatePageButtons(currentPage + 1);
 
             }
         });
-        Button btCreateRoom = new Button(500, 200, "Create Room", 60, 30, new ActionPerfomed() {
+        Button btCreateRoom = new Button(500, 500, "Create Room", 60, 30, new ActionPerfomed() {
             @Override
             public void doAction() {
                 RoomForm roomForm = new RoomForm(null, true);
                 roomForm.setVisible(true);
-                if(roomForm.getRoomName() != null){
+                if (roomForm.getRoomName() != null) {
                     try {
                         SimpleRoom room = ClientNetwork.getInstance().createRoom(
                                 roomForm.getMaxPlayersPerTeam(),
@@ -75,7 +105,14 @@ public final class RoomScene extends GameScene {
                 }
             }
         });
-        addComponents(btNextPage, btPreviousPage, btCreateRoom);
+
+        Button btExit = new Button(550, 500, "Exit", 60, 30, new ActionPerfomed() {
+            @Override
+            public void doAction() {
+                changeScene(new MainScene(getContext()));
+            }
+        });
+        addComponents(btNextPage, btPreviousPage, btCreateRoom, btExit);
     }
 
     public void updatePageButtons(int page) {
@@ -84,8 +121,8 @@ public final class RoomScene extends GameScene {
             int end = init + ROOMS_PER_PAGE;
             int index = 0;
             int cont = 0;
-            int x = 50;
-            int y = 50;
+            int x = 30;
+            int y = 100;
             for (int i = init; i < end; i++) {
                 this.pageButtons[index] = null;
                 if (i < roomData.getRooms().size()) {
@@ -105,10 +142,10 @@ public final class RoomScene extends GameScene {
                     });
                     cont++;
                     if (cont % 2 == 0) {
-                        x = 50;
-                        y += 120;
+                        x = 30;
+                        y += this.pageButtons[index].getHeight() + 15;
                     } else {
-                        x += 120;
+                        x += this.pageButtons[index].getWidth();
                     }
                 }
                 index++;
@@ -119,22 +156,35 @@ public final class RoomScene extends GameScene {
 
     @Override
     public void render(GraphicsContext gc) {
-        super.render(gc);
+        gc.drawImage(this.background, 0, 0);
         renderComponents(gc);
-        gc.setFill(Color.GREEN);
-        gc.fillText("" + currentPage, 380, 200);
+        gc.setFill(Color.WHITESMOKE);
+        gc.setFont(DEFAULT_FONT);
+        gc.fillText("User: [" + this.user.getUsername() + "]", 335, 60);
+        gc.fillText(this.generalStatistics.toString(), 235, 85);
+        gc.fillText("Online Players: ", 30, 400);
+        if (this.roomData != null) {
+            int x = 50;
+            int y = 430;
+            int index = 0;
+            for (User user : this.roomData.getOnlineUsers()) {
+                gc.fillText(user.getUsername(), x, y);
+                index++;
+                if (index % 7 == 0) {
+                    x = 50;
+                    y += 30;
+                } else {
+                    x += 100;
+                }
+            }
+        }
         for (RoomButton bt : this.pageButtons) {
             if (bt != null) {
                 bt.render(gc);
             }
         }
-        if (this.roomData != null) {
-            int y = 30;
-            for (User user : this.roomData.getOnlineUsers()) {
-                gc.fillText(user.getUsername(), 400, y);
-                y += 40;
-            }
-        }
+        gc.setFont(NUMBER_PAGE_FONT);
+        gc.fillText("" + currentPage, 390, 380);
     }
 
     @Override
@@ -153,7 +203,7 @@ public final class RoomScene extends GameScene {
                 }
             }
         }
-        if (System.currentTimeMillis() - this.lastUpdate >= 1000) { //10s
+        if (System.currentTimeMillis() - this.lastUpdate >= 1000) {
             try {
                 this.roomData = ClientNetwork.getInstance().getRooms();
                 updatePageButtons(this.currentPage);

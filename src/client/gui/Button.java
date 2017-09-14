@@ -5,8 +5,8 @@ import javafx.scene.paint.Color;
 
 public class Button extends GUIComponent {
 
-    private final int width;
-    private final int height;
+    private int width;
+    private int height;
     private boolean pressed;
     private ActionPerfomed action;
 
@@ -15,6 +15,19 @@ public class Button extends GUIComponent {
         this.width = width;
         this.height = height;
         this.action = action;
+    }
+
+    protected void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+    
+    public int getWidth(){
+        return this.width;
+    }
+    
+    public int getHeight(){
+        return this.height;
     }
 
     public void render(GraphicsContext gc) {
@@ -35,13 +48,17 @@ public class Button extends GUIComponent {
         //gc.drawString(getName(), getX() + width / 2 - stringWidth / 2, getY() + height / 2);
     }
 
-    private boolean isPressed(double x, double y) {
+    public boolean isPressed(){
+        return this.pressed;
+    }
+    
+    private boolean checkIsPressed(double x, double y) {
         return x >= getX() && x <= getX() + width
                 && y >= getY() && y <= getY() + height;
     }
 
     public void mousePressed(double x, double y) {
-        if (isPressed(x, y)) {
+        if (checkIsPressed(x, y)) {
             this.pressed = true;
         }
     }

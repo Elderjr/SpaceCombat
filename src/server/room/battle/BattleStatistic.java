@@ -15,88 +15,113 @@ import server.data.User;
  *
  * @author elderjr
  */
-public class BattleStatistic implements Serializable{
-    
+public class BattleStatistic implements Serializable {
+
     private final HashMap<Long, PersonalStatistic> blueTeam;
     private final HashMap<Long, PersonalStatistic> redTeam;
-    private int winner;
-    
-    public BattleStatistic(){
+    private int redTeamPoint;
+    private int blueTeamPoint;
+
+    public BattleStatistic() {
         this.blueTeam = new HashMap<>();
         this.redTeam = new HashMap<>();
-        this.winner = -1;
+        this.redTeamPoint = 0;
+        this.blueTeamPoint = 0;
     }
-    
-    public void addUser(User user, String spaceshipName, int team){
-        if(team == ServerConstants.BLUE_TEAM){
+
+    public void addUser(User user, String spaceshipName, int team) {
+        if (team == ServerConstants.BLUE_TEAM) {
             this.blueTeam.put(user.getId(), new PersonalStatistic(user, spaceshipName));
-        }else if(team == ServerConstants.RED_TEAM){
+        } else if (team == ServerConstants.RED_TEAM) {
             this.redTeam.put(user.getId(), new PersonalStatistic(user, spaceshipName));
         }
     }
-    
-    public Collection<PersonalStatistic> getBlueTeam(){
+
+    public PersonalStatistic getPersonalStatistic(long userId){
+        if(this.blueTeam.containsKey(userId)){
+            return this.blueTeam.get(userId);
+        }
+        return this.redTeam.get(userId);
+    }
+    public Collection<PersonalStatistic> getBlueTeam() {
         return this.blueTeam.values();
     }
-    
-    public Collection<PersonalStatistic> getRedTeam(){
+
+    public Collection<PersonalStatistic> getRedTeam() {
         return this.redTeam.values();
     }
-    
-    public int getWinner(){
-        return this.winner;
+
+    public int getWinner() {
+        if (this.blueTeamPoint > this.redTeamPoint) {
+            return ServerConstants.BLUE_TEAM;
+        } else if (this.blueTeamPoint < this.redTeamPoint) {
+            return ServerConstants.RED_TEAM;
+        } else {
+            return ServerConstants.DRAW;
+        }
+    }
+
+    public int getBlueTeamPoint(){
+        return this.blueTeamPoint;
     }
     
-    public void setWinner(int winner) {
-        this.winner = winner;
+    public int getRedTeamPoint(){
+        return this.redTeamPoint;
     }
-    
+    public void incrementBlueTeamPoint() {
+        this.blueTeamPoint++;
+    }
+
+    public void incrementRedTeamPoint() {
+        this.redTeamPoint++;
+    }
+
     public void incrementDeath(User user) {
-        if(this.blueTeam.containsKey(user.getId())){
+        if (this.blueTeam.containsKey(user.getId())) {
             this.blueTeam.get(user.getId()).incrementDeath();
-        }else if(this.redTeam.containsKey(user.getId())){
+        } else if (this.redTeam.containsKey(user.getId())) {
             this.redTeam.get(user.getId()).incrementDeath();
         }
     }
 
     public void incrementKills(User user) {
-        if(this.blueTeam.containsKey(user.getId())){
+        if (this.blueTeam.containsKey(user.getId())) {
             this.blueTeam.get(user.getId()).incrementKills();
-        }else if(this.redTeam.containsKey(user.getId())){
+        } else if (this.redTeam.containsKey(user.getId())) {
             this.redTeam.get(user.getId()).incrementKills();
         }
     }
 
     public void incrementDamageTaken(User user, int damage) {
-        if(this.blueTeam.containsKey(user.getId())){
+        if (this.blueTeam.containsKey(user.getId())) {
             this.blueTeam.get(user.getId()).incrementDamageTaken(damage);
-        }else if(this.redTeam.containsKey(user.getId())){
+        } else if (this.redTeam.containsKey(user.getId())) {
             this.redTeam.get(user.getId()).incrementDamageTaken(damage);
         }
     }
 
     public void incrementDamage(User user, int damage) {
-        if(this.blueTeam.containsKey(user.getId())){
+        if (this.blueTeam.containsKey(user.getId())) {
             this.blueTeam.get(user.getId()).incrementDamage(damage);
-        }else if(this.redTeam.containsKey(user.getId())){
+        } else if (this.redTeam.containsKey(user.getId())) {
             this.redTeam.get(user.getId()).incrementDamage(damage);
         }
     }
 
     public void incrementHealTaken(User user, int heal) {
-        if(this.blueTeam.containsKey(user.getId())){
+        if (this.blueTeam.containsKey(user.getId())) {
             this.blueTeam.get(user.getId()).incrementHealTaken(heal);
-        }else if(this.redTeam.containsKey(user.getId())){
+        } else if (this.redTeam.containsKey(user.getId())) {
             this.redTeam.get(user.getId()).incrementHealTaken(heal);
         }
     }
 
     public void incrementHeal(User user, int heal) {
-        if(this.blueTeam.containsKey(user.getId())){
+        if (this.blueTeam.containsKey(user.getId())) {
             this.blueTeam.get(user.getId()).incrementHeal(heal);
-        }else if(this.redTeam.containsKey(user.getId())){
+        } else if (this.redTeam.containsKey(user.getId())) {
             this.redTeam.get(user.getId()).incrementHeal(heal);
         }
     }
-    
+
 }

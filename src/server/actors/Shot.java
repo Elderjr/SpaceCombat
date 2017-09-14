@@ -21,8 +21,8 @@ public class Shot extends Skill implements Moviment {
     @Override
     public boolean update() {
         move(getCurrentDirection());
-        return (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0 || 
-                getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0);
+        return (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0
+                || getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0);
     }
 
     @Override

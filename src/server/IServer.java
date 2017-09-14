@@ -3,6 +3,7 @@ package server;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import server.data.BattleData;
+import server.data.GeneralStatistics;
 import server.data.LobbyData;
 import server.data.RoomData;
 import server.room.SimpleRoom;
@@ -43,4 +44,6 @@ public interface IServer extends Remote{
     public BattleData getBattleData(long playerId, long roomId) throws RemoteException, NotLoggedException;
     
     public BattleStatistic getBattleStatistic(long playerId, long roomId) throws RemoteException, NotLoggedException;
+    
+    public GeneralStatistics getGeneralStatistic(long playerId) throws RemoteException, NotLoggedException;
 }

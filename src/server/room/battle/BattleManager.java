@@ -14,23 +14,21 @@ import server.serverConstants.ServerConstants;
 
 public class BattleManager implements BattleListener {
 
-    private final long startedAt;
-    private final long matchTime;
     private final HashMap<Long, BattleUser> battleUsers;
+    private final HashMap<Long, BattleData> battleDatas;
     private final BattleStatistic battleStatistic;
     private final BattleActorsManager actorsManager;
+    private final long startedAt;
+    private final long matchTime;
     private long globalActorId;
     private long currentMatchTime;
-    private int blueTeamPoint;
-    private int redTeamPoint;
 
     public BattleManager(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam, long matchTime) {
         this.actorsManager = new BattleActorsManager();
         this.battleStatistic = new BattleStatistic();
         this.battleUsers = new HashMap<>();
+        this.battleDatas = new HashMap<>();
         this.globalActorId = 0;
-        this.blueTeamPoint = 0;
-        this.redTeamPoint = 0;
         initTeamSpaceships(blueTeam, redTeam);
         this.startedAt = System.currentTimeMillis();
         this.matchTime = matchTime;
@@ -40,26 +38,31 @@ public class BattleManager implements BattleListener {
     private void initTeamSpaceships(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam) {
         Random r = new Random();
         for (Entry<Long, LobbyUser> entry : blueTeam.entrySet()) {
-            Point location = new Point(150, r.nextInt(520) + 30);
-            Spaceship spaceship = SpaceshipFactory.createSpaceship(
-                    entry.getValue().getSpaceshipSelected(), this,
-                    location, ServerConstants.BLUE_TEAM, ClientCommands.RIGHT, entry.getValue().getUser());
-            this.battleUsers.put(entry.getKey(), new BattleUser(spaceship));
-            this.battleStatistic.addUser(entry.getValue().getUser(), entry.getValue().getSpaceshipSelected(), ServerConstants.BLUE_TEAM);
-            this.actorsManager.addSpaceship(spaceship);
+            Point location = new Point(150, randomLocation());
+            addUser(entry.getValue(), location, ClientCommands.RIGHT, ServerConstants.BLUE_TEAM);
             location.y += 50;
         }
 
         for (Entry<Long, LobbyUser> entry : redTeam.entrySet()) {
-            Point location = new Point(650, r.nextInt(520) + 30);
-            Spaceship spaceship = SpaceshipFactory.createSpaceship(
-                    entry.getValue().getSpaceshipSelected(), this,
-                    location, ServerConstants.RED_TEAM, ClientCommands.LEFT, entry.getValue().getUser());
-            this.battleUsers.put(entry.getKey(), new BattleUser(spaceship));
-            this.battleStatistic.addUser(entry.getValue().getUser(), entry.getValue().getSpaceshipSelected(), ServerConstants.RED_TEAM);
-            this.actorsManager.addSpaceship(spaceship);
+            Point location = new Point(650, randomLocation());
+            addUser(entry.getValue(), location, ClientCommands.LEFT, ServerConstants.RED_TEAM);
             location.y += 50;
         }
+    }
+
+    private void addUser(LobbyUser lobbyUser, Point location, int direction, int team) {
+        Spaceship spaceship = SpaceshipFactory.createSpaceship(
+                lobbyUser.getSpaceshipSelected(), this,
+                location, team, direction, lobbyUser.getUser());
+        this.battleUsers.put(lobbyUser.getUser().getId(), new BattleUser(spaceship));
+        this.battleDatas.put(lobbyUser.getUser().getId(), new BattleData(this.actorsManager.getSimpleActors(), this.matchTime, spaceship.getMaxHP()));
+        this.battleStatistic.addUser(lobbyUser.getUser(), lobbyUser.getSpaceshipSelected(), team);
+        this.actorsManager.addSpaceship(spaceship);
+    }
+    
+    private int randomLocation(){
+        Random r = new Random();
+        return r.nextInt(ServerConstants.MAP_HEIGHT - 80) + 30;
     }
 
     public void move(long userId, int direction) {
@@ -98,11 +101,11 @@ public class BattleManager implements BattleListener {
         this.battleStatistic.incrementKills(killer.getPilot());
         Random r = new Random();
         if (dead.getTeam() == ServerConstants.BLUE_TEAM) {
-            dead.updateLocation(150, r.nextInt(520) + 30);
-            redTeamPoint++;
+            dead.updateLocation(150, randomLocation());
+            this.battleStatistic.incrementRedTeamPoint();
         } else {
-            dead.updateLocation(650, r.nextInt(520) + 30);
-            blueTeamPoint++;
+            dead.updateLocation(650, randomLocation());
+            this.battleStatistic.incrementBlueTeamPoint();
         }
         dead.restoreHP();
     }
@@ -124,8 +127,17 @@ public class BattleManager implements BattleListener {
     public BattleData getBattleData(long userId) {
         if (this.battleUsers.containsKey(userId)) {
             Spaceship spaceship = this.battleUsers.get(userId).getSpaceship();
-            return new BattleData(this.actorsManager.getSimpleActors(), blueTeamPoint, redTeamPoint, currentMatchTime,
-                    spaceship.canUseShot(), spaceship.canUseSkill(), spaceship.getHP());
+            PersonalStatistic personalStatistic = this.battleStatistic.getPersonalStatistic(userId);
+            BattleData data = this.battleDatas.get(userId);
+            data.setBlueTeamPoint(this.battleStatistic.getBlueTeamPoint());
+            data.setRedTeamPoint(this.battleStatistic.getRedTeamPoint());
+            data.setMatchTime(this.currentMatchTime);
+            data.setKills(personalStatistic.getKills());
+            data.setDeaths(personalStatistic.getDeaths());
+            data.setCanUseShot(spaceship.canUseShot());
+            data.setCanUseSkill(spaceship.canUseSkill());
+            data.setMyHp(spaceship.getHP());
+            return data;
         }
         return null;
     }
@@ -165,17 +177,8 @@ public class BattleManager implements BattleListener {
                 this.processActions();
                 this.actorsManager.update();
                 return false;
-            } else if (this.blueTeamPoint > this.redTeamPoint) {
-                this.battleStatistic.setWinner(ServerConstants.BLUE_TEAM);
-                return true;
-            } else if (this.redTeamPoint > this.blueTeamPoint) {
-                this.battleStatistic.setWinner(ServerConstants.RED_TEAM);
-                return true;
-            } else {
-                this.battleStatistic.setWinner(ServerConstants.DRAW);
-                return true;
             }
         }
-        return false;
+        return true;
     }
 }

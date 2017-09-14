@@ -39,6 +39,10 @@ public abstract class Spaceship extends Actor implements Moviment {
         return this.pilot;
     }
 
+    public int getMaxHP(){
+        return this.maxHP;
+    }
+    
     public int getHP() {
         return this.hp;
     }

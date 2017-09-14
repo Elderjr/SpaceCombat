@@ -20,6 +20,10 @@ public final class LoggedUser {
         return this.user;
     }
 
+    public GeneralStatistics getStatistics(){
+        return this.statistics;
+    }
+    
     public void incrementStatisticsValues(PersonalStatistic statistic, boolean win, boolean draw) {
         this.statistics.incrementValues(statistic, win, draw);
     }

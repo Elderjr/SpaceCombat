@@ -32,6 +32,11 @@ public final class LoadingScene extends GameScene {
                 ExternalFileLoader.getInstance().getSprite(type, team);
                 totalFiledLoaded++;
                 calculeCurrentPercentage();
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(LoadingScene.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 
             private void loadImage(String imageName) {

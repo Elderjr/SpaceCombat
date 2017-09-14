@@ -7,7 +7,6 @@ package client.input;
 
 import java.util.HashSet;
 import java.util.Set;
-import javafx.scene.input.KeyEvent;
 
 /**
  *

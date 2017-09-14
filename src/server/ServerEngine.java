@@ -266,6 +266,17 @@ public class ServerEngine implements IServer {
         }
         return null;
     }
+    
+    @Override
+    public GeneralStatistics getGeneralStatistic(long playerId) throws RemoteException, NotLoggedException {
+        LoggedUser loggedUser = this.loggedUsers.get(playerId);
+        if (loggedUser != null) {
+            loggedUser.updateLastCommand();
+            return loggedUser.getStatistics();
+        } else{
+            throw new NotLoggedException();
+        }
+    }
 
     private void endRoom(long roomId) {
         Room r = this.rooms.get(roomId);
@@ -324,7 +335,7 @@ public class ServerEngine implements IServer {
         LoggedUser loggedUser = null;
         while (iterator.hasNext()) {
             loggedUser = iterator.next();
-            if (loggedUser.isDisconnected(10000)) {
+            if (loggedUser.isDisconnected(200000)) {
                 System.out.println(loggedUser.getUser().getUsername() + " disconnected");;
                 disconnectUser(loggedUser.getUser());
                 iterator.remove();
@@ -370,4 +381,6 @@ public class ServerEngine implements IServer {
             System.exit(0);
         }
     }
+
+    
 }

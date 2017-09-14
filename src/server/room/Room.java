@@ -2,16 +2,15 @@ package server.room;
 
 import server.data.User;
 import java.util.HashMap;
-import server.actors.Skill;
-import server.actors.Spaceship;
-import server.data.BattleData;
-import server.data.LobbyData;
 import server.room.battle.BattleManager;
 import server.data.LobbyUser;
 import server.room.lobby.WaitingRoomManager;
 
 public class Room {
 
+    public static final int WAITING = 0;
+    public static final int PLAYING = 1;
+    
     private static long globalId = 0;
     private final long matchTime;
     private final long id;
@@ -30,6 +29,7 @@ public class Room {
         this.id = globalId;
         this.simpleRoom = new SimpleRoom(id, maxPlayersPerTeam, matchTime, name);
         this.waitingManager = new WaitingRoomManager(this);
+        this.setState(Room.WAITING);
         globalId++;
     }
 
@@ -55,6 +55,7 @@ public class Room {
     }
 
     public void startBattle(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam) {
+        this.setState(Room.PLAYING);
         this.battleManager = new BattleManager(blueTeam, redTeam, this.matchTime);
     }
 

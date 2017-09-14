@@ -2,6 +2,7 @@ package server.room.lobby;
 
 import server.data.LobbyUser;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import server.ServerEngine;
 
 import server.actors.ActorsTypes;
@@ -11,17 +12,16 @@ import server.data.User;
 
 public class WaitingRoomManager {
 
-    private Room room;
-    private HashMap<Long, LobbyUser> blueTeam;
-    private HashMap<Long, LobbyUser> redTeam;
-    private LobbyData lobbyData;
+    private final Room room;
+    private final HashMap<Long, LobbyUser> blueTeam;
+    private final HashMap<Long, LobbyUser> redTeam;
+    private final LobbyData lobbyData;
 
     public WaitingRoomManager(Room room) {
         this.room = room;
-        this.blueTeam = new HashMap<>();
-        this.redTeam = new HashMap<>();
+        this.blueTeam = new LinkedHashMap<>();
+        this.redTeam = new LinkedHashMap<>();
         this.lobbyData = new LobbyData(blueTeam, redTeam);
-        room.setState(0);
     }
 
     public int getTotalPlayers() {
@@ -29,8 +29,8 @@ public class WaitingRoomManager {
     }
 
     public boolean addUser(User user) {
-        if (blueTeam.size() < room.getMaxPlayersPerTeam() || redTeam.size() < room.getMaxPlayersPerTeam()) {
-            if (redTeam.size() >= blueTeam.size()) {
+        if (this.redTeam.size() < this.room.getMaxPlayersPerTeam() || this.blueTeam.size() < this.room.getMaxPlayersPerTeam()) {
+            if (this.redTeam.size() >= this.blueTeam.size()) {
                 System.out.println("User " + user.getId() + " entered in blue team (room " + room.getId() + ")");
                 blueTeam.put(user.getId(), new LobbyUser(user, ActorsTypes.SPACESHIP_ASSAULTER, false));
             } else {
@@ -62,7 +62,7 @@ public class WaitingRoomManager {
             redTeam.get(userId).changeConfirm();
         }
         if (isReady()) {
-            startBattle();
+            room.startBattle(blueTeam, redTeam);
         }
     }
 
@@ -104,7 +104,4 @@ public class WaitingRoomManager {
         return this.lobbyData;
     }
 
-    public void startBattle() {
-        room.startBattle(blueTeam, redTeam);
-    }
 }

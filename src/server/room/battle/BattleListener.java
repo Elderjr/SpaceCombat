@@ -5,7 +5,6 @@
  */
 package server.room.battle;
 
-import server.actors.Skill;
 import server.actors.Spaceship;
 
 

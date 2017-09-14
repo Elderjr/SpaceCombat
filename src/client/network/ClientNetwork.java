@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import server.IServer;
 import server.ServerEngine;
 import server.data.BattleData;
+import server.data.GeneralStatistics;
 import server.data.LobbyData;
 import server.data.RoomData;
 import server.room.SimpleRoom;
@@ -35,9 +36,12 @@ public class ClientNetwork {
     private ClientNetwork() {
         try {
             this.server = ServerEngine.getInstance();
-            User user = this.login("sara", "123");
-            SimpleRoom room = this.createRoom(1, 10000, "meu amor");
-            this.server.changeConfirm(this.user.getId(), room.getId());
+            this.login("sara", "123");
+            SimpleRoom room = this.createRoom(1, 100, "Te amo mtaoo <3");
+            this.changeConfirm(room.getId());
+            this.login("elderjr", "123");
+            this.enterRoom(room.getId());
+            this.changeConfirm(room.getId());
         } catch (RemoteException | NotLoggedException ex) {
             Logger.getLogger(ClientNetwork.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -57,6 +61,10 @@ public class ClientNetwork {
         return true;
     }
 
+    public User getUser(){
+        return this.user;
+    }
+    
     public User register(String username, String password) throws RemoteException {
         this.user = server.register(username, password);
         return this.user;
@@ -105,6 +113,10 @@ public class ClientNetwork {
 
     public BattleStatistic getBattleStatistic(long roomId) throws RemoteException, NotLoggedException {
         return this.server.getBattleStatistic(this.user.getId(), roomId);
+    }
+    
+    public GeneralStatistics getGeneralStatistics() throws RemoteException, NotLoggedException {
+        return this.server.getGeneralStatistic(this.user.getId());
     }
 
     public void useShot(long roomId) throws RemoteException, NotLoggedException {

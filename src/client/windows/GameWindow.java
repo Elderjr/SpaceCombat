@@ -1,8 +1,12 @@
 package client.windows;
 
+import client.gameScenes.BattleScene;
 import client.gameScenes.GameContext;
 import client.gameScenes.GameScene;
 import client.gameScenes.LoadingScene;
+import client.gameScenes.LobbyScene;
+import client.gameScenes.MainScene;
+import client.gameScenes.RoomScene;
 import client.input.Input;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -21,6 +25,8 @@ import javafx.util.Duration;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import server.ServerEngine;
+import server.room.SimpleRoom;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 public class GameWindow extends Application implements GameContext {
 
@@ -92,7 +98,8 @@ public class GameWindow extends Application implements GameContext {
     private void initGame(Group root) {
         canvas = new Canvas(800, 600);
         root.getChildren().add(canvas);
-        this.gameScene = new LoadingScene(this);
+        SimpleRoom room = new SimpleRoom(0, 1, 1000, "Te amo mtaoo <3");
+        this.gameScene = new BattleScene(this, room);
         initGameLoop(canvas.getGraphicsContext2D());
     }
 

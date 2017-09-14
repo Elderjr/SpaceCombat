@@ -10,15 +10,19 @@ package client.gameScenes;
  * @author elderjr
  */
 import client.gui.ActionPerfomed;
-import client.gui.Animation;
 import client.gui.Button;
+import client.gui.ImageButton;
+import client.gui.LobbyUserPanel;
 import client.input.Input;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import server.actors.ActorsTypes;
 import server.data.LobbyData;
 import server.room.SimpleRoom;
@@ -28,51 +32,52 @@ import server.serverConstants.ServerConstants;
 
 public final class LobbyScene extends GameScene {
 
+    private static final Font TITLE_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
+            FontPosture.REGULAR, 30);
     private final SimpleRoom room;
+    private final LobbyUserPanel bluePanels[];
+    private final LobbyUserPanel redPanels[];
+    private final long matchTime;
     private LobbyData data;
     private Thread roomThread;
-    private Animation assaulterSpaceship[];
-    private Animation supporterSpaceship[];
-    private Animation raptorSpaceship[];
 
     public LobbyScene(GameContext context, SimpleRoom room) {
-        super(context);
+        super(context, ExternalFileLoader.getInstance().getImage("client/images/background.jpg"));
         this.room = room;
-        initAnimations();
+        this.matchTime = room.getMathTime() / 60000;
+        this.bluePanels = new LobbyUserPanel[5];
+        this.redPanels = new LobbyUserPanel[5];
+        initLobbyUserPanels();
         initComponents();
         initThread();
     }
 
-    public void initAnimations() {
-        this.assaulterSpaceship = new Animation[2];
-        this.supporterSpaceship = new Animation[2];
-        this.raptorSpaceship = new Animation[2];
-        this.assaulterSpaceship[0] = new Animation(100, 450,
-                ExternalFileLoader.getInstance().getSprite(
-                        ActorsTypes.SPACESHIP_ASSAULTER, ServerConstants.BLUE_TEAM));
-        this.assaulterSpaceship[1] = new Animation(164, 450,
-                ExternalFileLoader.getInstance().getSprite(
-                        ActorsTypes.SPACESHIP_ASSAULTER, ServerConstants.RED_TEAM));
-        this.supporterSpaceship[0] = new Animation(264, 450,
-                ExternalFileLoader.getInstance().getSprite(
-                        ActorsTypes.SPACESHIP_SUPPORTER, ServerConstants.BLUE_TEAM));
-        this.supporterSpaceship[1] = new Animation(328, 450,
-                ExternalFileLoader.getInstance().getSprite(
-                        ActorsTypes.SPACESHIP_SUPPORTER, ServerConstants.RED_TEAM));
-        this.raptorSpaceship[0] = new Animation(412, 450,
-                ExternalFileLoader.getInstance().getSprite(
-                        ActorsTypes.SPACESHIP_RAPTOR, ServerConstants.BLUE_TEAM));
-        this.raptorSpaceship[1] = new Animation(476, 450,
-                ExternalFileLoader.getInstance().getSprite(
-                        ActorsTypes.SPACESHIP_RAPTOR, ServerConstants.RED_TEAM));
+    @Override
+    public void changeScene(GameScene scene){
+        super.changeScene(scene);
+        this.roomThread.stop();
+    }
+    
+    public void initLobbyUserPanels() {
+        int x = 40;
+        int y = 70;
+        for (int i = 0; i < this.bluePanels.length; i++) {
+            this.bluePanels[i] = new LobbyUserPanel(x, y, ServerConstants.BLUE_TEAM);
+            this.redPanels[i] = new LobbyUserPanel(x, y + 295, ServerConstants.RED_TEAM);
+            addComponents(this.bluePanels[i], this.redPanels[i]);
+            x += 150;
+        }
+    }
 
-        Button btSelectAssaulter = new Button(100, 530, "Assaulter", 100, 40, new ActionPerfomed() {
+    public void initSpaceshiptsButtons() {
+        Image defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btAssaulter.png");
+        Image onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btAssaulter_onclick.png");
+        Button btSelectAssaulter = new ImageButton(40, 285, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 try {
                     ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_ASSAULTER);
                 } catch (RemoteException ex) {
-                    roomThread.stop();
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                 } catch (NotLoggedException ex) {
                     changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
@@ -81,13 +86,14 @@ public final class LobbyScene extends GameScene {
             }
         });
 
-        Button btSelectSupporter = new Button(264, 530, "Supporter", 100, 40, new ActionPerfomed() {
+        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btSupporter.png");
+        onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btSupporter_onclick.png");
+        Button btSelectSupporter = new ImageButton(190, 285, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 try {
                     ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_SUPPORTER);
                 } catch (RemoteException ex) {
-                    roomThread.stop();
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                 } catch (NotLoggedException ex) {
                     changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
@@ -95,46 +101,34 @@ public final class LobbyScene extends GameScene {
             }
         });
 
-        Button btSelectRaptor = new Button(412, 530, "Raptor", 100, 40, new ActionPerfomed() {
+        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btRaptor.png");
+        onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btRaptor_onclick.png");
+        Button btSelectRaptor = new ImageButton(340, 285, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 try {
                     ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_RAPTOR);
                 } catch (RemoteException ex) {
-                    roomThread.stop();
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                 } catch (NotLoggedException ex) {
                     changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
         });
-        addComponents(this.assaulterSpaceship[0], this.assaulterSpaceship[1]);
-        addComponents(this.supporterSpaceship[0], this.supporterSpaceship[1]);
-        addComponents(this.raptorSpaceship[0], this.raptorSpaceship[1]);
         addComponents(btSelectAssaulter, btSelectRaptor, btSelectSupporter);
     }
 
     public void initComponents() {
-        Button btChangeConfirm = new Button(164, 400, "Change Confirm", 120, 50, new ActionPerfomed() {
-            @Override
-            public void doAction() {
-                try {
-                    ClientNetwork.getInstance().changeConfirm(room.getId());
-                } catch (RemoteException ex) {
-                    roomThread.stop();
-                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-                } catch (NotLoggedException ex) {
-                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
-                }
-            }
-        });
-        Button btChangeTeam = new Button(290, 400, "Change Team", 120, 50, new ActionPerfomed() {
+        initLobbyUserPanels();
+        initSpaceshiptsButtons();
+        Image defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btChangeTeam.png");
+        Image onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btChangeTeam_onclick.png");
+        Button btChangeTeam = new ImageButton(490, 250, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 try {
                     ClientNetwork.getInstance().changeTeam(room.getId());
                 } catch (RemoteException ex) {
-                    roomThread.stop();
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                 } catch (NotLoggedException ex) {
                     changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
@@ -142,7 +136,24 @@ public final class LobbyScene extends GameScene {
 
             }
         });
-        Button btBack = new Button(400, 400, "Back", 120, 50, new ActionPerfomed() {
+
+        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btLetsGo.png");
+        onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btLetsGo_onclick.png");
+        Button btChangeConfirm = new ImageButton(640, 250, defaultImage, onclickImage, new ActionPerfomed() {
+            @Override
+            public void doAction() {
+                try {
+                    ClientNetwork.getInstance().changeConfirm(room.getId());
+                } catch (RemoteException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
+                }
+            }
+        });
+        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom.png");
+        onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom_onclick.png");
+        Button btBack = new ImageButton(336, 545, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 try {
@@ -152,8 +163,6 @@ public final class LobbyScene extends GameScene {
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                 } catch (NotLoggedException ex) {
                     changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
-                } finally {
-                    roomThread.stop();
                 }
             }
         });
@@ -166,9 +175,11 @@ public final class LobbyScene extends GameScene {
             public void run() {
                 try {
                     data = ClientNetwork.getInstance().getLobbyData(room.getId());
+                    LobbyData buffer;
                     while (true) {
+                        buffer = ClientNetwork.getInstance().getLobbyData(room.getId());
                         synchronized (data) {
-                            data = ClientNetwork.getInstance().getLobbyData(room.getId());
+                            data = buffer;
                         }
                         try {
                             Thread.sleep(1000);
@@ -177,7 +188,6 @@ public final class LobbyScene extends GameScene {
                         }
                     }
                 } catch (RemoteException ex) {
-                    roomThread.stop();
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                 } catch (NotLoggedException ex) {
                     changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
@@ -189,54 +199,36 @@ public final class LobbyScene extends GameScene {
         this.roomThread.start();
     }
 
-    private void renderSpaceship(GraphicsContext gc, String spacehipType, int team, int x, int y) {
-        Animation spaceship[] = null;
-        if (spacehipType.equals(ActorsTypes.SPACESHIP_ASSAULTER)) {
-            spaceship = this.assaulterSpaceship;
-        } else if (spacehipType.equals(ActorsTypes.SPACESHIP_RAPTOR)) {
-            spaceship = this.raptorSpaceship;
-        } else if (spacehipType.equals(ActorsTypes.SPACESHIP_SUPPORTER)) {
-            spaceship = this.supporterSpaceship;
+    private void updateLobbyUsers() {
+        for (int i = 0; i < this.bluePanels.length; i++) {
+            this.bluePanels[i].setLobbyUser(null);
+            this.redPanels[i].setLobbyUser(null);
         }
-        if (team == ServerConstants.BLUE_TEAM) {
-            spaceship[0].render(gc, x, y);
-        } else if (team == ServerConstants.RED_TEAM) {
-            spaceship[1].render(gc, x, y);
+        int index = 0;
+        for (LobbyUser lobbyUser : this.data.getBlueTeam()) {
+            this.bluePanels[index].setLobbyUser(lobbyUser);
+            index++;
         }
-    }
-
-    private void renderUsers(GraphicsContext gc) {
-        int x = 30;
-        int y = 30;
-        for (LobbyUser user : data.getBlueTeam()) {
-            gc.strokeText(user.getUser().getUsername(), x, y);
-            renderSpaceship(gc, user.getSpaceshipSelected(), ServerConstants.BLUE_TEAM, x, y + 10);
-            if (user.isConfirmed()) {
-                gc.strokeText("Ready", x, y + 84);
-            }
-            y += 120;
-        }
-        x = 230;
-        y = 30;
-        for (LobbyUser user : data.getRedTeam()) {
-            gc.strokeText(user.getUser().getUsername(), x, y);
-            renderSpaceship(gc, user.getSpaceshipSelected(), ServerConstants.RED_TEAM, x, y + 10);
-            if (user.isConfirmed()) {
-                gc.strokeText("Ready", x, y + 84);
-            }
-            y += 120;
+        index = 0;
+        for (LobbyUser lobbyUser : this.data.getRedTeam()) {
+            this.redPanels[index].setLobbyUser(lobbyUser);
+            index++;
         }
     }
 
     @Override
     public void render(GraphicsContext gc) {
         super.render(gc);
+        gc.setStroke(Color.WHITE);
+        gc.setFill(Color.WHITE);
+        gc.setFont(TITLE_FONT);
+        gc.strokeText("Room #" + room.getId() + " - " + room.getName() + " - "
+                + room.getMaxPlayersPerTeam() + " vs " + room.getMaxPlayersPerTeam() + " - "
+                + this.matchTime + ":00 min", 40, 60);
+        gc.fillText("Room #" + room.getId() + " - " + room.getName() + " - "
+                + room.getMaxPlayersPerTeam() + " vs " + room.getMaxPlayersPerTeam() + " - "
+                + this.matchTime + ":00 min", 40, 60);
         renderComponents(gc);
-        if (data != null) {
-            synchronized (data) {
-                renderUsers(gc);
-            }
-        }
     }
 
     @Override
@@ -245,8 +237,9 @@ public final class LobbyScene extends GameScene {
         if (data != null) {
             synchronized (data) {
                 if (data.isAllReady(room.getMaxPlayersPerTeam())) {
-                    this.roomThread.stop();
                     changeScene(new BattleScene(getContext(), room));
+                } else {
+                    updateLobbyUsers();
                 }
             }
         }

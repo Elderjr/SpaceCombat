@@ -13,15 +13,21 @@ public class BattleData implements Serializable {
     private boolean canUseSkill;
     private long matchTime;
     private int myHp;
+    private int maxHp;
+    private int kills;
+    private int deaths;
+    
+    
 
-    public BattleData(HashMap<Long, SimpleActor> actors, int blueTeamPoint, int redTeamPoint, long matchTime, boolean canUseShot, boolean canUseSkill, int myHp) {
+    public BattleData(HashMap<Long, SimpleActor> actors, long matchTime, int maxHp) {
         this.actors = actors;
-        this.canUseShot = canUseShot;
-        this.canUseSkill = canUseSkill;
-        this.blueTeamPoint = blueTeamPoint;
-        this.redTeamPoint = redTeamPoint;
         this.matchTime = matchTime;
-        this.myHp = myHp;
+        this.canUseShot = true;
+        this.canUseSkill = true;
+        this.blueTeamPoint = 0;
+        this.redTeamPoint = 0;
+        this.myHp = maxHp;
+        this.maxHp = maxHp;
     }
 
     /**
@@ -113,6 +119,25 @@ public class BattleData implements Serializable {
      */
     public void setMyHp(int myHp) {
         this.myHp = myHp;
+    }
+    
+    public int getKills(){
+        return this.kills;
+    }
+    
+    public void setKills(int kills){
+        this.kills = kills;
+    }
+    
+    public int getDeaths(){
+        return this.deaths;
+    }
+    
+    public void setDeaths(int deaths){
+        this.deaths = deaths;
+    }
+    public int getMaxHp(){
+        return this.maxHp;
     }
 
 }

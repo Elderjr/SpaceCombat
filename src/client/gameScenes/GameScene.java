@@ -4,6 +4,7 @@ import client.gui.Component;
 import client.gui.ComponentManager;
 import client.input.Input;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import server.serverConstants.ServerConstants;
 
@@ -11,13 +12,19 @@ public abstract class GameScene {
 
     private ComponentManager paintableManager;
     private GameContext gameContext;
+    private Image background;
 
     public GameScene(GameContext context) {
         this.paintableManager = new ComponentManager();
         this.gameContext = context;
     }
 
-    public void update(Input input){
+    public GameScene(GameContext context, Image background) {
+        this(context);
+        this.background = background;
+    }
+
+    public void update(Input input) {
         this.paintableManager.processMouseInput(input.getMouseState(), input.getMouseX(), input.getMouseY());
     }
 
@@ -26,18 +33,22 @@ public abstract class GameScene {
     }
 
     public void render(GraphicsContext gc) {
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, ServerConstants.MAP_WIDTH, ServerConstants.MAP_HEIGHT);
+        if (this.background != null) {
+            gc.drawImage(this.background, 0, 0);
+        } else {
+            gc.setFill(Color.BLACK);
+            gc.fillRect(0, 0, ServerConstants.MAP_WIDTH, ServerConstants.MAP_HEIGHT);
+        }
     }
 
-    protected GameContext getContext(){
+    protected GameContext getContext() {
         return this.gameContext;
     }
-    
-    protected void renderComponents(GraphicsContext gc){
+
+    protected void renderComponents(GraphicsContext gc) {
         this.paintableManager.render(gc);
     }
-    
+
     protected void addComponent(Component component) {
         this.paintableManager.addComponent(component);
     }

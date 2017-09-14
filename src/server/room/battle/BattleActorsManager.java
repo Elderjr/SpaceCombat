@@ -59,8 +59,15 @@ public class BattleActorsManager {
         for (Spaceship spaceship : spaceships) {
             spaceship.update();
         }
-        for (Skill skill : skills) {
-            skill.update();
+        Iterator<Skill> iterator = this.skills.iterator();
+        Skill skill;
+        while(iterator.hasNext()){
+            skill = iterator.next();
+            if(skill.update()){
+                this.simpleActors.remove(skill.getId());
+                iterator.remove();
+            }
         }
+        
     }
 }

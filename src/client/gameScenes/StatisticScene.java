@@ -11,8 +11,13 @@ package client.gameScenes;
  */
 import client.gui.ActionPerfomed;
 import client.gui.Button;
+import client.gui.ImageButton;
+import client.gui.ImageLabel;
+import client.gui.StatisticPanel;
 import client.input.Input;
+import client.sprite.ExternalFileLoader;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import server.room.battle.BattleStatistic;
 import server.room.battle.PersonalStatistic;
@@ -23,66 +28,41 @@ public final class StatisticScene extends GameScene {
     private BattleStatistic statistic;
 
     public StatisticScene(GameContext context, BattleStatistic statistic) {
-        super(context);
-        initComponents();
+        super(context, ExternalFileLoader.getInstance().getImage("client/images/background.png"));
         this.statistic = statistic;
+        initComponents();
     }
 
     public void initComponents() {
-        Button btBack = new Button(600, 500, "back", 60, 30, new ActionPerfomed() {
+        Image defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom.png");
+        Image onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom_onclick.png");
+        Button btBack = new ImageButton(336, 545, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 changeScene(new RoomScene(getContext()));
             }
         });
-        addComponents(btBack);
+        int x;
+        int winner = statistic.getWinner();
+        if (winner == ServerConstants.BLUE_TEAM) {
+            x = 240;
+            defaultImage = ExternalFileLoader.getInstance().getImage("client/images/blueWinsText.png");
+        } else if (winner == ServerConstants.RED_TEAM) {
+            x = 252;
+            defaultImage = ExternalFileLoader.getInstance().getImage("client/images/redWinsText.png");
+        } else {
+            x = 350;
+            defaultImage = ExternalFileLoader.getInstance().getImage("client/images/drawText.png");
+        }
+        ImageLabel textWinner = new ImageLabel(x, 30, defaultImage);
+        StatisticPanel panel = new StatisticPanel(45, 80, statistic.getBlueTeam(), statistic.getRedTeam());
+        addComponents(btBack, textWinner, panel);
     }
 
     @Override
     public void render(GraphicsContext gc) {
         super.render(gc);
         renderComponents(gc);
-        if(statistic.getWinner() == ServerConstants.BLUE_TEAM){
-            gc.setFill(Color.BLUE);
-            gc.fillText("BLUE WINNER", 10, 10);
-        }else if(statistic.getWinner() == ServerConstants.RED_TEAM){
-            gc.setFill(Color.RED);
-            gc.fillText("RED WINNER", 10, 10);
-        }else if(statistic.getWinner() == ServerConstants.DRAW){
-            gc.setFill(Color.WHITE);
-            gc.fillText("DRAW", 10, 10);
-        }
-        gc.setFill(Color.GREEN);
-        gc.fillText("User", 30, 30);
-        gc.fillText("Kills", 230, 30);
-        gc.fillText("Deaths", 330, 30);
-        gc.fillText("Damage", 430, 30);
-        gc.fillText("Damage Taken", 530, 30);
-        gc.fillText("Heal", 630, 30);
-        gc.fillText("Heal Taken", 730, 30);
-        int y = 50;
-        gc.setFill(Color.BLUE);
-        for (PersonalStatistic statistic : statistic.getBlueTeam()) {
-            gc.fillText("" + statistic.getUser().getUsername() + " (" + statistic.getSpaceshipName() + ")", 30, 30 + y);
-            gc.fillText("" + statistic.getKills(), 230, 30 + y);
-            gc.fillText("" + statistic.getDeaths(), 330, 30 + y);
-            gc.fillText("" + statistic.getDamage(), 430, 30 + y);
-            gc.fillText("" + statistic.getDamageTaken(), 530, 30 + y);
-            gc.fillText("" + statistic.getHeal(), 630, 30 + y);
-            gc.fillText("" + statistic.getHealTaken(), 730, 30 + y);
-            y += 20;
-        }
-        gc.setFill(Color.RED);
-        for (PersonalStatistic statistic : statistic.getRedTeam()) {
-            gc.fillText("" + statistic.getUser().getUsername() + " (" + statistic.getSpaceshipName() + ")", 30, 30 + y);
-            gc.fillText("" + statistic.getKills(), 230, 30 + y);
-            gc.fillText("" + statistic.getDeaths(), 330, 30 + y);
-            gc.fillText("" + statistic.getDamage(), 430, 30 + y);
-            gc.fillText("" + statistic.getDamageTaken(), 530, 30 + y);
-            gc.fillText("" + statistic.getHeal(), 630, 30 + y);
-            gc.fillText("" + statistic.getHealTaken(), 730, 30 + y);
-            y += 20;
-        }
     }
 
     @Override

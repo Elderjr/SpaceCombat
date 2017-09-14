@@ -42,6 +42,14 @@ public class GeneralStatistics implements Serializable {
         this.deaths += statistic.getDeaths();
     }
 
+    @Override
+    public String toString() {
+        return "Wins: " + this.wins + "   "
+                + "Loses: " + this.loses + "   "
+                + "Kills: " + this.kills + "   "
+                + "Deaths: " + this.deaths;
+    }
+
     /**
      * @return the matches
      */
