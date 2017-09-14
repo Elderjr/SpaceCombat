@@ -29,10 +29,10 @@ public class RoomButton extends Button{
     private SimpleRoom room;
     
     public RoomButton(int x, int y,SimpleRoom room,ActionPerfomed action) {
-        super(x, y, null, 100, 100, action);
+        super(x, y, action);
+        this.setSize((int) ROOM_BUTTON.getWidth(), (int) ROOM_BUTTON.getHeight());
         this.room = room;
         this.time = room.getMathTime() / 60000;
-        this.setSize((int) ROOM_BUTTON.getWidth(), (int) ROOM_BUTTON.getHeight());
     }
     
     

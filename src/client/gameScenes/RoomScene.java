@@ -19,8 +19,6 @@ import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;
 import client.windows.RoomForm;
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -85,7 +83,10 @@ public final class RoomScene extends GameScene {
 
             }
         });
-        Button btCreateRoom = new Button(500, 500, "Create Room", 60, 30, new ActionPerfomed() {
+        
+        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btCreateRoom.png");
+        onClickImage = ExternalFileLoader.getInstance().getImage("client/images/btCreateRoom_onclick.png");
+        Button btCreateRoom = new ImageButton(650, 360, defaultImage, onClickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 RoomForm roomForm = new RoomForm(null, true);
@@ -106,7 +107,9 @@ public final class RoomScene extends GameScene {
             }
         });
 
-        Button btExit = new Button(550, 500, "Exit", 60, 30, new ActionPerfomed() {
+        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom.png");
+        onClickImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom_onclick.png");
+        Button btExit = new ImageButton(336, 545, defaultImage, onClickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
                 changeScene(new MainScene(getContext()));
@@ -161,7 +164,7 @@ public final class RoomScene extends GameScene {
         gc.setFill(Color.WHITESMOKE);
         gc.setFont(DEFAULT_FONT);
         gc.fillText("User: [" + this.user.getUsername() + "]", 335, 60);
-        gc.fillText(this.generalStatistics.toString(), 235, 85);
+        gc.fillText(this.generalStatistics.toString(), 185, 85);
         gc.fillText("Online Players: ", 30, 400);
         if (this.roomData != null) {
             int x = 50;

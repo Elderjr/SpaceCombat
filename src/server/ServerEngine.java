@@ -279,6 +279,7 @@ public class ServerEngine implements IServer {
     }
 
     private void endRoom(long roomId) {
+        System.out.println("terminou!");
         Room r = this.rooms.get(roomId);
         if (r != null) {
             BattleStatistic statistics = r.getBattleRoomManager().getBattleStatistic();
@@ -297,9 +298,8 @@ public class ServerEngine implements IServer {
                 for (PersonalStatistic statistic : statistics.getRedTeam()) {
                     LoggedUser loggedUser = this.loggedUsers.get(statistic.getUser().getId());
                     if(loggedUser != null){
-                        loggedUser.incrementStatisticsValues(statistic, blueWins, draw);
+                        loggedUser.incrementStatisticsValues(statistic, redWins, draw);
                     }
-                    loggedUser.incrementStatisticsValues(statistic, redWins, draw);
                     UserDAO.updateStatistic(statistic, redWins, draw);
                 }
             } catch (SQLException ex) {

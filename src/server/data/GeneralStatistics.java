@@ -21,9 +21,10 @@ public class GeneralStatistics implements Serializable {
     private int kills;
     private int deaths;
 
-    public GeneralStatistics(int matches, int wins, int loses, int kills, int deaths) {
+    public GeneralStatistics(int matches, int wins, int draws, int loses, int kills, int deaths) {
         this.matches = matches;
         this.wins = wins;
+        this.draws = draws;
         this.loses = loses;
         this.kills = kills;
         this.deaths = deaths;
@@ -45,6 +46,7 @@ public class GeneralStatistics implements Serializable {
     @Override
     public String toString() {
         return "Wins: " + this.wins + "   "
+                + "Draws: " + this.draws + "   "
                 + "Loses: " + this.loses + "   "
                 + "Kills: " + this.kills + "   "
                 + "Deaths: " + this.deaths;

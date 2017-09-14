@@ -23,7 +23,7 @@ public class HpBar extends Component {
             FontPosture.REGULAR, 15);
     private int maxHP;
     private int currentHP;
-    private int currentPerc;
+    private double currentPerc;
 
     public HpBar(int x, int y) {
         super(x, y);
@@ -31,7 +31,7 @@ public class HpBar extends Component {
 
     private void calculePercentage() {
         if (this.maxHP != 0) {
-            this.currentPerc = (int) ((this.currentHP / this.maxHP) * BAR_IMAGE.getWidth());
+            this.currentPerc = (((double) this.currentHP / (double) this.maxHP) * BAR_IMAGE.getWidth());
         } else {
             this.currentPerc = 0;
         }

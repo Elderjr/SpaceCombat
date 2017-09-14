@@ -37,10 +37,7 @@ public class ClientNetwork {
         try {
             this.server = ServerEngine.getInstance();
             this.login("sara", "123");
-            SimpleRoom room = this.createRoom(1, 100, "Te amo mtaoo <3");
-            this.changeConfirm(room.getId());
-            this.login("elderjr", "123");
-            this.enterRoom(room.getId());
+            SimpleRoom room = this.createRoom(1, 3000, "Te amo mtaoo <3");
             this.changeConfirm(room.getId());
         } catch (RemoteException | NotLoggedException ex) {
             Logger.getLogger(ClientNetwork.class.getName()).log(Level.SEVERE, null, ex);

@@ -7,7 +7,6 @@ package client.gui;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 /**
  *
@@ -15,11 +14,11 @@ import javafx.scene.paint.Color;
  */
 public class ImageButton extends Button{
     
-    private Image defaultImage;
-    private Image onClick;
+    private final Image defaultImage;
+    private final Image onClick;
     
     public ImageButton(int x, int y, Image defaultImage, Image onClick, ActionPerfomed action) {
-        super(x, y, null, 0, 0, action);
+        super(x, y, action);
         setSize((int) defaultImage.getWidth(), (int) defaultImage.getHeight());
         this.defaultImage = defaultImage;
         this.onClick = onClick;

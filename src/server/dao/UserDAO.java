@@ -75,7 +75,7 @@ public class UserDAO {
                         int draws = rs.getInt("draws");
                         int kills = rs.getInt("kills");
                         int deaths = rs.getInt("deaths");
-                        return new GeneralStatistics(matches, wins, loses, kills, deaths);
+                        return new GeneralStatistics(matches, wins, draws, loses, kills, deaths);
                     }
                 }
             }
