@@ -16,14 +16,6 @@ import server.dao.ConnectionFactory;
  */
 public class Main {
     public static void main(String args[]){
-        String op = JOptionPane.showInputDialog("OP: ");
-        if(op.startsWith("s")){
-            ConnectionFactory.getInstance().setPassword("zzz");
-            server.ServerEngine.start("192.168.0.12");
-        }else{
-            GameWindow.start();
-        }
-        /*
         if(args.length == 0 || args[0].equalsIgnoreCase("-client")){
             GameWindow.start();
         }else if(args.length > 0 && args[0].equalsIgnoreCase("-server")){
@@ -40,6 +32,5 @@ public class Main {
             System.out.println("use -client to start the client");
             System.err.println("use -server IP DATABASE_USER PASSWORD_USER to start the server");
         }
-        */
     }
 }
