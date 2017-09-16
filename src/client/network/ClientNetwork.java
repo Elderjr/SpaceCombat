@@ -5,10 +5,18 @@
  */
 package client.network;
 
+import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import server.IServer;
@@ -46,23 +54,40 @@ public class ClientNetwork {
         } catch (RemoteException | NotLoggedException ex) {
             Logger.getLogger(ClientNetwork.class.getName()).log(Level.SEVERE, null, ex);
         }
-        */
+         */
     }
 
     public boolean connect(String host) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<IServer> future = executor.submit(new Callable<IServer>() {
+            @Override
+            public IServer call() {
+                try {
+                    Registry registry = LocateRegistry.getRegistry(host);
+                    return (IServer) registry.lookup("SpaceCombat");
+                } catch (RemoteException | NotBoundException ex) {
+                    return null;
+                }
+            }
+        });
         try {
-            Registry registry = LocateRegistry.getRegistry(host);
-            this.server = (IServer) registry.lookup("SpaceCombat");
-            return true;
-        } catch (RemoteException | NotBoundException ex) {
+            IServer server = future.get(10, TimeUnit.SECONDS);
+            if(server != null){
+                this.server = server;
+                return true;
+            }
+            return false;
+        } catch (InterruptedException | ExecutionException |
+                TimeoutException ex) {
+            future.cancel(true);
             return false;
         }
     }
 
-    public User getUser(){
+    public User getUser() {
         return this.user;
     }
-    
+
     public User register(String username, String password) throws RemoteException {
         this.user = server.register(username, password);
         return this.user;
@@ -112,7 +137,7 @@ public class ClientNetwork {
     public BattleStatistic getBattleStatistic(long roomId) throws RemoteException, NotLoggedException {
         return this.server.getBattleStatistic(this.user.getId(), roomId);
     }
-    
+
     public GeneralStatistics getGeneralStatistics() throws RemoteException, NotLoggedException {
         return this.server.getGeneralStatistic(this.user.getId());
     }
@@ -129,11 +154,11 @@ public class ClientNetwork {
         this.server.move(this.user.getId(), roomId, direction);
     }
 
-    public void ping() throws RemoteException, NotLoggedException{
+    public void ping() throws RemoteException, NotLoggedException {
         this.server.ping(this.user.getId());
     }
-    
-    public void exitGame() throws RemoteException{
+
+    public void exitGame() throws RemoteException {
         this.server.exitGame(this.user.getId());
     }
 }
