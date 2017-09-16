@@ -5,7 +5,6 @@
  */
 package client.network;
 
-import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -17,10 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import server.IServer;
-import server.ServerEngine;
 import server.data.BattleData;
 import server.data.GeneralStatistics;
 import server.data.LobbyData;
@@ -154,8 +150,10 @@ public class ClientNetwork {
         this.server.move(this.user.getId(), roomId, direction);
     }
 
-    public void ping() throws RemoteException, NotLoggedException {
+    public long ping() throws RemoteException, NotLoggedException {
+        long time = System.currentTimeMillis();
         this.server.ping(this.user.getId());
+        return System.currentTimeMillis() - time;
     }
 
     public void exitGame() throws RemoteException {

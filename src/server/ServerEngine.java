@@ -338,6 +338,7 @@ public class ServerEngine implements IServer {
         while(roomIterator.hasNext()){
             room = roomIterator.next();
             if(room.update()){
+                removeRoomFromData(room);
                 roomIterator.remove();
             }
         }
@@ -381,13 +382,11 @@ public class ServerEngine implements IServer {
                 System.out.println("Server Ready");
                 obj.mainLoop();
             } catch (SQLException ex) {
-                System.out.println("An error occured in user table");
-                ex.printStackTrace();
+                System.out.println("An error occured in database: " + ex.getMessage());
                 System.exit(0);
             }
         } catch (RemoteException | AlreadyBoundException ex) {
-            System.out.println("An error occured when creating a remote server");
-            ex.printStackTrace();
+            System.out.println("An error occured when creating a remote server: "+ex.getMessage());
             System.exit(0);
         }
     }

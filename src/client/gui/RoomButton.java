@@ -12,7 +12,6 @@ import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import server.room.Room;
 import server.room.SimpleRoom;
 
 /**
@@ -53,7 +52,7 @@ public class RoomButton extends Button{
         gc.fillText("Room #" + room.getId() + " - " + room.getName(), getX() + 10, getY() + 35);
         gc.setFont(CHARACTER_FONT);
         gc.fillText(room.getTotalPlayers() + " / " + (room.getMaxPlayersPerTeam() * 2), getX() + 290, getY() + 45);
-        gc.fillText("5:00", getX() + 315, getY() + 85);
+        gc.fillText(this.time+":00", getX() + 315, getY() + 85);
         if (room.getState() == Constants.WAITING && room.getTotalPlayers() != room.getMaxPlayersPerTeam() * 2) {
             gc.fillText("WAITING", getX() + 15, getY() + 90);
             gc.fillRect(getX() + 140, getY() + 85, 5, 5);

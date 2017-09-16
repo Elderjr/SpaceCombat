@@ -19,8 +19,6 @@ import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;
 import client.windows.RoomForm;
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -34,11 +32,13 @@ import server.exceptions.NotLoggedException;
 
 public final class RoomScene extends GameScene {
 
+    private static final Font PING_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
+            FontPosture.REGULAR, 15);
     private static final Font DEFAULT_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 20);
     private static final Font NUMBER_PAGE_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 40);
- 
+
     private static final int ROOMS_PER_PAGE = 4;
     private final User user;
     private final Image background;
@@ -46,6 +46,7 @@ public final class RoomScene extends GameScene {
     private RoomData roomData;
     private RoomButton pageButtons[];
     private long lastUpdate;
+    private long ping;
     private int currentPage;
 
     public RoomScene(GameContext context) {
@@ -56,6 +57,7 @@ public final class RoomScene extends GameScene {
         this.pageButtons = new RoomButton[ROOMS_PER_PAGE];
         this.currentPage = 1;
         this.lastUpdate = 0;
+        this.ping = 0;
         try {
             this.generalStatistics = ClientNetwork.getInstance().getGeneralStatistics();
         } catch (RemoteException ex) {
@@ -85,7 +87,7 @@ public final class RoomScene extends GameScene {
 
             }
         });
-        
+
         defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btCreateRoom.png");
         onClickImage = ExternalFileLoader.getInstance().getImage("client/images/btCreateRoom_onclick.png");
         Button btCreateRoom = new ImageButton(650, 360, defaultImage, onClickImage, new ActionPerfomed() {
@@ -169,6 +171,9 @@ public final class RoomScene extends GameScene {
     public void render(GraphicsContext gc) {
         gc.drawImage(this.background, 0, 0);
         renderComponents(gc);
+        gc.setFill(Color.YELLOW);
+        gc.setFont(PING_FONT);
+        gc.fillText("ping: "+this.ping+"ms", 20, 15);
         gc.setFill(Color.WHITESMOKE);
         gc.setFont(DEFAULT_FONT);
         gc.fillText("User: [" + this.user.getUsername() + "]", 335, 60);
@@ -214,16 +219,17 @@ public final class RoomScene extends GameScene {
                 }
             }
         }
-        if (System.currentTimeMillis() - this.lastUpdate >= 1000) {
-            try {
+        try {
+            if (System.currentTimeMillis() - this.lastUpdate >= 1000) {
                 this.roomData = ClientNetwork.getInstance().getRooms();
                 updatePageButtons(this.currentPage);
                 this.lastUpdate = System.currentTimeMillis();
-            } catch (RemoteException ex) {
-                changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-            } catch (NotLoggedException ex) {
-                changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
+                this.ping = ClientNetwork.getInstance().ping();
             }
+        } catch (RemoteException ex) {
+            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+        } catch (NotLoggedException ex) {
+            changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
         }
     }
 }

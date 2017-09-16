@@ -37,6 +37,8 @@ import server.room.battle.BattleStatistic;
 
 public final class BattleScene extends GameScene {
 
+    private static final Font PING_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
+            FontPosture.REGULAR, 15);
     private static final Font TIME_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 20);
     private static final Font REGULAR_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
@@ -46,6 +48,8 @@ public final class BattleScene extends GameScene {
     private final HashMap<Long, Animation> animations;
     private BattleData data;
     private Thread battleThread;
+    private long ping;
+    private long lastPing;
 
     //Components
     private HpBar hpBar;
@@ -56,6 +60,8 @@ public final class BattleScene extends GameScene {
         super(context, ExternalFileLoader.getInstance().getImage("client/images/battleBackground.png"));
         this.animations = new HashMap<>();
         this.room = room;
+        this.ping = 0;
+        this.lastPing = 0;
         this.loadData();
         this.initThread();
         initComponents();
@@ -80,11 +86,14 @@ public final class BattleScene extends GameScene {
             } else {
                 this.data = buffer;
             }
+            if(System.currentTimeMillis() - this.lastPing >= 1000){
+                this.ping = ClientNetwork.getInstance().ping();
+                this.lastPing = System.currentTimeMillis();
+            }
         } catch (NotLoggedException ex) {
             changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
         } catch (Exception ex) {
-            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-            ex.printStackTrace();
+            System.out.println("An error occured: " + ex.getMessage());
         }
     }
 
@@ -142,6 +151,9 @@ public final class BattleScene extends GameScene {
     public void render(GraphicsContext gc) {
         super.render(gc);
         renderComponents(gc);
+        gc.setFill(Color.YELLOW);
+        gc.setFont(PING_FONT);
+        gc.fillText("ping: "+this.ping+"ms", 20, 15);
         for (Animation animation : this.animations.values()) {
             animation.render(gc);
         }

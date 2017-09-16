@@ -28,17 +28,23 @@ import server.room.SimpleRoom;
 import server.data.LobbyUser;
 import server.exceptions.NotLoggedException;
 import constants.Constants;
+import server.data.BattleData;
 
 public final class LobbyScene extends GameScene {
 
+    private static final Font PING_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
+            FontPosture.REGULAR, 15);
     private static final Font TITLE_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 30);
+
     private final SimpleRoom room;
     private final LobbyUserPanel bluePanels[];
     private final LobbyUserPanel redPanels[];
     private final long matchTime;
     private LobbyData data;
     private Thread roomThread;
+    private long ping;
+    private long lastPing;
 
     public LobbyScene(GameContext context, SimpleRoom room) {
         super(context, ExternalFileLoader.getInstance().getImage("client/images/background.jpg"));
@@ -46,17 +52,20 @@ public final class LobbyScene extends GameScene {
         this.matchTime = room.getMathTime() / 60000;
         this.bluePanels = new LobbyUserPanel[5];
         this.redPanels = new LobbyUserPanel[5];
+        this.ping = 0;
+        this.lastPing = 0;
         initLobbyUserPanels();
         initComponents();
+        loadData();
         initThread();
     }
 
     @Override
-    public void changeScene(GameScene scene){
+    public void changeScene(GameScene scene) {
         super.changeScene(scene);
         this.roomThread.stop();
     }
-    
+
     public void initLobbyUserPanels() {
         int x = 40;
         int y = 70;
@@ -168,28 +177,38 @@ public final class LobbyScene extends GameScene {
         addComponents(btChangeConfirm, btChangeTeam, btBack);
     }
 
+    private void loadData() {
+        try {
+            LobbyData buffer = ClientNetwork.getInstance().getLobbyData(this.room.getId());
+            if (data != null) {
+                synchronized (this.data) {
+                    this.data = buffer;
+                }
+            } else {
+                this.data = buffer;
+            }
+            if (System.currentTimeMillis() - this.lastPing >= 1000) {
+                this.ping = ClientNetwork.getInstance().ping();
+                this.lastPing = System.currentTimeMillis();
+            }
+        } catch (NotLoggedException ex) {
+            changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
+        } catch (Exception ex) {
+            System.out.println("An error occured: " + ex.getMessage());
+        }
+    }
+
     public void initThread() {
         this.roomThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    data = ClientNetwork.getInstance().getLobbyData(room.getId());
-                    LobbyData buffer;
-                    while (true) {
-                        buffer = ClientNetwork.getInstance().getLobbyData(room.getId());
-                        synchronized (data) {
-                            data = buffer;
-                        }
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
+                while (true) {
+                    loadData();
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
                     }
-                } catch (RemoteException ex) {
-                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-                } catch (NotLoggedException ex) {
-                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
         }
@@ -218,6 +237,9 @@ public final class LobbyScene extends GameScene {
     @Override
     public void render(GraphicsContext gc) {
         super.render(gc);
+        gc.setFill(Color.YELLOW);
+        gc.setFont(PING_FONT);
+        gc.fillText("ping: " + this.ping + "ms", 20, 15);
         gc.setStroke(Color.WHITE);
         gc.setFill(Color.WHITE);
         gc.setFont(TITLE_FONT);

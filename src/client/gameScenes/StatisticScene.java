@@ -22,17 +22,25 @@ import javafx.scene.image.Image;
 import server.room.battle.BattleStatistic;
 import constants.Constants;
 import java.rmi.RemoteException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import server.exceptions.NotLoggedException;
 
 public final class StatisticScene extends GameScene {
 
+    private static final Font PING_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
+            FontPosture.REGULAR, 15);
     private BattleStatistic statistic;
-
+    private long ping;
+    private long lastPing;
+    
     public StatisticScene(GameContext context, BattleStatistic statistic) {
         super(context, ExternalFileLoader.getInstance().getImage("client/images/background.png"));
         this.statistic = statistic;
+        this.ping = 0;
+        this.lastPing = 0;
         initComponents();
     }
 
@@ -66,13 +74,19 @@ public final class StatisticScene extends GameScene {
     public void render(GraphicsContext gc) {
         super.render(gc);
         renderComponents(gc);
+        gc.setFill(Color.YELLOW);
+        gc.setFont(PING_FONT);
+        gc.fillText("ping: "+this.ping+"ms", 20, 15);
     }
 
     @Override
     public void update(Input input) {
         try {
             super.update(input);
-            ClientNetwork.getInstance().ping();
+            if(System.currentTimeMillis() - this.lastPing >= 1000){
+                this.ping = ClientNetwork.getInstance().ping();
+                this.lastPing = System.currentTimeMillis();
+            }
         } catch (RemoteException ex) {
             changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
         } catch (NotLoggedException ex){
