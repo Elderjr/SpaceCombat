@@ -362,7 +362,7 @@ public class ServerEngine implements IServer {
             update(System.currentTimeMillis() - lastUpdate);
             lastUpdate = System.currentTimeMillis();
             try {
-                Thread.sleep(30);
+                Thread.sleep(5);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

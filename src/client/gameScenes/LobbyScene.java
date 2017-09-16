@@ -179,18 +179,17 @@ public final class LobbyScene extends GameScene {
 
     private void loadData() {
         try {
-            LobbyData buffer = ClientNetwork.getInstance().getLobbyData(this.room.getId());
-            if (data != null) {
-                synchronized (this.data) {
-                    this.data = buffer;
-                }
-            } else {
-                this.data = buffer;
-            }
             if (System.currentTimeMillis() - this.lastPing >= 1000) {
-                this.ping = ClientNetwork.getInstance().ping();
+                long pingAux = System.currentTimeMillis();
+                this.data = ClientNetwork.getInstance().getLobbyData(this.room.getId());
+                this.ping = System.currentTimeMillis() - pingAux;
                 this.lastPing = System.currentTimeMillis();
+            } else {
+                this.data = ClientNetwork.getInstance().getLobbyData(this.room.getId());
             }
+        } catch (RemoteException ex) {
+            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+            System.err.println("Connection down: " + ex.getMessage());
         } catch (NotLoggedException ex) {
             changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
         } catch (Exception ex) {

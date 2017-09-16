@@ -11,7 +11,7 @@ import server.room.battle.BattleUtils;
 public class Shot extends Skill implements Moviment {
 
     public static final Dimension SIZE = new Dimension(32, 32);
-    private static final int SPEED = 10;
+    private static final double SPEED = 0.4;
     private static final int DAMAGE = 5; //5
     public static final int COOLDOWN = 400; //400ms
 
@@ -30,25 +30,25 @@ public class Shot extends Skill implements Moviment {
         double x = this.getLocation().getX();
         double y = this.getLocation().getY();
         if (direction == Constants.UP) {
-            y -= SPEED;
+            y -= speed;
         } else if (direction == Constants.UP_LEFT) {
-            y -= SPEED;
-            x -= SPEED;
+            y -= speed;
+            x -= speed;
         } else if (direction == Constants.UP_RIGHT) {
-            y -= SPEED;
-            x += SPEED;
+            y -= speed;
+            x += speed;
         } else if (direction == Constants.DOWN) {
-            y += SPEED;
+            y += speed;
         } else if (direction == Constants.DOWN_LEFT) {
-            y += SPEED;
-            x -= SPEED;
+            y += speed;
+            x -= speed;
         } else if (direction == Constants.DOWN_RIGHT) {
-            y += SPEED;
-            x += SPEED;
+            y += speed;
+            x += speed;
         } else if (direction == Constants.LEFT) {
-            x -= SPEED;
+            x -= speed;
         } else if (direction == Constants.RIGHT) {
-            x += SPEED;
+            x += speed;
         }
         updateLocation(x, y);
     }

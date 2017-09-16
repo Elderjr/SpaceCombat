@@ -8,9 +8,8 @@ import server.room.battle.BattleUtils;
 public class AssaulterSkill extends Skill implements Moviment {
 
     private static final Dimension SIZE = new Dimension(32, 32);
-    private static final int SPEED = 15;
+    private static final double SPEED = 0.6;
     private static final int DAMAGE = 15;
-
     public static final int COOLDOWN = 4 * 1000; //4s
 
     public AssaulterSkill(BattleListener room, Position location, Spaceship source, int currentDirection) {
@@ -28,25 +27,25 @@ public class AssaulterSkill extends Skill implements Moviment {
         double x = this.getLocation().getX();
         double y = this.getLocation().getY();
         if (direction == Constants.UP) {
-            y -= SPEED;
+            y -= speed;
         } else if (direction == Constants.UP_LEFT) {
-            y -= SPEED;
-            x -= SPEED;
+            y -= speed;
+            x -= speed;
         } else if (direction == Constants.UP_RIGHT) {
-            y -= SPEED;
-            x += SPEED;
+            y -= speed;
+            x += speed;
         } else if (direction == Constants.DOWN) {
-            y += SPEED;
+            y += speed;
         } else if (direction == Constants.DOWN_LEFT) {
-            y += SPEED;
-            x -= SPEED;
+            y += speed;
+            x -= speed;
         } else if (direction == Constants.DOWN_RIGHT) {
-            y += SPEED;
-            x += SPEED;
+            y += speed;
+            x += speed;
         } else if (direction == Constants.LEFT) {
-            x -= SPEED;
+            x -= speed;
         } else if (direction == Constants.RIGHT) {
-            x += SPEED;
+            x += speed;
         }
         updateLocation(x, y);
     }
