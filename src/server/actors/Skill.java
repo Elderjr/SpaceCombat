@@ -1,7 +1,6 @@
 package server.actors;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import server.room.battle.BattleListener;
 
 public abstract class Skill extends Actor {

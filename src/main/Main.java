@@ -6,7 +6,6 @@
 package main;
 
 import client.windows.GameWindow;
-import javax.swing.JOptionPane;
 import server.dao.ConnectionFactory;
 
 

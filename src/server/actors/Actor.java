@@ -2,7 +2,6 @@ package server.actors;
 
 import server.data.SimpleActor;
 import java.awt.Dimension;
-import java.awt.Point;
 import server.room.battle.BattleListener;
 
 public abstract class Actor {
