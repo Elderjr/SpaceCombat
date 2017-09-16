@@ -32,7 +32,7 @@ public class Sprite {
         }
     }
 
-    public void render(GraphicsContext gc, int x, int y) {
+    public void render(GraphicsContext gc, double x, double y) {
         double sourceX = spritesheet.getWidthSubImage() * countCurrentlyImage;
         double sourceY = spritesheet.getHeightSubImage() * currenttlyDirection;
         gc.drawImage(spritesheet.getImage(), sourceX, sourceY,

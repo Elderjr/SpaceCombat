@@ -8,7 +8,7 @@ import server.room.battle.BattleListener;
 public abstract class Actor {
 
     private final BattleListener room;
-    private final Point location;
+    private final Position location;
     private final Dimension size;
     private final String actorType;
     private final long id;
@@ -16,7 +16,7 @@ public abstract class Actor {
     private final SimpleActor simpleActor;
     private int currentDirection;
 
-    public Actor(BattleListener room, Point location, Dimension size, int team, String actorType, int currentDirection) {
+    public Actor(BattleListener room, Position location, Dimension size, int team, String actorType, int currentDirection) {
         this.room = room;
         this.location = location;
         this.size = size;
@@ -27,7 +27,7 @@ public abstract class Actor {
         this.simpleActor = new SimpleActor(location, size, id, actorType, currentDirection, team);
     }
 
-    public abstract boolean update();
+    public abstract boolean update(long time);
 
     public long getId() {
         return this.id;
@@ -37,7 +37,7 @@ public abstract class Actor {
         return this.simpleActor;
     }
 
-    public Point getLocation() {
+    public Position getLocation() {
         return this.location;
     }
 
@@ -57,8 +57,8 @@ public abstract class Actor {
         return this.room;
     }
 
-    public void updateLocation(int x, int y) {
-        this.location.setLocation(x, y);
+    public void updateLocation(double x, double y) {
+        this.location.updatePosition(x, y);
     }
 
     protected void setCurrentDirection(int direction) {

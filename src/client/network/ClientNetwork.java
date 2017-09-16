@@ -16,7 +16,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import server.IServer;
+import server.ServerEngine;
 import server.data.BattleData;
 import server.data.GeneralStatistics;
 import server.data.LobbyData;
@@ -40,19 +43,18 @@ public class ClientNetwork {
         return instance;
     }
 
-    private ClientNetwork() {
-        /*
+    private ClientNetwork() {        
+    }
+
+    public void automatic(){
         try {
-            this.server = ServerEngine.getInstance();
             this.login("sara", "123");
             SimpleRoom room = this.createRoom(1, 3000, "Te amo mtaoo <3");
             this.changeConfirm(room.getId());
         } catch (RemoteException | NotLoggedException ex) {
             Logger.getLogger(ClientNetwork.class.getName()).log(Level.SEVERE, null, ex);
         }
-         */
     }
-
     public boolean connect(String host) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<IServer> future = executor.submit(new Callable<IServer>() {
@@ -70,6 +72,7 @@ public class ClientNetwork {
             IServer server = future.get(10, TimeUnit.SECONDS);
             if(server != null){
                 this.server = server;
+                automatic();
                 return true;
             }
             return false;

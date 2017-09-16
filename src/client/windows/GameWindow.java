@@ -20,6 +20,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import server.dao.ConnectionFactory;
 
 public class GameWindow extends Application implements GameContext {
 

@@ -44,23 +44,24 @@ public class ServerEngine implements IServer {
     }
 
     @Override
-    public void ping(long userId) throws RemoteException, NotLoggedException{
+    public void ping(long userId) throws RemoteException, NotLoggedException {
         LoggedUser loggedUser = this.loggedUsers.get(userId);
         if (loggedUser != null) {
             loggedUser.updateLastCommand();
-        }else{
+        } else {
             throw new NotLoggedException();
         }
     }
 
     @Override
-    public void exitGame(long userId) throws RemoteException{
+    public void exitGame(long userId) throws RemoteException {
         LoggedUser loggedUser = this.loggedUsers.get(userId);
         if (loggedUser != null) {
             disconnectUser(loggedUser.getUser());
             this.loggedUsers.remove(userId);
         }
     }
+
     public boolean addLoggedUser(User user) {
         try {
             GeneralStatistics userStatistic = UserDAO.getUserStatistics(user.getId());
@@ -318,10 +319,10 @@ public class ServerEngine implements IServer {
         }
     }
 
-    public void removeRoomFromData(Room r){
+    public void removeRoomFromData(Room r) {
         this.roomsData.removeRoom(r.getSimpleRoom());
     }
-    
+
     private void disconnectUser(User user) {
         this.roomsData.removeUser(user);
         for (Room r : this.rooms.values()) {
@@ -332,12 +333,13 @@ public class ServerEngine implements IServer {
         }
     }
 
-    public void update() {
+    public void update(long time) {
         Iterator<Room> roomIterator = this.rooms.values().iterator();
         Room room = null;
-        while(roomIterator.hasNext()){
+        while (roomIterator.hasNext()) {
             room = roomIterator.next();
-            if(room.update()){
+            if (room.update(time)) {
+                System.out.println(room.getId() + " deleted");
                 removeRoomFromData(room);
                 roomIterator.remove();
             }
@@ -346,7 +348,7 @@ public class ServerEngine implements IServer {
         LoggedUser loggedUser = null;
         while (iterator.hasNext()) {
             loggedUser = iterator.next();
-            if (loggedUser.isDisconnected(10000)) {
+            if (loggedUser.isDisconnected(100000)) {
                 System.out.println(loggedUser.getUser().getUsername() + " disconnected");;
                 disconnectUser(loggedUser.getUser());
                 iterator.remove();
@@ -355,8 +357,10 @@ public class ServerEngine implements IServer {
     }
 
     public void mainLoop() {
+        long lastUpdate = System.currentTimeMillis();
         while (true) {
-            update();
+            update(System.currentTimeMillis() - lastUpdate);
+            lastUpdate = System.currentTimeMillis();
             try {
                 Thread.sleep(30);
             } catch (InterruptedException e) {
@@ -367,13 +371,11 @@ public class ServerEngine implements IServer {
 
     public static void start(String host) {
         try {
-            //String host = JOptionPane.showInputDialog("Ip server: ");
             System.out.println("Criando servidor (RMI)");
             System.setProperty("java.rmi.server.hostname", host);
             ServerEngine obj = ServerEngine.getInstance();
             IServer stub = (IServer) UnicastRemoteObject.exportObject(obj, 0);
             LocateRegistry.createRegistry(1099);
-            //Register the remote object with a Java RMI registry
             Registry registry = LocateRegistry.getRegistry();
             registry.bind("SpaceCombat", stub);
             System.out.println("Checking database");
@@ -386,7 +388,7 @@ public class ServerEngine implements IServer {
                 System.exit(0);
             }
         } catch (RemoteException | AlreadyBoundException ex) {
-            System.out.println("An error occured when creating a remote server: "+ex.getMessage());
+            System.out.println("An error occured when creating a remote server: " + ex.getMessage());
             System.exit(0);
         }
     }

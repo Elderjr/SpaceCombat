@@ -154,7 +154,7 @@ public class RoomForm extends javax.swing.JDialog {
 
     private void btCreateRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCreateRoomActionPerformed
         if (!tfRoomName.getText().isEmpty()) {
-            this.roomName = tfRoomName.getText().toString();
+            this.roomName = tfRoomName.getText();
             this.maxPlayersPerTeam = this.jcPlayerPerTeam.getSelectedIndex() + 1;
             this.matchTime = (this.jcMatchTime.getSelectedIndex() + 1) * 60000;
             dispose();

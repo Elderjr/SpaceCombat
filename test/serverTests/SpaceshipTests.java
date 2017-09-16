@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.util.HashMap;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import server.actors.Position;
 import server.actors.Shot;
 import server.actors.Skill;
 import server.actors.Spaceship;
@@ -36,7 +37,7 @@ public class SpaceshipTests {
                 new HashMap<Long, LobbyUser>() ,new HashMap<Long, LobbyUser>(), r);
         return SpaceshipFactory.createSpaceship(
                 type, battleListener,
-                new Point(100,100), team, 
+                new Position(100,100), team, 
                 Constants.RIGHT, user);
     }
     @Test

@@ -3,17 +3,18 @@ package server.data;
 import java.awt.Point;
 import java.awt.geom.Dimension2D;
 import java.io.Serializable;
+import server.actors.Position;
 
 public class SimpleActor implements Serializable {
 
     private long id;
     private String actorType;
-    private Point location;
+    private Position location;
     private Dimension2D size;
     private int direction;
     private int team;
 
-    public SimpleActor(Point location, Dimension2D size, long id, String actorType, int direction, int team) {
+    public SimpleActor(Position location, Dimension2D size, long id, String actorType, int direction, int team) {
         this.location = location;
         this.size = size;
         this.id = id;
@@ -39,7 +40,7 @@ public class SimpleActor implements Serializable {
         return this.actorType;
     }
     
-    public Point getLocation(){
+    public Position getLocation(){
         return this.location;
     }
     

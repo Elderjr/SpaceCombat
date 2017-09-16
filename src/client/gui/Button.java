@@ -48,7 +48,7 @@ public abstract class Button extends Component{
         }
     }
 
-    public final void doClick() {
+    public void doClick() {
         if (action != null) {
             action.doAction();
         }

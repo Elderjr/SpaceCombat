@@ -5,7 +5,6 @@
  */
 package client.gameScenes;
 
-import client.gameScenes.GameScene;
 
 /**
  *

@@ -2,11 +2,11 @@ package client.gui;
 
 public abstract class Component implements Paintable {
 
-    private int x;
-    private int y;
+    private double x;
+    private double y;
     private boolean visible;
 
-    protected Component(int x, int y) {
+    protected Component(double x, double y) {
         this.x = x;
         this.y = y;
         this.visible = true;
@@ -20,15 +20,15 @@ public abstract class Component implements Paintable {
         return this.visible;
     }
     
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
-    public void updateLocation(int x, int y){
+    public void updateLocation(double x, double y){
         this.x = x;
         this.y = y;
     }

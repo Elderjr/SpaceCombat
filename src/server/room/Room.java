@@ -91,9 +91,9 @@ public class Room {
         System.out.println("done");
     }
     
-    public boolean update() {
+    public boolean update(long time) {
         if (this.state == Constants.PLAYING) {
-            this.battleManager.update();
+            this.battleManager.update(time);
         }
         return (this.state == Constants.DONE && System.currentTimeMillis() - this.doneAt >= 25000)
                 || (this.state == Constants.WAITING && this.getWaitingRoomManager().getTotalPlayers() == 0);

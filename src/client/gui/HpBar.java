@@ -27,6 +27,9 @@ public class HpBar extends Component {
 
     public HpBar(int x, int y) {
         super(x, y);
+        this.maxHP = 0;
+        this.currentHP = 0;
+        this.currentPerc = 0;
     }
 
     private void calculePercentage() {

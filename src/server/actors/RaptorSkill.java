@@ -13,12 +13,12 @@ public class RaptorSkill extends Skill {
     private static final int DAMAGE = 25;
     public static final int COOLDOWN = 10 * 1000;
 
-    public RaptorSkill(BattleListener room, Point location, Spaceship source) {
+    public RaptorSkill(BattleListener room, Position location, Spaceship source) {
         super(room, location, SIZE, source, DAMAGE, 0, Constants.RAPTOR_SKILL);
     }
 
     @Override
-    public boolean update() {
+    public boolean update(long time) {
         return BattleUtils.isOutside(getLocation());
     }
 

@@ -50,8 +50,8 @@ public class LobbyUserPanel extends Component {
     }
 
     private final void initAnimations() {
-        int x = getX() + 25;
-        int y = getY() + 45;
+        double x = getX() + 25;
+        double y = getY() + 45;
         this.assaulterSpaceship = new Animation(x, y,
                 ExternalFileLoader.getInstance().getSprite(
                         Constants.SPACESHIP_ASSAULTER, team));

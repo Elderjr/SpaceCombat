@@ -144,8 +144,11 @@ public final class RoomScene extends GameScene {
                         @Override
                         public void doAction() {
                             try {
-                                ClientNetwork.getInstance().enterRoom(room.getId());
-                                changeScene(new LobbyScene(getContext(), room));
+                                if (room.getMaxPlayersPerTeam() * 2 != room.getTotalPlayers()
+                                        && room.getState() == constants.Constants.WAITING) {
+                                    ClientNetwork.getInstance().enterRoom(room.getId());
+                                    changeScene(new LobbyScene(getContext(), room));
+                                }
                             } catch (RemoteException ex) {
                                 changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                             } catch (NotLoggedException ex) {
@@ -173,7 +176,7 @@ public final class RoomScene extends GameScene {
         renderComponents(gc);
         gc.setFill(Color.YELLOW);
         gc.setFont(PING_FONT);
-        gc.fillText("ping: "+this.ping+"ms", 20, 15);
+        gc.fillText("ping: " + this.ping + "ms", 20, 15);
         gc.setFill(Color.WHITESMOKE);
         gc.setFont(DEFAULT_FONT);
         gc.fillText("User: [" + this.user.getUsername() + "]", 335, 60);
@@ -221,10 +224,11 @@ public final class RoomScene extends GameScene {
         }
         try {
             if (System.currentTimeMillis() - this.lastUpdate >= 1000) {
+                long pingAux = System.currentTimeMillis();
                 this.roomData = ClientNetwork.getInstance().getRooms();
+                this.ping = System.currentTimeMillis() - pingAux;
                 updatePageButtons(this.currentPage);
                 this.lastUpdate = System.currentTimeMillis();
-                this.ping = ClientNetwork.getInstance().ping();
             }
         } catch (RemoteException ex) {
             changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));

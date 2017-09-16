@@ -11,24 +11,24 @@ import server.room.battle.BattleUtils;
 public class Shot extends Skill implements Moviment {
 
     public static final Dimension SIZE = new Dimension(32, 32);
-    private static final int SPEED = 9;
+    private static final int SPEED = 10;
     private static final int DAMAGE = 5; //5
     public static final int COOLDOWN = 400; //400ms
 
-    public Shot(BattleListener room, Point location, Spaceship source, int currentDirection) {
+    public Shot(BattleListener room, Position location, Spaceship source, int currentDirection) {
         super(room, location, SIZE, source, DAMAGE, currentDirection, Constants.SHOT);
     }
 
     @Override
-    public boolean update() {
-        move(getCurrentDirection());
+    public boolean update(long time) {
+        move(getCurrentDirection(), SPEED * time);
         return BattleUtils.isOutside(getLocation());
     }
 
     @Override
-    public void move(int direction) {
-        int x = this.getLocation().x;
-        int y = this.getLocation().y;
+    public void move(int direction, double speed) {
+        double x = this.getLocation().getX();
+        double y = this.getLocation().getY();
         if (direction == Constants.UP) {
             y -= SPEED;
         } else if (direction == Constants.UP_LEFT) {

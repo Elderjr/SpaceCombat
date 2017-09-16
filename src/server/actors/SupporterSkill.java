@@ -12,12 +12,12 @@ public class SupporterSkill extends Skill {
     private static final int DAMAGE = 10;
     public static final int COOLDOWN = 4 * 1000; //5s
 
-    public SupporterSkill(BattleListener room, Point location, Spaceship source) {
+    public SupporterSkill(BattleListener room, Position location, Spaceship source) {
         super(room, location, SIZE, source, DAMAGE, 0, Constants.SUPPORTER_SKILL);
     }
 
     @Override
-    public boolean update() {
+    public boolean update(long time) {
         return BattleUtils.isOutside(getLocation());
     }
 

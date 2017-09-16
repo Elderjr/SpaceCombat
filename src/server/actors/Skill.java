@@ -9,7 +9,7 @@ public abstract class Skill extends Actor {
     private int damage;
     private Spaceship source;
 
-    public Skill(BattleListener room, Point location, Dimension size, Spaceship source, int damage, int currentDirection, String actorType) {
+    public Skill(BattleListener room, Position location, Dimension size, Spaceship source, int damage, int currentDirection, String actorType) {
         super(room, location, size, source.getTeam(), actorType, currentDirection);
         this.damage = damage;
         this.source = source;

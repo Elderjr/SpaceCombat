@@ -16,11 +16,11 @@ public abstract class Spaceship extends Actor implements Moviment {
 
     private final User pilot;
     private final int maxHP;
-    private final int movimentSpeed;
+    private final double movimentSpeed;
     private final int team;
     private int hp;
 
-    public Spaceship(BattleListener room, Point location, int team, String actorType, int maxHP, int movimentSpeed, int initialDirection, User pilot) {
+    public Spaceship(BattleListener room, Position location, int team, String actorType, int maxHP, double movimentSpeed, int initialDirection, User pilot) {
         super(room, location, SIZE, team, actorType, initialDirection);
         this.maxHP = maxHP;
         this.hp = maxHP;
@@ -45,6 +45,10 @@ public abstract class Spaceship extends Actor implements Moviment {
     
     public int getHP() {
         return this.hp;
+    }
+    
+    public double getMovimentSpeed(){
+        return this.movimentSpeed;
     }
 
     public void restoreHP() {
@@ -82,59 +86,64 @@ public abstract class Spaceship extends Actor implements Moviment {
 
     public Shot shoot() {
         if (canUseShot()) {
-            Point shotLocation = new Point(this.getLocation().x, this.getLocation().y);
+            double x = this.getLocation().getX();
+            double y = this.getLocation().getY();
             if (getCurrentDirection() == Constants.UP) {
-                shotLocation.y -= this.getSize().getHeight() / 2;
+                y -= this.getSize().getHeight() / 2;
             } else if (getCurrentDirection() == Constants.DOWN) {
-                shotLocation.y += this.getSize().getHeight() / 2;
+                y += this.getSize().getHeight() / 2;
             } else if (getCurrentDirection() == Constants.LEFT) {
-                shotLocation.x -= this.getSize().getWidth() / 2;
+                x -= this.getSize().getWidth() / 2;
             } else if (getCurrentDirection() == Constants.RIGHT) {
-                shotLocation.x += this.getSize().getWidth() / 2;
+                x += this.getSize().getWidth() / 2;
             } else if (getCurrentDirection() == Constants.UP_LEFT) {
-                shotLocation.y -= this.getSize().getHeight() / 2;
-                shotLocation.x -= this.getSize().getWidth() / 2;
+                y -= this.getSize().getHeight() / 2;
+                x -= this.getSize().getWidth() / 2;
             } else if (getCurrentDirection() == Constants.UP_RIGHT) {
-                shotLocation.y -= this.getSize().getHeight() / 2;
-                shotLocation.x += this.getSize().getWidth() / 2;
+                y -= this.getSize().getHeight() / 2;
+                x += this.getSize().getWidth() / 2;
             } else if (getCurrentDirection() == Constants.DOWN_RIGHT) {
-                shotLocation.y += this.getSize().getHeight() / 2;
-                shotLocation.x += this.getSize().getWidth() / 2;
+                y += this.getSize().getHeight() / 2;
+                x += this.getSize().getWidth() / 2;
             } else if (getCurrentDirection() == Constants.DOWN_LEFT) {
-                shotLocation.y += this.getSize().getHeight() / 2;
-                shotLocation.x -= this.getSize().getWidth() / 2;
+                y += this.getSize().getHeight() / 2;
+                x -= this.getSize().getWidth() / 2;
             }
             this.shotFired = System.currentTimeMillis();
-            return new Shot(getBattleListener(), shotLocation, this, getCurrentDirection());
+            return new Shot(getBattleListener(), new Position(x, y), this, getCurrentDirection());
         }else{
             return null;
         }
     }
 
+    
+    public void move(int direction){
+        move(direction, this.movimentSpeed);
+    }
     @Override
-    public void move(int direction) {
-        int x = this.getLocation().x;
-        int y = this.getLocation().y;
+    public void move(int direction, double speed) {
+        double x = this.getLocation().getX();
+        double y = this.getLocation().getY();
         if (direction == Constants.UP) {
-            y -= movimentSpeed;
+            y -= speed;
         } else if (direction == Constants.UP_LEFT) {
-            y -= movimentSpeed;
-            x -= movimentSpeed;
+            y -= speed;
+            x -= speed;
         } else if (direction == Constants.UP_RIGHT) {
-            y -= movimentSpeed;
-            x += movimentSpeed;
+            y -= speed;
+            x += speed;
         } else if (direction == Constants.DOWN) {
-            y += movimentSpeed;
+            y += speed;
         } else if (direction == Constants.DOWN_LEFT) {
-            y += movimentSpeed;
-            x -= movimentSpeed;
+            y += speed;
+            x -= speed;
         } else if (direction == Constants.DOWN_RIGHT) {
-            y += movimentSpeed;
-            x += movimentSpeed;
+            y += speed;
+            x += speed;
         } else if (direction == Constants.LEFT) {
-            x -= movimentSpeed;
+            x -= speed;
         } else if (direction == Constants.RIGHT) {
-            x += movimentSpeed;
+            x += speed;
         }
         if (!BattleUtils.isOutside(x, y)) {
             updateLocation(x, y);
@@ -143,7 +152,7 @@ public abstract class Spaceship extends Actor implements Moviment {
     }
 
     @Override
-    public boolean update() {
+    public boolean update(long time) {
         return false;
     }
 }

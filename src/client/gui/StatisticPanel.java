@@ -35,7 +35,7 @@ public class StatisticPanel extends Component{
     @Override
     public void render(GraphicsContext gc) {
         gc.drawImage(STATISTIC_LINE, getX(), getY());
-        int y = getY() + 30;
+        double y = getY() + 30;
         gc.setFill(Color.BLUE);
         for (PersonalStatistic statistic : this.blueTeam) {
             gc.drawImage(BLUE_LINE, getX() + 6, y);

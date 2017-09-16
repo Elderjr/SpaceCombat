@@ -69,8 +69,10 @@ public final class BattleScene extends GameScene {
 
     public void initComponents() {
         this.hpBar = new HpBar(37, 53);
-        this.hpBar.setMaxHP(this.data.getMaxHp());
-        this.hpBar.setCurrentHP(this.data.getMyHp());
+        if (data != null) {
+            this.hpBar.setMaxHP(this.data.getMaxHp());
+            this.hpBar.setCurrentHP(this.data.getMyHp());
+        }
         this.shootReady = new ImageLabel(249, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
         this.skillReady = new ImageLabel(345, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
         addComponents(this.hpBar, this.shootReady, this.skillReady);
@@ -78,18 +80,17 @@ public final class BattleScene extends GameScene {
 
     public void loadData() {
         try {
-            BattleData buffer = ClientNetwork.getInstance().getBattleData(this.room.getId());
-            if (data != null) {
-                synchronized (this.data) {
-                    this.data = buffer;
-                }
-            } else {
-                this.data = buffer;
-            }
-            if(System.currentTimeMillis() - this.lastPing >= 1000){
-                this.ping = ClientNetwork.getInstance().ping();
+            if (System.currentTimeMillis() - this.lastPing >= 1000) {
+                long pingAux = System.currentTimeMillis();
+                this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
+                this.ping = System.currentTimeMillis() - pingAux;
                 this.lastPing = System.currentTimeMillis();
+            } else {
+                this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
             }
+        } catch (RemoteException ex) {
+            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+            System.err.println("Connection down: " + ex.getMessage());
         } catch (NotLoggedException ex) {
             changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
         } catch (Exception ex) {
@@ -100,7 +101,9 @@ public final class BattleScene extends GameScene {
     @Override
     public void changeScene(GameScene scene) {
         super.changeScene(scene);
-        this.battleThread.stop();
+        if(this.battleThread != null){
+            this.battleThread.stop();
+        }
     }
 
     public void initThread() {
@@ -110,7 +113,7 @@ public final class BattleScene extends GameScene {
                 while (data != null) {
                     loadData();
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(10);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RoomScene.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -124,15 +127,14 @@ public final class BattleScene extends GameScene {
         for (SimpleActor simpleActor : simpleActors.values()) {
             if (this.animations.containsKey(simpleActor.getId())) {
                 Animation animation = this.animations.get(simpleActor.getId());
-                animation.updateLocation(simpleActor.getLocation().x + 25, simpleActor.getLocation().y + 110);
+                animation.updateLocation(simpleActor.getLocation().getX() - simpleActor.getSize().getWidth() / 2 + 25, simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 +110);
                 animation.setSpriteDirection(simpleActor.getDirection());
             } else {
                 Sprite sprite = ExternalFileLoader.getInstance().
                         getSprite(simpleActor.getActorType(), simpleActor.getTeam());
-                Animation animation = new Animation(simpleActor.getLocation().x + 25,
-                        simpleActor.getLocation().y + 110,
-                        sprite, (int) simpleActor.getSize().getWidth() / 2,
-                        (int) simpleActor.getSize().getHeight() / 2);
+                Animation animation = new Animation(simpleActor.getLocation().getX() - simpleActor.getSize().getWidth() / 2 + 25,
+                        simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 +110,
+                        sprite);
                 animation.setSpriteDirection(simpleActor.getDirection());
                 this.animations.put(simpleActor.getId(), animation);
             }
@@ -153,24 +155,22 @@ public final class BattleScene extends GameScene {
         renderComponents(gc);
         gc.setFill(Color.YELLOW);
         gc.setFont(PING_FONT);
-        gc.fillText("ping: "+this.ping+"ms", 20, 15);
+        gc.fillText("ping: " + this.ping + "ms", 20, 15);
         for (Animation animation : this.animations.values()) {
             animation.render(gc);
         }
         if (data != null) {
-            synchronized (data) {
-                gc.setFill(Color.WHITE);
-                gc.setFont(TIME_FONT);
-                gc.fillText(Util.formatMicroseconds(data.getMatchTime()), 380, 48);
-                gc.setFill(Color.BLUE);
-                gc.fillText("" + data.getBlueTeamPoint(), 585, 61);
-                gc.setFill(Color.RED);
-                gc.fillText("" + data.getRedTeamPoint(), 735, 61);
-                gc.setFill(Color.WHITE);
-                gc.setFont(REGULAR_FONT);
-                gc.fillText("" + data.getKills(), 490, 92);
-                gc.fillText("" + data.getDeaths(), 610, 92);
-            }
+            gc.setFill(Color.WHITE);
+            gc.setFont(TIME_FONT);
+            gc.fillText(Util.formatMicroseconds(data.getMatchTime()), 380, 48);
+            gc.setFill(Color.BLUE);
+            gc.fillText("" + data.getBlueTeamPoint(), 585, 61);
+            gc.setFill(Color.RED);
+            gc.fillText("" + data.getRedTeamPoint(), 735, 61);
+            gc.setFill(Color.WHITE);
+            gc.setFont(REGULAR_FONT);
+            gc.fillText("" + data.getKills(), 490, 92);
+            gc.fillText("" + data.getDeaths(), 610, 92);
         }
     }
 
@@ -201,6 +201,7 @@ public final class BattleScene extends GameScene {
             }
         } catch (RemoteException ex) {
             changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+            System.err.println("Connection down: " + ex.getMessage());
         } catch (NotLoggedException ex) {
             changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
         }
@@ -223,6 +224,7 @@ public final class BattleScene extends GameScene {
                     changeScene(new StatisticScene(getContext(), statistics));
                 } catch (RemoteException ex) {
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                    System.err.println("Connection down: " + ex.getMessage());
                 } catch (NotLoggedException ex) {
                     changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }

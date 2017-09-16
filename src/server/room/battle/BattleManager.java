@@ -10,6 +10,7 @@ import server.actors.SpaceshipFactory;
 import server.data.BattleData;
 import server.data.LobbyUser;
 import constants.Constants;
+import server.actors.Position;
 import server.room.Room;
 
 public class BattleManager implements BattleListener {
@@ -38,19 +39,17 @@ public class BattleManager implements BattleListener {
     private void initTeamSpaceships(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam) {
         Random r = new Random();
         for (Entry<Long, LobbyUser> entry : blueTeam.entrySet()) {
-            Point location = new Point(150, randomLocation());
-            addUser(entry.getValue(), location, Constants.RIGHT, Constants.BLUE_TEAM);
-            location.y += 50;
+            Position position = new Position(150, randomLocation());
+            addUser(entry.getValue(), position, Constants.RIGHT, Constants.BLUE_TEAM);
         }
 
         for (Entry<Long, LobbyUser> entry : redTeam.entrySet()) {
-            Point location = new Point(650, randomLocation());
-            addUser(entry.getValue(), location, Constants.LEFT, Constants.RED_TEAM);
-            location.y += 50;
+            Position position = new Position(650, randomLocation());
+            addUser(entry.getValue(), position, Constants.LEFT, Constants.RED_TEAM);
         }
     }
 
-    private void addUser(LobbyUser lobbyUser, Point location, int direction, int team) {
+    private void addUser(LobbyUser lobbyUser, Position location, int direction, int team) {
         Spaceship spaceship = SpaceshipFactory.createSpaceship(
                 lobbyUser.getSpaceshipSelected(), this,
                 location, team, direction, lobbyUser.getUser());
@@ -170,12 +169,12 @@ public class BattleManager implements BattleListener {
         }
     }
 
-    public void update() {
+    public void update(long time) {
         if(room.getState() == Constants.PLAYING){
             this.currentMatchTime = room.getMatchTime() - (System.currentTimeMillis() - this.startedAt);
             if (this.currentMatchTime > 0) {
                 this.processActions();
-                this.actorsManager.update();
+                this.actorsManager.update(time);
             }else{
                 room.endBattle();
             }

@@ -6,10 +6,9 @@
 package server.room.battle;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import server.actors.Skill;
 import server.actors.Spaceship;
-import constants.Constants;
+import server.actors.Position;
 
 /**
  *
@@ -20,19 +19,19 @@ public class BattleUtils {
     public static final Dimension MAP_SIZE = new Dimension(745, 450);
     
     public static boolean isColision(Spaceship spaceship, Skill skill) {
-        int distanceX = Math.abs(spaceship.getLocation().x - skill.getLocation().x);
-        int distanceY = Math.abs(spaceship.getLocation().y - skill.getLocation().y);
+        double distanceX = Math.abs(spaceship.getLocation().getX() - skill.getLocation().getX());
+        double distanceY = Math.abs(spaceship.getLocation().getY() - skill.getLocation().getY());
         return (distanceX < spaceship.getSize().getWidth() / 2 + skill.getSize().getWidth() / 2)
                 && (distanceY < spaceship.getSize().getHeight() / 2 + skill.getSize().getHeight() / 2);
     }
     
-    public static boolean isOutside(int x, int y){
+    public static boolean isOutside(double x, double y){
         return (x > MAP_SIZE.getWidth() || x < 0 
                 || y > MAP_SIZE.getHeight() || y < 0);
     }
     
-    public static boolean isOutside(Point p){
-        return isOutside(p.x, p.y);
+    public static boolean isOutside(Position p){
+        return isOutside(p.getX(), p.getY());
     }
     
     
