@@ -6,6 +6,7 @@
 package client.gui;
 
 import client.sprite.ExternalFileLoader;
+import constants.Constants;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.text.Font;
@@ -53,14 +54,14 @@ public class RoomButton extends Button{
         gc.setFont(CHARACTER_FONT);
         gc.fillText(room.getTotalPlayers() + " / " + (room.getMaxPlayersPerTeam() * 2), getX() + 290, getY() + 45);
         gc.fillText("5:00", getX() + 315, getY() + 85);
-        if (room.getState() == Room.WAITING && room.getTotalPlayers() != room.getMaxPlayersPerTeam() * 2) {
+        if (room.getState() == Constants.WAITING && room.getTotalPlayers() != room.getMaxPlayersPerTeam() * 2) {
             gc.fillText("WAITING", getX() + 15, getY() + 90);
             gc.fillRect(getX() + 140, getY() + 85, 5, 5);
             gc.fillRect(getX() + 150, getY() + 85, 5, 5);
             gc.fillRect(getX() + 160, getY() + 85, 5, 5);
-        } else if(room.getState() == Room.WAITING && room.getTotalPlayers() == room.getMaxPlayersPerTeam() * 2){
+        } else if(room.getState() == Constants.WAITING && room.getTotalPlayers() == room.getMaxPlayersPerTeam() * 2){
             gc.fillText("FULL", getX() + 15, getY() + 90);
-        } else if (room.getState() == Room.PLAYING) {
+        } else if (room.getState() == Constants.PLAYING) {
             gc.fillText("PLAYING", getX() + 15, getY() + 90);
         }
     }

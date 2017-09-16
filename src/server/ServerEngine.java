@@ -17,7 +17,7 @@ import server.room.battle.BattleStatistic;
 import server.data.User;
 import server.exceptions.NotLoggedException;
 import server.room.battle.PersonalStatistic;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
 import server.dao.UserDAO;
 import server.data.GeneralStatistics;
 
@@ -27,25 +27,40 @@ public class ServerEngine implements IServer {
 
     private final HashMap<Long, LoggedUser> loggedUsers;
     private final HashMap<Long, Room> rooms;
-    private final HashMap<Long, BattleStatistic> roomsStatistics;
     private final RoomData roomsData;
 
     private ServerEngine() {
         this.roomsData = new RoomData();
         this.loggedUsers = new HashMap<>();
         this.rooms = new HashMap<>();
-        this.roomsStatistics = new HashMap<>();
     }
 
     public static ServerEngine getInstance() {
         return instance;
     }
 
-    @Override
-    public void ping() {
-
+    public HashMap<Long, Room> getRooms() {
+        return this.rooms;
     }
 
+    @Override
+    public void ping(long userId) throws RemoteException, NotLoggedException{
+        LoggedUser loggedUser = this.loggedUsers.get(userId);
+        if (loggedUser != null) {
+            loggedUser.updateLastCommand();
+        }else{
+            throw new NotLoggedException();
+        }
+    }
+
+    @Override
+    public void exitGame(long userId) throws RemoteException{
+        LoggedUser loggedUser = this.loggedUsers.get(userId);
+        if (loggedUser != null) {
+            disconnectUser(loggedUser.getUser());
+            this.loggedUsers.remove(userId);
+        }
+    }
     public boolean addLoggedUser(User user) {
         try {
             GeneralStatistics userStatistic = UserDAO.getUserStatistics(user.getId());
@@ -256,65 +271,57 @@ public class ServerEngine implements IServer {
 
     @Override
     public BattleStatistic getBattleStatistic(long playerId, long roomId) throws RemoteException, NotLoggedException {
-        BattleStatistic statistics = this.roomsStatistics.get(roomId);
+        Room room = this.rooms.get(roomId);
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
-        if (statistics != null && loggedUser != null) {
+        if (loggedUser != null && room != null && room.getState() == Constants.DONE) {
             loggedUser.updateLastCommand();
-            return statistics;
+            return room.getBattleRoomManager().getBattleStatistic();
         } else if (loggedUser == null) {
             throw new NotLoggedException();
         }
         return null;
     }
-    
+
     @Override
     public GeneralStatistics getGeneralStatistic(long playerId) throws RemoteException, NotLoggedException {
         LoggedUser loggedUser = this.loggedUsers.get(playerId);
         if (loggedUser != null) {
             loggedUser.updateLastCommand();
             return loggedUser.getStatistics();
-        } else{
+        } else {
             throw new NotLoggedException();
         }
     }
 
-    private void endRoom(long roomId) {
-        System.out.println("terminou!");
-        Room r = this.rooms.get(roomId);
-        if (r != null) {
-            BattleStatistic statistics = r.getBattleRoomManager().getBattleStatistic();
-            this.roomsStatistics.put(r.getId(), statistics);
-            boolean blueWins = statistics.getWinner() == ServerConstants.BLUE_TEAM;
-            boolean redWins = statistics.getWinner() == ServerConstants.RED_TEAM;
-            boolean draw = statistics.getWinner() == ServerConstants.DRAW;
-            try {
-                for (PersonalStatistic statistic : statistics.getBlueTeam()) {
-                    LoggedUser loggedUser = this.loggedUsers.get(statistic.getUser().getId());
-                    if(loggedUser != null){
-                        loggedUser.incrementStatisticsValues(statistic, blueWins, draw);
-                    }
-                    UserDAO.updateStatistic(statistic, blueWins, draw);
+    public void updateStatistics(Room r) {
+        BattleStatistic statistics = r.getBattleRoomManager().getBattleStatistic();
+        boolean blueWins = statistics.getWinner() == Constants.BLUE_TEAM;
+        boolean redWins = statistics.getWinner() == Constants.RED_TEAM;
+        boolean draw = statistics.getWinner() == Constants.DRAW;
+        try {
+            for (PersonalStatistic statistic : statistics.getBlueTeam()) {
+                LoggedUser loggedUser = this.loggedUsers.get(statistic.getUser().getId());
+                if (loggedUser != null) {
+                    loggedUser.incrementStatisticsValues(statistic, blueWins, draw);
                 }
-                for (PersonalStatistic statistic : statistics.getRedTeam()) {
-                    LoggedUser loggedUser = this.loggedUsers.get(statistic.getUser().getId());
-                    if(loggedUser != null){
-                        loggedUser.incrementStatisticsValues(statistic, redWins, draw);
-                    }
-                    UserDAO.updateStatistic(statistic, redWins, draw);
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+                UserDAO.updateStatistic(statistic, blueWins, draw);
             }
-            removeRoom(r.getId());
+            for (PersonalStatistic statistic : statistics.getRedTeam()) {
+                LoggedUser loggedUser = this.loggedUsers.get(statistic.getUser().getId());
+                if (loggedUser != null) {
+                    loggedUser.incrementStatisticsValues(statistic, redWins, draw);
+                }
+                UserDAO.updateStatistic(statistic, redWins, draw);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 
-    public void removeRoom(long roomId) {
-        Room r = this.rooms.get(roomId);
+    public void removeRoomFromData(Room r){
         this.roomsData.removeRoom(r.getSimpleRoom());
-        this.rooms.remove(roomId);
     }
-
+    
     private void disconnectUser(User user) {
         this.roomsData.removeUser(user);
         for (Room r : this.rooms.values()) {
@@ -326,16 +333,19 @@ public class ServerEngine implements IServer {
     }
 
     public void update() {
-        for (Room r : this.rooms.values()) {
-            if (r.update()) {
-                endRoom(r.getId());
+        Iterator<Room> roomIterator = this.rooms.values().iterator();
+        Room room = null;
+        while(roomIterator.hasNext()){
+            room = roomIterator.next();
+            if(room.update()){
+                roomIterator.remove();
             }
         }
         Iterator<LoggedUser> iterator = this.loggedUsers.values().iterator();
         LoggedUser loggedUser = null;
         while (iterator.hasNext()) {
             loggedUser = iterator.next();
-            if (loggedUser.isDisconnected(200000)) {
+            if (loggedUser.isDisconnected(10000)) {
                 System.out.println(loggedUser.getUser().getUsername() + " disconnected");;
                 disconnectUser(loggedUser.getUser());
                 iterator.remove();
@@ -382,5 +392,4 @@ public class ServerEngine implements IServer {
         }
     }
 
-    
 }

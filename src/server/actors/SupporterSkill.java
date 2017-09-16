@@ -2,11 +2,9 @@ package server.actors;
 
 import java.awt.Dimension;
 import java.awt.Point;
-
-import client.commands.ClientCommands;
-import server.room.Room;
 import server.room.battle.BattleListener;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
+import server.room.battle.BattleUtils;
 
 public class SupporterSkill extends Skill {
 
@@ -15,13 +13,12 @@ public class SupporterSkill extends Skill {
     public static final int COOLDOWN = 4 * 1000; //5s
 
     public SupporterSkill(BattleListener room, Point location, Spaceship source) {
-        super(room, location, SIZE, source, DAMAGE, 0, ActorsTypes.SUPPORTER_SKILL);
+        super(room, location, SIZE, source, DAMAGE, 0, Constants.SUPPORTER_SKILL);
     }
 
     @Override
     public boolean update() {
-        return (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0 
-                || getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0);
+        return BattleUtils.isOutside(getLocation());
     }
 
     @Override

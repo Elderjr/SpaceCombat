@@ -8,7 +8,7 @@ package server.room.battle;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
 import server.data.User;
 
 /**
@@ -30,9 +30,9 @@ public class BattleStatistic implements Serializable {
     }
 
     public void addUser(User user, String spaceshipName, int team) {
-        if (team == ServerConstants.BLUE_TEAM) {
+        if (team == Constants.BLUE_TEAM) {
             this.blueTeam.put(user.getId(), new PersonalStatistic(user, spaceshipName));
-        } else if (team == ServerConstants.RED_TEAM) {
+        } else if (team == Constants.RED_TEAM) {
             this.redTeam.put(user.getId(), new PersonalStatistic(user, spaceshipName));
         }
     }
@@ -53,11 +53,11 @@ public class BattleStatistic implements Serializable {
 
     public int getWinner() {
         if (this.blueTeamPoint > this.redTeamPoint) {
-            return ServerConstants.BLUE_TEAM;
+            return Constants.BLUE_TEAM;
         } else if (this.blueTeamPoint < this.redTeamPoint) {
-            return ServerConstants.RED_TEAM;
+            return Constants.RED_TEAM;
         } else {
-            return ServerConstants.DRAW;
+            return Constants.DRAW;
         }
     }
 

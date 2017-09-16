@@ -41,7 +41,7 @@ public abstract class Actor {
         return this.location;
     }
 
-    protected int getCurrentDirection() {
+    public int getCurrentDirection() {
         return this.currentDirection;
     }
 

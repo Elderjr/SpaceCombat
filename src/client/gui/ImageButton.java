@@ -19,9 +19,9 @@ public class ImageButton extends Button{
     
     public ImageButton(int x, int y, Image defaultImage, Image onClick, ActionPerfomed action) {
         super(x, y, action);
-        setSize((int) defaultImage.getWidth(), (int) defaultImage.getHeight());
         this.defaultImage = defaultImage;
         this.onClick = onClick;
+        setSize((int) defaultImage.getWidth(), (int) defaultImage.getHeight());
     }
     
     @Override

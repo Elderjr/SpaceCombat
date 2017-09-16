@@ -12,9 +12,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import server.actors.ActorsTypes;
 import server.data.LobbyUser;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
 
 /**
  *
@@ -36,7 +35,7 @@ public class LobbyUserPanel extends Component {
     public LobbyUserPanel(int x, int y, int team) {
         super(x, y);
         this.team = team;
-        if (this.team == ServerConstants.BLUE_TEAM) {
+        if (this.team == Constants.BLUE_TEAM) {
             this.panelReady = ExternalFileLoader.getInstance().getImage("client/images/bluePanel_ready.png");
             this.panelNotReady = ExternalFileLoader.getInstance().getImage("client/images/bluePanel_notReady.png");
         } else {
@@ -55,13 +54,13 @@ public class LobbyUserPanel extends Component {
         int y = getY() + 45;
         this.assaulterSpaceship = new Animation(x, y,
                 ExternalFileLoader.getInstance().getSprite(
-                        ActorsTypes.SPACESHIP_ASSAULTER, team));
+                        Constants.SPACESHIP_ASSAULTER, team));
         this.supporterSpaceship = new Animation(x, y,
                 ExternalFileLoader.getInstance().getSprite(
-                        ActorsTypes.SPACESHIP_SUPPORTER, team));
+                        Constants.SPACESHIP_SUPPORTER, team));
         this.raptorSpaceship = new Animation(x, y,
                 ExternalFileLoader.getInstance().getSprite(
-                        ActorsTypes.SPACESHIP_RAPTOR, team));
+                        Constants.SPACESHIP_RAPTOR, team));
     }
 
     @Override
@@ -75,11 +74,11 @@ public class LobbyUserPanel extends Component {
             }
             gc.setFill(Color.WHITE);
             gc.fillText(this.lobbyUser.getUser().getUsername(), getX() + 10, getY() + 15);
-            if (this.lobbyUser.getSpaceshipSelected() == ActorsTypes.SPACESHIP_ASSAULTER) {
+            if (this.lobbyUser.getSpaceshipSelected().equalsIgnoreCase(Constants.SPACESHIP_ASSAULTER)) {
                 this.assaulterSpaceship.render(gc);
-            } else if (this.lobbyUser.getSpaceshipSelected() == ActorsTypes.SPACESHIP_RAPTOR) {
+            } else if (this.lobbyUser.getSpaceshipSelected().equalsIgnoreCase(Constants.SPACESHIP_RAPTOR)) {
                 this.raptorSpaceship.render(gc);
-            } else if (this.lobbyUser.getSpaceshipSelected() == ActorsTypes.SPACESHIP_SUPPORTER) {
+            } else if (this.lobbyUser.getSpaceshipSelected().equalsIgnoreCase(Constants.SPACESHIP_SUPPORTER)) {
                 this.supporterSpaceship.render(gc);
             }
         } else {

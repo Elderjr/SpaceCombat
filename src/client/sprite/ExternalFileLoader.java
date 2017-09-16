@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import javafx.scene.image.Image;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
 
 public class ExternalFileLoader {
 
@@ -35,9 +35,9 @@ public class ExternalFileLoader {
 
     public Sprite getSprite(String actorType, int team) {
         String spritesheetName = actorType;
-        if (team == ServerConstants.BLUE_TEAM) {
+        if (team == Constants.BLUE_TEAM) {
             spritesheetName += "_blue";
-        } else if (team == ServerConstants.RED_TEAM) {
+        } else if (team == Constants.RED_TEAM) {
             spritesheetName += "_red";
         } else {
             return null;

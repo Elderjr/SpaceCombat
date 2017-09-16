@@ -23,12 +23,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import server.actors.ActorsTypes;
 import server.data.LobbyData;
 import server.room.SimpleRoom;
 import server.data.LobbyUser;
 import server.exceptions.NotLoggedException;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
 
 public final class LobbyScene extends GameScene {
 
@@ -62,8 +61,8 @@ public final class LobbyScene extends GameScene {
         int x = 40;
         int y = 70;
         for (int i = 0; i < this.bluePanels.length; i++) {
-            this.bluePanels[i] = new LobbyUserPanel(x, y, ServerConstants.BLUE_TEAM);
-            this.redPanels[i] = new LobbyUserPanel(x, y + 295, ServerConstants.RED_TEAM);
+            this.bluePanels[i] = new LobbyUserPanel(x, y, Constants.BLUE_TEAM);
+            this.redPanels[i] = new LobbyUserPanel(x, y + 295, Constants.RED_TEAM);
             addComponents(this.bluePanels[i], this.redPanels[i]);
             x += 150;
         }
@@ -76,7 +75,7 @@ public final class LobbyScene extends GameScene {
             @Override
             public void doAction() {
                 try {
-                    ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_ASSAULTER);
+                    ClientNetwork.getInstance().changeSpacechip(room.getId(), Constants.SPACESHIP_ASSAULTER);
                 } catch (RemoteException ex) {
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                 } catch (NotLoggedException ex) {
@@ -92,7 +91,7 @@ public final class LobbyScene extends GameScene {
             @Override
             public void doAction() {
                 try {
-                    ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_SUPPORTER);
+                    ClientNetwork.getInstance().changeSpacechip(room.getId(), Constants.SPACESHIP_SUPPORTER);
                 } catch (RemoteException ex) {
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                 } catch (NotLoggedException ex) {
@@ -107,7 +106,7 @@ public final class LobbyScene extends GameScene {
             @Override
             public void doAction() {
                 try {
-                    ClientNetwork.getInstance().changeSpacechip(room.getId(), ActorsTypes.SPACESHIP_RAPTOR);
+                    ClientNetwork.getInstance().changeSpacechip(room.getId(), Constants.SPACESHIP_RAPTOR);
                 } catch (RemoteException ex) {
                     changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
                 } catch (NotLoggedException ex) {
@@ -182,7 +181,7 @@ public final class LobbyScene extends GameScene {
                             data = buffer;
                         }
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(100);
                         } catch (InterruptedException ex) {
                             ex.printStackTrace();
                         }

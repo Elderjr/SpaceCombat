@@ -3,10 +3,11 @@ package client.gameScenes;
 import client.gui.Component;
 import client.gui.ComponentManager;
 import client.input.Input;
+import client.windows.GameWindow;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
 
 public abstract class GameScene {
 
@@ -37,7 +38,7 @@ public abstract class GameScene {
             gc.drawImage(this.background, 0, 0);
         } else {
             gc.setFill(Color.BLACK);
-            gc.fillRect(0, 0, ServerConstants.MAP_WIDTH, ServerConstants.MAP_HEIGHT);
+            gc.fillRect(0, 0, GameWindow.WIDTH, GameWindow.HEIGHT);
         }
     }
 

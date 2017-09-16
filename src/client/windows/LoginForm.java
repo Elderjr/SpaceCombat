@@ -162,27 +162,32 @@ public class LoginForm extends javax.swing.JDialog {
 
     private void btEnterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btEnterActionPerformed
         String username = tfUsername.getText();
+        String serverIP = tfServerIP.getText();
         StringBuilder passwordBuilder = new StringBuilder("");
         for (char c : tfPassword.getPassword()) {
             passwordBuilder.append(c);
         }
         String password = passwordBuilder.toString();
-        if (!username.isEmpty() && !password.isEmpty()) {
+        if (!username.isEmpty() && !password.isEmpty() && !serverIP.isEmpty()) {
             try {
-                if (this.rbLogin.isSelected()) {
-                    this.user = ClientNetwork.getInstance().login(username, password);
-                    if (this.user != null) {
-                        dispose();
-                    }else{
-                        JOptionPane.showMessageDialog(null, "Username ou senha incorreto(s)");
+                if (ClientNetwork.getInstance().connect(serverIP)) {
+                    if (this.rbLogin.isSelected()) {
+                        this.user = ClientNetwork.getInstance().login(username, password);
+                        if (this.user != null) {
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Username ou senha incorreto(s)");
+                        }
+                    } else {
+                        this.user = ClientNetwork.getInstance().register(username, password);
+                        if (this.user != null) {
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Username em uso");
+                        }
                     }
-                } else {
-                    this.user = ClientNetwork.getInstance().register(username, password);
-                    if (this.user != null) {
-                        dispose();
-                    }else{
-                        JOptionPane.showMessageDialog(null, "Username em uso");
-                    }
+                }else{
+                    JOptionPane.showMessageDialog(null, "Nao foi possivel criar conexao com servidor");    
                 }
             } catch (RemoteException ex) {
                 ex.printStackTrace();
@@ -198,7 +203,7 @@ public class LoginForm extends javax.swing.JDialog {
     }//GEN-LAST:event_btExitActionPerformed
 
     private void tfPasswordKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfPasswordKeyPressed
-        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             btEnter.doClick();
         }
     }//GEN-LAST:event_tfPasswordKeyPressed

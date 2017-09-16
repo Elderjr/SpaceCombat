@@ -15,13 +15,16 @@ import client.gui.ImageButton;
 import client.gui.ImageLabel;
 import client.gui.StatisticPanel;
 import client.input.Input;
+import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import server.room.battle.BattleStatistic;
-import server.room.battle.PersonalStatistic;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import server.exceptions.NotLoggedException;
 
 public final class StatisticScene extends GameScene {
 
@@ -44,10 +47,10 @@ public final class StatisticScene extends GameScene {
         });
         int x;
         int winner = statistic.getWinner();
-        if (winner == ServerConstants.BLUE_TEAM) {
+        if (winner == Constants.BLUE_TEAM) {
             x = 240;
             defaultImage = ExternalFileLoader.getInstance().getImage("client/images/blueWinsText.png");
-        } else if (winner == ServerConstants.RED_TEAM) {
+        } else if (winner == Constants.RED_TEAM) {
             x = 252;
             defaultImage = ExternalFileLoader.getInstance().getImage("client/images/redWinsText.png");
         } else {
@@ -67,6 +70,13 @@ public final class StatisticScene extends GameScene {
 
     @Override
     public void update(Input input) {
-        super.update(input);
+        try {
+            super.update(input);
+            ClientNetwork.getInstance().ping();
+        } catch (RemoteException ex) {
+            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+        } catch (NotLoggedException ex){
+            changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
+        }
     }
 }

@@ -5,7 +5,10 @@
  */
 package client.network;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import server.IServer;
@@ -34,6 +37,7 @@ public class ClientNetwork {
     }
 
     private ClientNetwork() {
+        /*
         try {
             this.server = ServerEngine.getInstance();
             this.login("sara", "123");
@@ -42,20 +46,17 @@ public class ClientNetwork {
         } catch (RemoteException | NotLoggedException ex) {
             Logger.getLogger(ClientNetwork.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        */
     }
 
     public boolean connect(String host) {
-        /*
         try {
             Registry registry = LocateRegistry.getRegistry(host);
             this.server = (IServer) registry.lookup("SpaceCombat");
             return true;
         } catch (RemoteException | NotBoundException ex) {
             return false;
-        } 
-         */
-        return true;
+        }
     }
 
     public User getUser(){
@@ -126,5 +127,13 @@ public class ClientNetwork {
 
     public void move(long roomId, int direction) throws RemoteException, NotLoggedException {
         this.server.move(this.user.getId(), roomId, direction);
+    }
+
+    public void ping() throws RemoteException, NotLoggedException{
+        this.server.ping(this.user.getId());
+    }
+    
+    public void exitGame() throws RemoteException{
+        this.server.exitGame(this.user.getId());
     }
 }

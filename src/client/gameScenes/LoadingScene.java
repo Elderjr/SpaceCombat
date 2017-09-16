@@ -8,8 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import server.actors.ActorsTypes;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
 
 public final class LoadingScene extends GameScene {
 
@@ -47,20 +46,20 @@ public final class LoadingScene extends GameScene {
 
             @Override
             public void run() {
-                loadSprite(ActorsTypes.ASSAULTER_SKILL, ServerConstants.BLUE_TEAM);
-                loadSprite(ActorsTypes.ASSAULTER_SKILL, ServerConstants.RED_TEAM);
-                loadSprite(ActorsTypes.RAPTOR_SKILL, ServerConstants.BLUE_TEAM);
-                loadSprite(ActorsTypes.RAPTOR_SKILL, ServerConstants.RED_TEAM);
-                loadSprite(ActorsTypes.SUPPORTER_SKILL, ServerConstants.BLUE_TEAM);
-                loadSprite(ActorsTypes.SUPPORTER_SKILL, ServerConstants.RED_TEAM);
-                loadSprite(ActorsTypes.SHOT, ServerConstants.BLUE_TEAM);
-                loadSprite(ActorsTypes.SHOT, ServerConstants.RED_TEAM);
-                loadSprite(ActorsTypes.SPACESHIP_ASSAULTER, ServerConstants.BLUE_TEAM);
-                loadSprite(ActorsTypes.SPACESHIP_ASSAULTER, ServerConstants.RED_TEAM);
-                loadSprite(ActorsTypes.SPACESHIP_RAPTOR, ServerConstants.BLUE_TEAM);
-                loadSprite(ActorsTypes.SPACESHIP_RAPTOR, ServerConstants.RED_TEAM);
-                loadSprite(ActorsTypes.SPACESHIP_SUPPORTER, ServerConstants.BLUE_TEAM);
-                loadSprite(ActorsTypes.SPACESHIP_SUPPORTER, ServerConstants.RED_TEAM);
+                loadSprite(Constants.ASSAULTER_SKILL, Constants.BLUE_TEAM);
+                loadSprite(Constants.ASSAULTER_SKILL, Constants.RED_TEAM);
+                loadSprite(Constants.RAPTOR_SKILL, Constants.BLUE_TEAM);
+                loadSprite(Constants.RAPTOR_SKILL, Constants.RED_TEAM);
+                loadSprite(Constants.SUPPORTER_SKILL, Constants.BLUE_TEAM);
+                loadSprite(Constants.SUPPORTER_SKILL, Constants.RED_TEAM);
+                loadSprite(Constants.SHOT, Constants.BLUE_TEAM);
+                loadSprite(Constants.SHOT, Constants.RED_TEAM);
+                loadSprite(Constants.SPACESHIP_ASSAULTER, Constants.BLUE_TEAM);
+                loadSprite(Constants.SPACESHIP_ASSAULTER, Constants.RED_TEAM);
+                loadSprite(Constants.SPACESHIP_RAPTOR, Constants.BLUE_TEAM);
+                loadSprite(Constants.SPACESHIP_RAPTOR, Constants.RED_TEAM);
+                loadSprite(Constants.SPACESHIP_SUPPORTER, Constants.BLUE_TEAM);
+                loadSprite(Constants.SPACESHIP_SUPPORTER, Constants.RED_TEAM);
             }
         });
         this.loadThread.start();

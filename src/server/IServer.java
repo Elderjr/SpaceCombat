@@ -13,7 +13,9 @@ import server.exceptions.NotLoggedException;
 
 public interface IServer extends Remote{
 
-    public void ping() throws RemoteException;
+    public void ping(long userId) throws RemoteException, NotLoggedException;
+    
+    public void exitGame(long userId) throws RemoteException;
     
     public User register(String username, String password) throws RemoteException;
 

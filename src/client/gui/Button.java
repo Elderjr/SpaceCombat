@@ -30,7 +30,7 @@ public abstract class Button extends Component{
         return this.pressed;
     }
     
-    private final boolean checkIsPressed(double x, double y) {
+    private boolean checkIsPressed(double x, double y) {
         return x >= getX() && x <= getX() + width
                 && y >= getY() && y <= getY() + height;
     }

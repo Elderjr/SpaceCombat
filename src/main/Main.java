@@ -14,8 +14,9 @@ import client.windows.GameWindow;
  */
 public class Main {
     public static void main(String args[]){
-        GameWindow.start();
-        /*
+        //GameWindow.start();
+        //server.ServerEngine.start("192.168.0.12");
+        
         if(args.length == 0 || args[0].equalsIgnoreCase("-client")){
             GameWindow.start();
         }else if(args.length >= 2 && args[0].equalsIgnoreCase("-server")){
@@ -23,6 +24,6 @@ public class Main {
         }else{
             System.out.println("Command not recognized, use -client to start client or -server ip to start server");
         }
-        */
+        
     }
 }

@@ -9,7 +9,6 @@ package client.gameScenes;
  *
  * @author elderjr
  */
-import client.commands.ClientCommands;
 import client.gui.Animation;
 import client.gui.HpBar;
 import client.gui.ImageLabel;
@@ -19,6 +18,7 @@ import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;
 import client.sprite.Sprite;
 import client.util.Util;
+import constants.Constants;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,19 +35,18 @@ import server.exceptions.NotLoggedException;
 import server.room.SimpleRoom;
 import server.room.battle.BattleStatistic;
 
-
 public final class BattleScene extends GameScene {
 
     private static final Font TIME_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 20);
     private static final Font REGULAR_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 15);
-    
+
     private final SimpleRoom room;
     private final HashMap<Long, Animation> animations;
     private BattleData data;
     private Thread battleThread;
-    
+
     //Components
     private HpBar hpBar;
     private ImageLabel shootReady;
@@ -62,7 +61,7 @@ public final class BattleScene extends GameScene {
         initComponents();
     }
 
-    public void initComponents(){
+    public void initComponents() {
         this.hpBar = new HpBar(37, 53);
         this.hpBar.setMaxHP(this.data.getMaxHp());
         this.hpBar.setCurrentHP(this.data.getMyHp());
@@ -70,6 +69,7 @@ public final class BattleScene extends GameScene {
         this.skillReady = new ImageLabel(345, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
         addComponents(this.hpBar, this.shootReady, this.skillReady);
     }
+
     public void loadData() {
         try {
             BattleData buffer = ClientNetwork.getInstance().getBattleData(this.room.getId());
@@ -77,13 +77,14 @@ public final class BattleScene extends GameScene {
                 synchronized (this.data) {
                     this.data = buffer;
                 }
-            }else{
+            } else {
                 this.data = buffer;
             }
-        } catch (RemoteException ex) {
-            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
         } catch (NotLoggedException ex) {
             changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
+        } catch (Exception ex) {
+            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+            ex.printStackTrace();
         }
     }
 
@@ -98,9 +99,9 @@ public final class BattleScene extends GameScene {
             @Override
             public void run() {
                 while (data != null) {
+                    loadData();
                     try {
-                        Thread.sleep(100);
-                        loadData();
+                        Thread.sleep(20);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(RoomScene.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -164,21 +165,21 @@ public final class BattleScene extends GameScene {
     private void processKeysPressed(Input input) {
         try {
             if (input.containsKey(KeyCode.W.getName()) && input.containsKey(KeyCode.D.getName())) {
-                ClientNetwork.getInstance().move(room.getId(), ClientCommands.UP_RIGHT);
+                ClientNetwork.getInstance().move(room.getId(), Constants.UP_RIGHT);
             } else if (input.containsKey(KeyCode.W.getName()) && input.containsKey(KeyCode.A.getName())) {
-                ClientNetwork.getInstance().move(room.getId(), ClientCommands.UP_LEFT);
+                ClientNetwork.getInstance().move(room.getId(), Constants.UP_LEFT);
             } else if (input.containsKey(KeyCode.S.getName()) && input.containsKey(KeyCode.D.getName())) {
-                ClientNetwork.getInstance().move(room.getId(), ClientCommands.DOWN_RIGHT);
+                ClientNetwork.getInstance().move(room.getId(), Constants.DOWN_RIGHT);
             } else if (input.containsKey(KeyCode.S.getName()) && input.containsKey(KeyCode.A.getName())) {
-                ClientNetwork.getInstance().move(room.getId(), ClientCommands.DOWN_LEFT);
+                ClientNetwork.getInstance().move(room.getId(), Constants.DOWN_LEFT);
             } else if (input.containsKey(KeyCode.W.getName())) {
-                ClientNetwork.getInstance().move(room.getId(), ClientCommands.UP);
+                ClientNetwork.getInstance().move(room.getId(), Constants.UP);
             } else if (input.containsKey(KeyCode.A.getName())) {
-                ClientNetwork.getInstance().move(room.getId(), ClientCommands.LEFT);
+                ClientNetwork.getInstance().move(room.getId(), Constants.LEFT);
             } else if (input.containsKey(KeyCode.S.getName())) {
-                ClientNetwork.getInstance().move(room.getId(), ClientCommands.DOWN);
+                ClientNetwork.getInstance().move(room.getId(), Constants.DOWN);
             } else if (input.containsKey(KeyCode.D.getName())) {
-                ClientNetwork.getInstance().move(room.getId(), ClientCommands.RIGHT);
+                ClientNetwork.getInstance().move(room.getId(), Constants.RIGHT);
             }
             if (input.containsKey(KeyCode.J.getName())) {
                 ClientNetwork.getInstance().useShot(room.getId());
@@ -199,21 +200,19 @@ public final class BattleScene extends GameScene {
         super.update(input);
         processKeysPressed(input);
         if (data != null) {
-            synchronized (data) {
-                if (data.getMatchTime() > 0) {
-                    this.hpBar.setCurrentHP(this.data.getMyHp());
-                    this.shootReady.setVisible(this.data.canUseShot());
-                    this.skillReady.setVisible(this.data.canUseSkill());
-                    updateAnimations(data.getActors());
-                } else {
-                    try {
-                        BattleStatistic statistics = ClientNetwork.getInstance().getBattleStatistic(room.getId());
-                        changeScene(new StatisticScene(getContext(), statistics));
-                    } catch (RemoteException ex) {
-                        changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-                    } catch (NotLoggedException ex) {
-                        changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
-                    }
+            if (data.getMatchTime() > 0) {
+                this.hpBar.setCurrentHP(this.data.getMyHp());
+                this.shootReady.setVisible(this.data.canUseShot());
+                this.skillReady.setVisible(this.data.canUseSkill());
+                updateAnimations(data.getActors());
+            } else {
+                try {
+                    BattleStatistic statistics = ClientNetwork.getInstance().getBattleStatistic(room.getId());
+                    changeScene(new StatisticScene(getContext(), statistics));
+                } catch (RemoteException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                } catch (NotLoggedException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
         } else {

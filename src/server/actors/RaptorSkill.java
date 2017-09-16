@@ -4,7 +4,8 @@ import java.awt.Dimension;
 import java.awt.Point;
 
 import server.room.battle.BattleListener;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
+import server.room.battle.BattleUtils;
 
 public class RaptorSkill extends Skill {
 
@@ -13,13 +14,12 @@ public class RaptorSkill extends Skill {
     public static final int COOLDOWN = 10 * 1000;
 
     public RaptorSkill(BattleListener room, Point location, Spaceship source) {
-        super(room, location, SIZE, source, DAMAGE, 0, ActorsTypes.RAPTOR_SKILL);
+        super(room, location, SIZE, source, DAMAGE, 0, Constants.RAPTOR_SKILL);
     }
 
     @Override
     public boolean update() {
-        return (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0 
-                || getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0);
+        return BattleUtils.isOutside(getLocation());
     }
 
     @Override

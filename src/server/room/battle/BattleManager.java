@@ -3,14 +3,14 @@ package server.room.battle;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import client.commands.ClientCommands;
 import java.util.Random;
 import server.actors.Skill;
 import server.actors.Spaceship;
 import server.actors.SpaceshipFactory;
 import server.data.BattleData;
 import server.data.LobbyUser;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
+import server.room.Room;
 
 public class BattleManager implements BattleListener {
 
@@ -19,33 +19,33 @@ public class BattleManager implements BattleListener {
     private final BattleStatistic battleStatistic;
     private final BattleActorsManager actorsManager;
     private final long startedAt;
-    private final long matchTime;
+    private final Room room;
     private long globalActorId;
     private long currentMatchTime;
 
-    public BattleManager(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam, long matchTime) {
+    public BattleManager(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam, Room room) {
         this.actorsManager = new BattleActorsManager();
         this.battleStatistic = new BattleStatistic();
         this.battleUsers = new HashMap<>();
         this.battleDatas = new HashMap<>();
         this.globalActorId = 0;
+        this.room = room;
         initTeamSpaceships(blueTeam, redTeam);
         this.startedAt = System.currentTimeMillis();
-        this.matchTime = matchTime;
-        this.currentMatchTime = matchTime;
+        this.currentMatchTime = room.getMatchTime();
     }
 
     private void initTeamSpaceships(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam) {
         Random r = new Random();
         for (Entry<Long, LobbyUser> entry : blueTeam.entrySet()) {
             Point location = new Point(150, randomLocation());
-            addUser(entry.getValue(), location, ClientCommands.RIGHT, ServerConstants.BLUE_TEAM);
+            addUser(entry.getValue(), location, Constants.RIGHT, Constants.BLUE_TEAM);
             location.y += 50;
         }
 
         for (Entry<Long, LobbyUser> entry : redTeam.entrySet()) {
             Point location = new Point(650, randomLocation());
-            addUser(entry.getValue(), location, ClientCommands.LEFT, ServerConstants.RED_TEAM);
+            addUser(entry.getValue(), location, Constants.LEFT, Constants.RED_TEAM);
             location.y += 50;
         }
     }
@@ -55,14 +55,14 @@ public class BattleManager implements BattleListener {
                 lobbyUser.getSpaceshipSelected(), this,
                 location, team, direction, lobbyUser.getUser());
         this.battleUsers.put(lobbyUser.getUser().getId(), new BattleUser(spaceship));
-        this.battleDatas.put(lobbyUser.getUser().getId(), new BattleData(this.actorsManager.getSimpleActors(), this.matchTime, spaceship.getMaxHP()));
+        this.battleDatas.put(lobbyUser.getUser().getId(), new BattleData(this.actorsManager.getSimpleActors(), this.room.getMatchTime(), spaceship.getMaxHP()));
         this.battleStatistic.addUser(lobbyUser.getUser(), lobbyUser.getSpaceshipSelected(), team);
         this.actorsManager.addSpaceship(spaceship);
     }
-    
-    private int randomLocation(){
+
+    private int randomLocation() {
         Random r = new Random();
-        return r.nextInt(ServerConstants.MAP_HEIGHT - 80) + 30;
+        return r.nextInt(BattleUtils.MAP_SIZE.height - 80) + 30;
     }
 
     public void move(long userId, int direction) {
@@ -100,7 +100,7 @@ public class BattleManager implements BattleListener {
         this.battleStatistic.incrementDeath(dead.getPilot());
         this.battleStatistic.incrementKills(killer.getPilot());
         Random r = new Random();
-        if (dead.getTeam() == ServerConstants.BLUE_TEAM) {
+        if (dead.getTeam() == Constants.BLUE_TEAM) {
             dead.updateLocation(150, randomLocation());
             this.battleStatistic.incrementRedTeamPoint();
         } else {
@@ -170,15 +170,15 @@ public class BattleManager implements BattleListener {
         }
     }
 
-    public boolean update() {
-        if (this.currentMatchTime > 0) {
-            this.currentMatchTime = matchTime - (System.currentTimeMillis() - this.startedAt);
+    public void update() {
+        if(room.getState() == Constants.PLAYING){
+            this.currentMatchTime = room.getMatchTime() - (System.currentTimeMillis() - this.startedAt);
             if (this.currentMatchTime > 0) {
                 this.processActions();
                 this.actorsManager.update();
-                return false;
+            }else{
+                room.endBattle();
             }
         }
-        return true;
     }
 }

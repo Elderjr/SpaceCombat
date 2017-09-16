@@ -1,6 +1,5 @@
 package client.windows;
 
-import client.gameScenes.BattleScene;
 import client.gameScenes.GameContext;
 import client.gameScenes.GameScene;
 import client.gameScenes.MainScene;
@@ -21,11 +20,12 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
-import server.ServerEngine;
-import server.room.SimpleRoom;
 
 public class GameWindow extends Application implements GameContext {
 
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 600;
+    
     private Canvas canvas;
     private GameScene gameScene;
     private Input input;
@@ -92,7 +92,7 @@ public class GameWindow extends Application implements GameContext {
     }
 
     private void initGame(Group root) {
-        canvas = new Canvas(800, 600);
+        canvas = new Canvas(WIDTH, HEIGHT);
         root.getChildren().add(canvas);
         this.gameScene = new MainScene(this);
         initGameLoop(canvas.getGraphicsContext2D());
@@ -107,7 +107,6 @@ public class GameWindow extends Application implements GameContext {
             public void handle(ActionEvent ae) {
                 gameScene.render(gc);
                 gameScene.update(input);
-                ServerEngine.getInstance().update();
             }
         });
         gameLoop.getKeyFrames().add(kf);

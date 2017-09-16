@@ -1,5 +1,6 @@
 package server.room;
 
+import constants.Constants;
 import server.data.User;
 import java.util.HashMap;
 import server.room.battle.BattleManager;
@@ -8,17 +9,15 @@ import server.room.lobby.WaitingRoomManager;
 
 public class Room {
 
-    public static final int WAITING = 0;
-    public static final int PLAYING = 1;
-    
     private static long globalId = 0;
     private final long matchTime;
     private final long id;
     private final int maxPlayersPerTeam;
     private final String name;
+    private int state;
+    private long doneAt;
     private WaitingRoomManager waitingManager;
     private BattleManager battleManager;
-    private int state;
     private SimpleRoom simpleRoom;
 
     public Room(int maxPlayersPerTeam, long matchTime, String name) {
@@ -29,10 +28,11 @@ public class Room {
         this.id = globalId;
         this.simpleRoom = new SimpleRoom(id, maxPlayersPerTeam, matchTime, name);
         this.waitingManager = new WaitingRoomManager(this);
-        this.setState(Room.WAITING);
+        this.setState(Constants.WAITING);
         globalId++;
     }
 
+    
     public SimpleRoom getSimpleRoom() {
         return this.simpleRoom;
     }
@@ -49,14 +49,17 @@ public class Room {
         return this.id;
     }
 
+    public int getState(){
+        return this.state;
+    }
+    
     public void setState(int state) {
         this.state = state;
         this.simpleRoom.setState(state);
     }
-
-    public void startBattle(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam) {
-        this.setState(Room.PLAYING);
-        this.battleManager = new BattleManager(blueTeam, redTeam, this.matchTime);
+    
+    public String getName() {
+        return this.name;
     }
 
     public long getMatchTime() {
@@ -67,18 +70,32 @@ public class Room {
         return this.maxPlayersPerTeam;
     }
 
-    public boolean update() {
-        if (this.battleManager != null) {
-            return this.battleManager.update();
-        }
-        return false;
-    }
-
     public void removeUser(User user) {
         this.waitingManager.removeUser(user.getId());
         if(this.battleManager != null){
             this.battleManager.removeUser(user.getId());
         }
         this.simpleRoom.decrementTotalPlayers();
+    }
+
+    public void startBattle(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam) {
+        this.battleManager = new BattleManager(blueTeam, redTeam, this);
+        this.setState(Constants.PLAYING);
+    }
+    
+    public void endBattle(){
+        this.setState(Constants.DONE);
+        this.doneAt = System.currentTimeMillis();
+        server.ServerEngine.getInstance().updateStatistics(this);
+        server.ServerEngine.getInstance().removeRoomFromData(this);
+        System.out.println("done");
+    }
+    
+    public boolean update() {
+        if (this.state == Constants.PLAYING) {
+            this.battleManager.update();
+        }
+        return (this.state == Constants.DONE && System.currentTimeMillis() - this.doneAt >= 25000)
+                || (this.state == Constants.WAITING && this.getWaitingRoomManager().getTotalPlayers() == 0);
     }
 }

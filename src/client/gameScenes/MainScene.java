@@ -35,6 +35,7 @@ public final class MainScene extends GameScene {
             public void doAction() {
                 LoginForm loginForm = new LoginForm(null, true);
                 loginForm.setVisible(true);
+                loginForm.setFocusable(true);
                 if(loginForm.getUser() != null){
                     changeScene(new RoomScene(getContext()));
                 }

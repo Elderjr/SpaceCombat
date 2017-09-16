@@ -19,6 +19,8 @@ import client.network.ClientNetwork;
 import client.sprite.ExternalFileLoader;
 import client.windows.RoomForm;
 import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -91,6 +93,7 @@ public final class RoomScene extends GameScene {
             public void doAction() {
                 RoomForm roomForm = new RoomForm(null, true);
                 roomForm.setVisible(true);
+                roomForm.setFocusable(true);
                 if (roomForm.getRoomName() != null) {
                     try {
                         SimpleRoom room = ClientNetwork.getInstance().createRoom(
@@ -112,7 +115,12 @@ public final class RoomScene extends GameScene {
         Button btExit = new ImageButton(336, 545, defaultImage, onClickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
-                changeScene(new MainScene(getContext()));
+                try {
+                    ClientNetwork.getInstance().exitGame();
+                    changeScene(new MainScene(getContext()));
+                } catch (RemoteException ex) {
+                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                }
             }
         });
         addComponents(btNextPage, btPreviousPage, btCreateRoom, btExit);

@@ -1,12 +1,12 @@
 package server.actors;
 
+import constants.Constants;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import client.commands.ClientCommands;
 import server.room.battle.BattleListener;
-import server.serverConstants.ServerConstants;
 import server.data.User;
+import server.room.battle.BattleUtils;
 
 public abstract class Spaceship extends Actor implements Moviment {
 
@@ -52,7 +52,7 @@ public abstract class Spaceship extends Actor implements Moviment {
     }
 
     public void receiveDamage(Skill skill) {
-        int damageTaken = 0;
+        int damageTaken;
         if (this.hp <= skill.getDamage()) {
             damageTaken = this.hp;
             this.hp = 0;
@@ -80,27 +80,27 @@ public abstract class Spaceship extends Actor implements Moviment {
         return System.currentTimeMillis() - shotFired >= Shot.COOLDOWN;
     }
 
-    public Skill shoot() {
+    public Shot shoot() {
         if (canUseShot()) {
             Point shotLocation = new Point(this.getLocation().x, this.getLocation().y);
-            if (getCurrentDirection() == ClientCommands.UP) {
+            if (getCurrentDirection() == Constants.UP) {
                 shotLocation.y -= this.getSize().getHeight() / 2;
-            } else if (getCurrentDirection() == ClientCommands.DOWN) {
+            } else if (getCurrentDirection() == Constants.DOWN) {
                 shotLocation.y += this.getSize().getHeight() / 2;
-            } else if (getCurrentDirection() == ClientCommands.LEFT) {
+            } else if (getCurrentDirection() == Constants.LEFT) {
                 shotLocation.x -= this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.RIGHT) {
+            } else if (getCurrentDirection() == Constants.RIGHT) {
                 shotLocation.x += this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.UP_LEFT) {
+            } else if (getCurrentDirection() == Constants.UP_LEFT) {
                 shotLocation.y -= this.getSize().getHeight() / 2;
                 shotLocation.x -= this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.UP_RIGHT) {
+            } else if (getCurrentDirection() == Constants.UP_RIGHT) {
                 shotLocation.y -= this.getSize().getHeight() / 2;
                 shotLocation.x += this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.DOWN_RIGHT) {
+            } else if (getCurrentDirection() == Constants.DOWN_RIGHT) {
                 shotLocation.y += this.getSize().getHeight() / 2;
                 shotLocation.x += this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.DOWN_LEFT) {
+            } else if (getCurrentDirection() == Constants.DOWN_LEFT) {
                 shotLocation.y += this.getSize().getHeight() / 2;
                 shotLocation.x -= this.getSize().getWidth() / 2;
             }
@@ -115,28 +115,28 @@ public abstract class Spaceship extends Actor implements Moviment {
     public void move(int direction) {
         int x = this.getLocation().x;
         int y = this.getLocation().y;
-        if (direction == ClientCommands.UP) {
+        if (direction == Constants.UP) {
             y -= movimentSpeed;
-        } else if (direction == ClientCommands.UP_LEFT) {
+        } else if (direction == Constants.UP_LEFT) {
             y -= movimentSpeed;
             x -= movimentSpeed;
-        } else if (direction == ClientCommands.UP_RIGHT) {
+        } else if (direction == Constants.UP_RIGHT) {
             y -= movimentSpeed;
             x += movimentSpeed;
-        } else if (direction == ClientCommands.DOWN) {
+        } else if (direction == Constants.DOWN) {
             y += movimentSpeed;
-        } else if (direction == ClientCommands.DOWN_LEFT) {
+        } else if (direction == Constants.DOWN_LEFT) {
             y += movimentSpeed;
             x -= movimentSpeed;
-        } else if (direction == ClientCommands.DOWN_RIGHT) {
+        } else if (direction == Constants.DOWN_RIGHT) {
             y += movimentSpeed;
             x += movimentSpeed;
-        } else if (direction == ClientCommands.LEFT) {
+        } else if (direction == Constants.LEFT) {
             x -= movimentSpeed;
-        } else if (direction == ClientCommands.RIGHT) {
+        } else if (direction == Constants.RIGHT) {
             x += movimentSpeed;
         }
-        if (!(x > ServerConstants.MAP_WIDTH || x < 0 || y > ServerConstants.MAP_HEIGHT || y < 0)) {
+        if (!BattleUtils.isOutside(x, y)) {
             updateLocation(x, y);
         }
         setCurrentDirection(direction);

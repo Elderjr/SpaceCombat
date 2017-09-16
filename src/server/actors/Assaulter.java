@@ -2,8 +2,7 @@ package server.actors;
 
 import java.awt.Point;
 
-import client.commands.ClientCommands;
-import server.room.Room;
+import constants.Constants;
 import server.room.battle.BattleListener;
 import server.data.User;
 
@@ -13,31 +12,31 @@ public class Assaulter extends Spaceship {
     private static final int MAX_HP = 100;
 
     public Assaulter(BattleListener room, Point location, int team, int initialDirection, User user) {
-        super(room, location, team, ActorsTypes.SPACESHIP_ASSAULTER, MAX_HP, MOVIMENT_SPEED, initialDirection, user);
+        super(room, location, team, Constants.SPACESHIP_ASSAULTER, MAX_HP, MOVIMENT_SPEED, initialDirection, user);
     }
 
     @Override
     public Skill useSkill() {
         if (canUseSkill()) {
             Point skillLocation = new Point(this.getLocation().x, this.getLocation().y);
-            if (getCurrentDirection() == ClientCommands.UP) {
+            if (getCurrentDirection() == Constants.UP) {
                 skillLocation.y -= this.getSize().getHeight() / 2;
-            } else if (getCurrentDirection() == ClientCommands.DOWN) {
+            } else if (getCurrentDirection() == Constants.DOWN) {
                 skillLocation.y += this.getSize().getHeight() / 2;
-            } else if (getCurrentDirection() == ClientCommands.LEFT) {
+            } else if (getCurrentDirection() == Constants.LEFT) {
                 skillLocation.x -= this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.RIGHT) {
+            } else if (getCurrentDirection() == Constants.RIGHT) {
                 skillLocation.x += this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.UP_LEFT) {
+            } else if (getCurrentDirection() == Constants.UP_LEFT) {
                 skillLocation.y -= this.getSize().getHeight() / 2;
                 skillLocation.x -= this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.UP_RIGHT) {
+            } else if (getCurrentDirection() == Constants.UP_RIGHT) {
                 skillLocation.y -= this.getSize().getHeight() / 2;
                 skillLocation.x += this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.DOWN_RIGHT) {
+            } else if (getCurrentDirection() == Constants.DOWN_RIGHT) {
                 skillLocation.y += this.getSize().getHeight() / 2;
                 skillLocation.x += this.getSize().getWidth() / 2;
-            } else if (getCurrentDirection() == ClientCommands.DOWN_LEFT) {
+            } else if (getCurrentDirection() == Constants.DOWN_LEFT) {
                 skillLocation.y += this.getSize().getHeight() / 2;
                 skillLocation.x -= this.getSize().getWidth() / 2;
             }

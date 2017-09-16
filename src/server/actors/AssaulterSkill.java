@@ -3,9 +3,9 @@ package server.actors;
 import java.awt.Dimension;
 import java.awt.Point;
 
-import client.commands.ClientCommands;
 import server.room.battle.BattleListener;
-import server.serverConstants.ServerConstants;
+import constants.Constants;
+import server.room.battle.BattleUtils;
 
 public class AssaulterSkill extends Skill implements Moviment {
 
@@ -16,39 +16,38 @@ public class AssaulterSkill extends Skill implements Moviment {
     public static final int COOLDOWN = 4 * 1000; //4s
 
     public AssaulterSkill(BattleListener room, Point location, Spaceship source, int currentDirection) {
-        super(room, location, SIZE, source, DAMAGE, currentDirection, ActorsTypes.ASSAULTER_SKILL);
+        super(room, location, SIZE, source, DAMAGE, currentDirection, Constants.ASSAULTER_SKILL);
     }
 
     @Override
     public boolean update() {
         move(getCurrentDirection());
-        return (getLocation().x > ServerConstants.MAP_WIDTH || getLocation().x < 0 
-                || getLocation().y > ServerConstants.MAP_HEIGHT || getLocation().y < 0);
+        return BattleUtils.isOutside(getLocation());
     }
 
     @Override
     public void move(int direction) {
         int x = this.getLocation().x;
         int y = this.getLocation().y;
-        if (direction == ClientCommands.UP) {
+        if (direction == Constants.UP) {
             y -= SPEED;
-        } else if (direction == ClientCommands.UP_LEFT) {
+        } else if (direction == Constants.UP_LEFT) {
             y -= SPEED;
             x -= SPEED;
-        } else if (direction == ClientCommands.UP_RIGHT) {
+        } else if (direction == Constants.UP_RIGHT) {
             y -= SPEED;
             x += SPEED;
-        } else if (direction == ClientCommands.DOWN) {
+        } else if (direction == Constants.DOWN) {
             y += SPEED;
-        } else if (direction == ClientCommands.DOWN_LEFT) {
+        } else if (direction == Constants.DOWN_LEFT) {
             y += SPEED;
             x -= SPEED;
-        } else if (direction == ClientCommands.DOWN_RIGHT) {
+        } else if (direction == Constants.DOWN_RIGHT) {
             y += SPEED;
             x += SPEED;
-        } else if (direction == ClientCommands.LEFT) {
+        } else if (direction == Constants.LEFT) {
             x -= SPEED;
-        } else if (direction == ClientCommands.RIGHT) {
+        } else if (direction == Constants.RIGHT) {
             x += SPEED;
         }
         updateLocation(x, y);
