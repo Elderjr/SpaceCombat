@@ -6,7 +6,29 @@ import java.sql.SQLException;
 
 public class ConnectionFactory {
 
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/spacecombat", "root", "zzz");
+    public static final ConnectionFactory instance = new ConnectionFactory();
+    
+    private String user;
+    private String password;
+    
+    private ConnectionFactory(){
+        this.user = "root";
+        this.password = "";
+    }
+    
+    public static ConnectionFactory getInstance(){
+        return instance;
+    }
+    
+    public void setUser(String user){
+        this.user = user;
+    }
+    
+    public void setPassword(String password){
+        this.password = password;
+    }
+    
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:mysql://localhost/spacecombat", this.user, this.password);
     }
 }

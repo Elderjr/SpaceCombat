@@ -12,7 +12,7 @@ import server.room.battle.PersonalStatistic;
 public class UserDAO {
 
     public static void createUserTable() throws SQLException {
-        try (Connection conn = ConnectionFactory.getConnection()) {
+        try (Connection conn = ConnectionFactory.getInstance().getConnection()) {
             String sql = "CREATE TABLE IF NOT EXISTS user("
                     + "id BIGINT NOT NULL AUTO_INCREMENT primary key,"
                     + "username VARCHAR(30) NOT NULL UNIQUE,"
@@ -32,7 +32,7 @@ public class UserDAO {
 
     public static boolean checkUsername(String username) throws SQLException {
         boolean userExists = false;
-        try (Connection conn = ConnectionFactory.getConnection()) {
+        try (Connection conn = ConnectionFactory.getInstance().getConnection()) {
             String sql = "Select id from user where username=? LIMIT 1";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, username);
@@ -46,7 +46,7 @@ public class UserDAO {
 
     public static User registerUser(String username, String password) throws SQLException {
         if (!checkUsername(username)) {
-            try (Connection conn = ConnectionFactory.getConnection()) {
+            try (Connection conn = ConnectionFactory.getInstance().getConnection()) {
                 String sql = "INSERT INTO user(username,password)"
                         + " values (?,?)";
                 try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -62,7 +62,7 @@ public class UserDAO {
 
     public static GeneralStatistics getUserStatistics(long userId) throws SQLException {
         GeneralStatistics generalStatistics = null;
-        try (Connection conn = ConnectionFactory.getConnection()) {
+        try (Connection conn = ConnectionFactory.getInstance().getConnection()) {
             String sql = "Select matches, wins, loses, draws, kills, deaths "
                     + "from user where id = ? LIMIT 1";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -86,7 +86,7 @@ public class UserDAO {
     public static User login(String username, String password) throws SQLException {
         User user = null;
         String sql = "Select id from user where username=? and password=? LIMIT 1";
-        try (Connection conn = ConnectionFactory.getConnection()) {
+        try (Connection conn = ConnectionFactory.getInstance().getConnection()) {
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, username);
                 stmt.setString(2, password);
@@ -113,7 +113,7 @@ public class UserDAO {
             sqlUpdate += "loses = loses + 1 ";
         }
         sqlUpdate += "WHERE id = " + statistic.getUser().getId();
-        try (Connection conn = ConnectionFactory.getConnection();
+        try (Connection conn = ConnectionFactory.getInstance().getConnection();
                 Statement stmt = conn.createStatement()) {
             stmt.executeUpdate(sqlUpdate);
         }

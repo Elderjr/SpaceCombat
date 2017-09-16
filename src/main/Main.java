@@ -6,6 +6,7 @@
 package main;
 
 import client.windows.GameWindow;
+import server.dao.ConnectionFactory;
 
 
 /**
@@ -16,13 +17,21 @@ public class Main {
     public static void main(String args[]){
         //GameWindow.start();
         //server.ServerEngine.start("192.168.0.12");
-        
         if(args.length == 0 || args[0].equalsIgnoreCase("-client")){
             GameWindow.start();
-        }else if(args.length >= 2 && args[0].equalsIgnoreCase("-server")){
-            server.ServerEngine.start(args[1]);
+        }else if(args.length > 0 && args[0].equalsIgnoreCase("-server")){
+            String host = args.length >= 2 ? args[1] : "127.0.0.1";
+            if(args.length >= 3){
+                ConnectionFactory.getInstance().setUser(args[2]);
+            }
+            if(args.length >= 4){
+                ConnectionFactory.getInstance().setPassword(args[3]);
+            }
+            server.ServerEngine.start(host);
         }else{
-            System.out.println("Command not recognized, use -client to start client or -server ip to start server");
+            System.out.println("Command not recognized");
+            System.out.println("use -client to start the client");
+            System.err.println("use -server IP DATABASE_USER PASSWORD_USER to start the server");
         }
         
     }
