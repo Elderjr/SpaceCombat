@@ -73,8 +73,8 @@ public final class BattleScene extends GameScene {
             this.hpBar.setMaxHP(this.data.getMaxHp());
             this.hpBar.setCurrentHP(this.data.getMyHp());
         }
-        this.shootReady = new ImageLabel(249, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
-        this.skillReady = new ImageLabel(345, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
+        this.skillReady = new ImageLabel(249, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
+        this.shootReady = new ImageLabel(345, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
         addComponents(this.hpBar, this.shootReady, this.skillReady);
     }
 

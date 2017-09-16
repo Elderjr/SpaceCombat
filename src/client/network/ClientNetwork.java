@@ -46,6 +46,7 @@ public class ClientNetwork {
     private ClientNetwork() {        
     }
 
+    /*
     public void automatic(){
         try {
             this.login("sara", "123");
@@ -55,6 +56,8 @@ public class ClientNetwork {
             Logger.getLogger(ClientNetwork.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    */
+    
     public boolean connect(String host) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<IServer> future = executor.submit(new Callable<IServer>() {
@@ -72,7 +75,7 @@ public class ClientNetwork {
             IServer server = future.get(10, TimeUnit.SECONDS);
             if(server != null){
                 this.server = server;
-                automatic();
+                //automatic();
                 return true;
             }
             return false;
