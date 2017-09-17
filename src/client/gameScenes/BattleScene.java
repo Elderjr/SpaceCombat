@@ -194,8 +194,6 @@ public final class BattleScene extends LoadDataScene {
                     changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                 }
             }
-        } else {
-            changeScene(new RoomScene(getContext()));
         }
     }
 
