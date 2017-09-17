@@ -35,7 +35,7 @@ import server.exceptions.NotLoggedException;
 import server.room.SimpleRoom;
 import server.room.battle.BattleStatistic;
 
-public final class BattleScene extends GameScene {
+public final class BattleScene extends LoadDataScene {
 
     private static final Font PING_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 15);
@@ -57,13 +57,11 @@ public final class BattleScene extends GameScene {
     private ImageLabel skillReady;
 
     public BattleScene(GameContext context, SimpleRoom room) {
-        super(context, ExternalFileLoader.getInstance().getImage("client/images/battleBackground.png"));
+        super(context, ExternalFileLoader.getInstance().getImage("client/images/battleBackground.png"), 10);
         this.animations = new HashMap<>();
         this.room = room;
         this.ping = 0;
         this.lastPing = 0;
-        this.loadData();
-        this.initThread();
         initComponents();
     }
 
@@ -78,62 +76,29 @@ public final class BattleScene extends GameScene {
         addComponents(this.hpBar, this.shootReady, this.skillReady);
     }
 
-    public void loadData() {
-        try {
-            if (System.currentTimeMillis() - this.lastPing >= 1000) {
-                long pingAux = System.currentTimeMillis();
-                this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
-                this.ping = System.currentTimeMillis() - pingAux;
-                this.lastPing = System.currentTimeMillis();
-            } else {
-                this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
-            }
-        } catch (RemoteException ex) {
-            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-            System.err.println("Connection down: " + ex.getMessage());
-        } catch (NotLoggedException ex) {
-            changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
-        } catch (Exception ex) {
-            System.out.println("An error occured: " + ex.getMessage());
-        }
-    }
-
     @Override
-    public void changeScene(GameScene scene) {
-        super.changeScene(scene);
-        if(this.battleThread != null){
-            this.battleThread.stop();
+    public void loadData() throws RemoteException, NotLoggedException {
+        if (System.currentTimeMillis() - this.lastPing >= 1000) {
+            long pingAux = System.currentTimeMillis();
+            this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
+            this.ping = System.currentTimeMillis() - pingAux;
+            this.lastPing = System.currentTimeMillis();
+        } else {
+            this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
         }
-    }
-
-    public void initThread() {
-        this.battleThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (data != null) {
-                    loadData();
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(RoomScene.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        });
-        this.battleThread.start();
     }
 
     private void updateAnimations(HashMap<Long, SimpleActor> simpleActors) {
         for (SimpleActor simpleActor : simpleActors.values()) {
             if (this.animations.containsKey(simpleActor.getId())) {
                 Animation animation = this.animations.get(simpleActor.getId());
-                animation.updateLocation(simpleActor.getLocation().getX() - simpleActor.getSize().getWidth() / 2 + 25, simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 +110);
+                animation.updateLocation(simpleActor.getLocation().getX() - simpleActor.getSize().getWidth() / 2 + 25, simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 + 110);
                 animation.setSpriteDirection(simpleActor.getDirection());
             } else {
                 Sprite sprite = ExternalFileLoader.getInstance().
                         getSprite(simpleActor.getActorType(), simpleActor.getTeam());
                 Animation animation = new Animation(simpleActor.getLocation().getX() - simpleActor.getSize().getWidth() / 2 + 25,
-                        simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 +110,
+                        simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 + 110,
                         sprite);
                 animation.setSpriteDirection(simpleActor.getDirection());
                 this.animations.put(simpleActor.getId(), animation);

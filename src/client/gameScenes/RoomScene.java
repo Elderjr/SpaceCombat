@@ -30,7 +30,7 @@ import server.room.SimpleRoom;
 import server.data.User;
 import server.exceptions.NotLoggedException;
 
-public final class RoomScene extends GameScene {
+public final class RoomScene extends LoadDataScene {
 
     private static final Font PING_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 15);
@@ -41,7 +41,6 @@ public final class RoomScene extends GameScene {
 
     private static final int ROOMS_PER_PAGE = 4;
     private final User user;
-    private final Image background;
     private GeneralStatistics generalStatistics;
     private RoomData roomData;
     private RoomButton pageButtons[];
@@ -50,10 +49,9 @@ public final class RoomScene extends GameScene {
     private int currentPage;
 
     public RoomScene(GameContext context) {
-        super(context);
+        super(context, ExternalFileLoader.getInstance().getImage("client/images/background.jpg"), 1000);
         initComponents();
         this.user = ClientNetwork.getInstance().getUser();
-        this.background = ExternalFileLoader.getInstance().getImage("client/images/background.jpg");
         this.pageButtons = new RoomButton[ROOMS_PER_PAGE];
         this.currentPage = 1;
         this.lastUpdate = 0;
@@ -130,6 +128,7 @@ public final class RoomScene extends GameScene {
 
     public void updatePageButtons(int page) {
         if (this.roomData != null) {
+
             int init = (page - 1) * ROOMS_PER_PAGE;
             int end = init + ROOMS_PER_PAGE;
             int index = 0;
@@ -172,7 +171,7 @@ public final class RoomScene extends GameScene {
 
     @Override
     public void render(GraphicsContext gc) {
-        gc.drawImage(this.background, 0, 0);
+        super.render(gc);
         renderComponents(gc);
         gc.setFill(Color.YELLOW);
         gc.setFont(PING_FONT);
@@ -222,18 +221,16 @@ public final class RoomScene extends GameScene {
                 }
             }
         }
-        try {
-            if (System.currentTimeMillis() - this.lastUpdate >= 1000) {
-                long pingAux = System.currentTimeMillis();
-                this.roomData = ClientNetwork.getInstance().getRooms();
-                this.ping = System.currentTimeMillis() - pingAux;
-                updatePageButtons(this.currentPage);
-                this.lastUpdate = System.currentTimeMillis();
-            }
-        } catch (RemoteException ex) {
-            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-        } catch (NotLoggedException ex) {
-            changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
+    }
+
+    @Override
+    public void loadData() throws RemoteException, NotLoggedException {
+        if (System.currentTimeMillis() - this.lastUpdate >= 1000) {
+            long pingAux = System.currentTimeMillis();
+            this.roomData = ClientNetwork.getInstance().getRooms();
+            this.ping = System.currentTimeMillis() - pingAux;
+            updatePageButtons(this.currentPage);
+            this.lastUpdate = System.currentTimeMillis();
         }
     }
 }

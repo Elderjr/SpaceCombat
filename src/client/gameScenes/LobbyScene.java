@@ -28,9 +28,8 @@ import server.room.SimpleRoom;
 import server.data.LobbyUser;
 import server.exceptions.NotLoggedException;
 import constants.Constants;
-import server.data.BattleData;
 
-public final class LobbyScene extends GameScene {
+public final class LobbyScene extends LoadDataScene {
 
     private static final Font PING_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 15);
@@ -47,7 +46,7 @@ public final class LobbyScene extends GameScene {
     private long lastPing;
 
     public LobbyScene(GameContext context, SimpleRoom room) {
-        super(context, ExternalFileLoader.getInstance().getImage("client/images/background.jpg"));
+        super(context, ExternalFileLoader.getInstance().getImage("client/images/background.jpg"), 10);
         this.room = room;
         this.matchTime = room.getMathTime() / 60000;
         this.bluePanels = new LobbyUserPanel[5];
@@ -56,14 +55,6 @@ public final class LobbyScene extends GameScene {
         this.lastPing = 0;
         initLobbyUserPanels();
         initComponents();
-        loadData();
-        initThread();
-    }
-
-    @Override
-    public void changeScene(GameScene scene) {
-        super.changeScene(scene);
-        this.roomThread.stop();
     }
 
     public void initLobbyUserPanels() {
@@ -177,43 +168,24 @@ public final class LobbyScene extends GameScene {
         addComponents(btChangeConfirm, btChangeTeam, btBack);
     }
 
-    private void loadData() {
-        try {
-            if (System.currentTimeMillis() - this.lastPing >= 1000) {
-                long pingAux = System.currentTimeMillis();
-                this.data = ClientNetwork.getInstance().getLobbyData(this.room.getId());
-                this.ping = System.currentTimeMillis() - pingAux;
-                this.lastPing = System.currentTimeMillis();
-            } else {
-                this.data = ClientNetwork.getInstance().getLobbyData(this.room.getId());
-            }
-        } catch (RemoteException ex) {
-            changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-            System.err.println("Connection down: " + ex.getMessage());
-        } catch (NotLoggedException ex) {
-            changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
-        } catch (Exception ex) {
-            System.out.println("An error occured: " + ex.getMessage());
+    @Override
+    public void loadData() throws RemoteException, NotLoggedException {
+        LobbyData buffer;
+        if (System.currentTimeMillis() - this.lastPing >= 1000) {
+            long pingAux = System.currentTimeMillis();
+            buffer = ClientNetwork.getInstance().getLobbyData(this.room.getId());
+            this.ping = System.currentTimeMillis() - pingAux;
+            this.lastPing = System.currentTimeMillis();
+        } else {
+            buffer = ClientNetwork.getInstance().getLobbyData(this.room.getId());
         }
-    }
-
-    public void initThread() {
-        this.roomThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    loadData();
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException ex) {
-                        ex.printStackTrace();
-                    }
-                }
+        if (this.data != null) {
+            synchronized (this.data) {
+                this.data = buffer;
             }
+        } else {
+            this.data = buffer;
         }
-        );
-
-        this.roomThread.start();
     }
 
     private void updateLobbyUsers() {
