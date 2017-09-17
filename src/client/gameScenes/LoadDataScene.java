@@ -59,6 +59,7 @@ public abstract class LoadDataScene extends GameScene{
                 while(true){
                     try {
                         loadData();
+                        errorsCount = 0;
                     } catch (RemoteException ex) {
                         System.out.println("Connection down: " + ex.getMessage());
                         incrementErrorCount();
