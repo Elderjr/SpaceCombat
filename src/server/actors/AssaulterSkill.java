@@ -8,9 +8,9 @@ import server.room.battle.BattleUtils;
 public class AssaulterSkill extends Skill implements Moviment {
 
     private static final Dimension SIZE = new Dimension(32, 32);
-    private static final double SPEED = 0.6;
-    private static final int DAMAGE = 15;
-    public static final int COOLDOWN = 4 * 1000; //4s
+    private static final double SPEED = 0.8;
+    private static final int DAMAGE = 35;
+    public static final int COOLDOWN = 5000; //4s
 
     public AssaulterSkill(BattleListener room, Position location, Spaceship source, int currentDirection) {
         super(room, location, SIZE, source, DAMAGE, currentDirection, Constants.ASSAULTER_SKILL);

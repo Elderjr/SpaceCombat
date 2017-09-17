@@ -67,10 +67,6 @@ public final class BattleScene extends LoadDataScene {
 
     public void initComponents() {
         this.hpBar = new HpBar(37, 53);
-        if (data != null) {
-            this.hpBar.setMaxHP(this.data.getMaxHp());
-            this.hpBar.setCurrentHP(this.data.getMyHp());
-        }
         this.skillReady = new ImageLabel(249, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
         this.shootReady = new ImageLabel(345, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
         addComponents(this.hpBar, this.shootReady, this.skillReady);
@@ -85,6 +81,10 @@ public final class BattleScene extends LoadDataScene {
             this.lastPing = System.currentTimeMillis();
         } else {
             this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
+        }
+        if (this.data != null) {
+            this.hpBar.setMaxHP(this.data.getMaxHp());
+            this.hpBar.setCurrentHP(this.data.getMyHp());
         }
     }
 

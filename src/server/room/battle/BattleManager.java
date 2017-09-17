@@ -1,6 +1,5 @@
 package server.room.battle;
 
-import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Random;

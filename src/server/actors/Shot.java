@@ -12,8 +12,8 @@ public class Shot extends Skill implements Moviment {
 
     public static final Dimension SIZE = new Dimension(32, 32);
     private static final double SPEED = 0.4;
-    private static final int DAMAGE = 5; //5
-    public static final int COOLDOWN = 400; //400ms
+    private static final int DAMAGE = 10;
+    public static final int COOLDOWN = 300;
 
     public Shot(BattleListener room, Position location, Spaceship source, int currentDirection) {
         super(room, location, SIZE, source, DAMAGE, currentDirection, Constants.SHOT);
