@@ -18,9 +18,9 @@ import server.room.battle.PersonalStatistic;
  */
 public class StatisticPanel extends Component{
 
-    private static final Image STATISTIC_LINE = ExternalFileLoader.getInstance().getImage("client/images/statisticLine.png");
-    private static final Image BLUE_LINE = ExternalFileLoader.getInstance().getImage("client/images/blueLine.png");
-    private static final Image RED_LINE = ExternalFileLoader.getInstance().getImage("client/images/redLine.png");
+    private static final Image STATISTIC_LINE = ExternalFileLoader.getInstance().getImage("statisticLine.png");
+    private static final Image BLUE_LINE = ExternalFileLoader.getInstance().getImage("blueLine.png");
+    private static final Image RED_LINE = ExternalFileLoader.getInstance().getImage("redLine.png");
     
     private Collection<PersonalStatistic> blueTeam;
     private Collection<PersonalStatistic> redTeam;
