@@ -16,7 +16,7 @@ import client.gui.RoomButton;
 import client.input.Input;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import client.windows.RoomForm;
 import java.rmi.RemoteException;
 import javafx.scene.image.Image;
@@ -49,7 +49,7 @@ public final class RoomScene extends LoadDataScene {
     private int currentPage;
 
     public RoomScene(GameContext context) {
-        super(context, ExternalFileLoader.getInstance().getImage("client/images/background.jpg"), 1000);
+        super(context, ExternalFileLoader.getInstance().getImage("background.png"), 1000);
         initComponents();
         this.user = ClientNetwork.getInstance().getUser();
         this.pageButtons = new RoomButton[ROOMS_PER_PAGE];
@@ -66,8 +66,8 @@ public final class RoomScene extends LoadDataScene {
     }
 
     public void initComponents() {
-        Image defaultImage = ExternalFileLoader.getInstance().getImage("client/images/left_button.png");
-        Image onClickImage = ExternalFileLoader.getInstance().getImage("client/images/left_button_on_click.png");
+        Image defaultImage = ExternalFileLoader.getInstance().getImage("left_button.png");
+        Image onClickImage = ExternalFileLoader.getInstance().getImage("left_button_on_click.png");
         Button btPreviousPage = new ImageButton(250, 330, defaultImage, onClickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -76,8 +76,8 @@ public final class RoomScene extends LoadDataScene {
                 }
             }
         });
-        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/right_button.png");
-        onClickImage = ExternalFileLoader.getInstance().getImage("client/images/right_button_on_click.png");
+        defaultImage = ExternalFileLoader.getInstance().getImage("right_button.png");
+        onClickImage = ExternalFileLoader.getInstance().getImage("right_button_on_click.png");
         Button btNextPage = new ImageButton(350 + btPreviousPage.getWidth(), 330, defaultImage, onClickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -86,8 +86,8 @@ public final class RoomScene extends LoadDataScene {
             }
         });
 
-        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btCreateRoom.png");
-        onClickImage = ExternalFileLoader.getInstance().getImage("client/images/btCreateRoom_onclick.png");
+        defaultImage = ExternalFileLoader.getInstance().getImage("btCreateRoom.png");
+        onClickImage = ExternalFileLoader.getInstance().getImage("btCreateRoom_onclick.png");
         Button btCreateRoom = new ImageButton(650, 360, defaultImage, onClickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -110,8 +110,8 @@ public final class RoomScene extends LoadDataScene {
             }
         });
 
-        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom.png");
-        onClickImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom_onclick.png");
+        defaultImage = ExternalFileLoader.getInstance().getImage("btExitRoom.png");
+        onClickImage = ExternalFileLoader.getInstance().getImage("btExitRoom_onclick.png");
         Button btExit = new ImageButton(336, 545, defaultImage, onClickImage, new ActionPerfomed() {
             @Override
             public void doAction() {

@@ -6,7 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import client.gui.*;
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import client.windows.LoginForm;
 
 public final class MainScene extends GameScene {
@@ -17,7 +17,7 @@ public final class MainScene extends GameScene {
     private String msgError;
 
     public MainScene(GameContext context) {
-        super(context, ExternalFileLoader.getInstance().getImage("client/images/main_screen.png"));
+        super(context, ExternalFileLoader.getInstance().getImage("main_screen.png"));
         this.msgError = null;
         initComponents();
     }
@@ -28,8 +28,8 @@ public final class MainScene extends GameScene {
     }
 
     public void initComponents() {        
-        Image defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btPlay.png");
-        Image onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btPlay_onclick.png");
+        Image defaultImage = ExternalFileLoader.getInstance().getImage("btPlay.png");
+        Image onclickImage = ExternalFileLoader.getInstance().getImage("btPlay_onclick.png");
         Button btGameStart = new ImageButton(295, 200, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -41,8 +41,8 @@ public final class MainScene extends GameScene {
                 }
             }
         });
-        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btExitGame.png");
-        onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btExitGame_onclick.png");
+        defaultImage = ExternalFileLoader.getInstance().getImage("btExitGame.png");
+        onclickImage = ExternalFileLoader.getInstance().getImage("btExitGame_onclick.png");
         Button btExit = new ImageButton(295, 350, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {

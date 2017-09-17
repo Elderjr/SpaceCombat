@@ -24,7 +24,7 @@ import server.data.GeneralStatistics;
 public class ServerEngine implements IServer {
 
     private static final ServerEngine instance = new ServerEngine();
-
+    private static final long USER_TOLERANCE = 20000;
     private final HashMap<Long, LoggedUser> loggedUsers;
     private final HashMap<Long, Room> rooms;
     private final RoomData roomsData;
@@ -348,7 +348,7 @@ public class ServerEngine implements IServer {
         LoggedUser loggedUser = null;
         while (iterator.hasNext()) {
             loggedUser = iterator.next();
-            if (loggedUser.isDisconnected(100000)) {
+            if (loggedUser.isDisconnected(USER_TOLERANCE)) {
                 System.out.println(loggedUser.getUser().getUsername() + " disconnected");;
                 disconnectUser(loggedUser.getUser());
                 iterator.remove();

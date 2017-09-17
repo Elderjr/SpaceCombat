@@ -5,7 +5,7 @@
  */
 package client.gui;
 
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.text.Font;
@@ -18,7 +18,7 @@ import javafx.scene.text.FontWeight;
  */
 public class HpBar extends Component {
 
-    private static final Image BAR_IMAGE = ExternalFileLoader.getInstance().getImage("client/images/hpBar.png");
+    private static final Image BAR_IMAGE = ExternalFileLoader.getInstance().getImage("hpBar.png");
     private static final Font HP_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 15);
     private int maxHP;

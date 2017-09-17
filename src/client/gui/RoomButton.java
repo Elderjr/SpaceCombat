@@ -5,7 +5,7 @@
  */
 package client.gui;
 
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import constants.Constants;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -24,7 +24,7 @@ public class RoomButton extends Button{
          FontPosture.REGULAR, 20);
     private static final Font CHARACTER_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
          FontPosture.REGULAR, 25);
-    private static final Image ROOM_BUTTON = ExternalFileLoader.getInstance().getImage("client/images/room.png");
+    private static final Image ROOM_BUTTON = ExternalFileLoader.getInstance().getImage("room.png");
     private final long time;
     private SimpleRoom room;
     

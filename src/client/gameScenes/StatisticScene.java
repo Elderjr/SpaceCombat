@@ -16,7 +16,7 @@ import client.gui.ImageLabel;
 import client.gui.StatisticPanel;
 import client.input.Input;
 import client.network.ClientNetwork;
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import server.room.battle.BattleStatistic;
@@ -37,7 +37,7 @@ public final class StatisticScene extends GameScene {
     private long lastPing;
     
     public StatisticScene(GameContext context, BattleStatistic statistic) {
-        super(context, ExternalFileLoader.getInstance().getImage("client/images/background.png"));
+        super(context, ExternalFileLoader.getInstance().getImage("background.png"));
         this.statistic = statistic;
         this.ping = 0;
         this.lastPing = 0;
@@ -45,8 +45,8 @@ public final class StatisticScene extends GameScene {
     }
 
     public void initComponents() {
-        Image defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom.png");
-        Image onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom_onclick.png");
+        Image defaultImage = ExternalFileLoader.getInstance().getImage("btExitRoom.png");
+        Image onclickImage = ExternalFileLoader.getInstance().getImage("btExitRoom_onclick.png");
         Button btBack = new ImageButton(336, 545, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -57,13 +57,13 @@ public final class StatisticScene extends GameScene {
         int winner = statistic.getWinner();
         if (winner == Constants.BLUE_TEAM) {
             x = 240;
-            defaultImage = ExternalFileLoader.getInstance().getImage("client/images/blueWinsText.png");
+            defaultImage = ExternalFileLoader.getInstance().getImage("blueWinsText.png");
         } else if (winner == Constants.RED_TEAM) {
             x = 252;
-            defaultImage = ExternalFileLoader.getInstance().getImage("client/images/redWinsText.png");
+            defaultImage = ExternalFileLoader.getInstance().getImage("redWinsText.png");
         } else {
             x = 350;
-            defaultImage = ExternalFileLoader.getInstance().getImage("client/images/drawText.png");
+            defaultImage = ExternalFileLoader.getInstance().getImage("drawText.png");
         }
         ImageLabel textWinner = new ImageLabel(x, 30, defaultImage);
         StatisticPanel panel = new StatisticPanel(45, 80, statistic.getBlueTeam(), statistic.getRedTeam());

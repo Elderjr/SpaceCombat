@@ -2,6 +2,7 @@ package client.windows;
 
 import client.gameScenes.GameContext;
 import client.gameScenes.GameScene;
+import client.gameScenes.LoadingScene;
 import client.gameScenes.MainScene;
 import client.input.Input;
 import javafx.animation.KeyFrame;
@@ -95,7 +96,7 @@ public class GameWindow extends Application implements GameContext {
     private void initGame(Group root) {
         canvas = new Canvas(WIDTH, HEIGHT);
         root.getChildren().add(canvas);
-        this.gameScene = new MainScene(this);
+        this.gameScene = new LoadingScene(this);
         initGameLoop(canvas.getGraphicsContext2D());
     }
 

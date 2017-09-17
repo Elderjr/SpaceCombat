@@ -1,5 +1,7 @@
-package client.sprite;
+package client.input;
 
+import client.sprite.Sprite;
+import client.sprite.Spritesheet;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,6 +47,10 @@ public class ExternalFileLoader {
         return new Sprite(getSpritesheet(spritesheetName));
     }
 
+    public Sprite getSprite(String spritesheetName) {
+        return new Sprite(getSpritesheet(spritesheetName));
+    }
+
     private Spritesheet getSpritesheet(String spritesheetName) {
         if (spritesheets.containsKey(spritesheetName)) {
             return spritesheets.get(spritesheetName);
@@ -58,15 +64,15 @@ public class ExternalFileLoader {
     }
 
     private Image loadImage(String imageName) {
-        return new Image(imageName);
+        return new Image("/client/images/" + imageName);
     }
 
     private Spritesheet loadSpritesheet(String spritesheetName) {
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("images/" + spritesheetName + ".txt")));
+            BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/client/images/spritesheets/" + spritesheetName + ".txt")));
             int totalLines = Integer.parseInt(br.readLine().split("=")[1]);
             int totalColumns = Integer.parseInt(br.readLine().split("=")[1]);
-            Image img = new Image(getClass().getResourceAsStream("images/" + spritesheetName + ".png"));
+            Image img = new Image("/client/images/spritesheets/"+spritesheetName+".png");
             br.close();
             return new Spritesheet(img, totalLines, totalColumns);
         } catch (FileNotFoundException e) {

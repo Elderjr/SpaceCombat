@@ -16,7 +16,7 @@ import client.gui.LobbyUserPanel;
 import client.input.Input;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import java.rmi.RemoteException;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -46,7 +46,7 @@ public final class LobbyScene extends LoadDataScene {
     private long lastPing;
 
     public LobbyScene(GameContext context, SimpleRoom room) {
-        super(context, ExternalFileLoader.getInstance().getImage("client/images/background.jpg"), 10);
+        super(context, ExternalFileLoader.getInstance().getImage("background.png"), 10);
         this.room = room;
         this.matchTime = room.getMathTime() / 60000;
         this.bluePanels = new LobbyUserPanel[5];
@@ -69,8 +69,8 @@ public final class LobbyScene extends LoadDataScene {
     }
 
     public void initSpaceshiptsButtons() {
-        Image defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btAssaulter.png");
-        Image onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btAssaulter_onclick.png");
+        Image defaultImage = ExternalFileLoader.getInstance().getImage("btAssaulter.png");
+        Image onclickImage = ExternalFileLoader.getInstance().getImage("btAssaulter_onclick.png");
         Button btSelectAssaulter = new ImageButton(40, 285, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -85,8 +85,8 @@ public final class LobbyScene extends LoadDataScene {
             }
         });
 
-        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btSupporter.png");
-        onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btSupporter_onclick.png");
+        defaultImage = ExternalFileLoader.getInstance().getImage("btSupporter.png");
+        onclickImage = ExternalFileLoader.getInstance().getImage("btSupporter_onclick.png");
         Button btSelectSupporter = new ImageButton(190, 285, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -100,8 +100,8 @@ public final class LobbyScene extends LoadDataScene {
             }
         });
 
-        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btRaptor.png");
-        onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btRaptor_onclick.png");
+        defaultImage = ExternalFileLoader.getInstance().getImage("btRaptor.png");
+        onclickImage = ExternalFileLoader.getInstance().getImage("btRaptor_onclick.png");
         Button btSelectRaptor = new ImageButton(340, 285, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -120,8 +120,8 @@ public final class LobbyScene extends LoadDataScene {
     public void initComponents() {
         initLobbyUserPanels();
         initSpaceshiptsButtons();
-        Image defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btChangeTeam.png");
-        Image onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btChangeTeam_onclick.png");
+        Image defaultImage = ExternalFileLoader.getInstance().getImage("btChangeTeam.png");
+        Image onclickImage = ExternalFileLoader.getInstance().getImage("btChangeTeam_onclick.png");
         Button btChangeTeam = new ImageButton(490, 250, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -136,8 +136,8 @@ public final class LobbyScene extends LoadDataScene {
             }
         });
 
-        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btLetsGo.png");
-        onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btLetsGo_onclick.png");
+        defaultImage = ExternalFileLoader.getInstance().getImage("btLetsGo.png");
+        onclickImage = ExternalFileLoader.getInstance().getImage("btLetsGo_onclick.png");
         Button btChangeConfirm = new ImageButton(640, 250, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {
@@ -150,8 +150,8 @@ public final class LobbyScene extends LoadDataScene {
                 }
             }
         });
-        defaultImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom.png");
-        onclickImage = ExternalFileLoader.getInstance().getImage("client/images/btExitRoom_onclick.png");
+        defaultImage = ExternalFileLoader.getInstance().getImage("btExitRoom.png");
+        onclickImage = ExternalFileLoader.getInstance().getImage("btExitRoom_onclick.png");
         Button btBack = new ImageButton(336, 545, defaultImage, onclickImage, new ActionPerfomed() {
             @Override
             public void doAction() {

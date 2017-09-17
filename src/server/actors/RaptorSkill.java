@@ -1,7 +1,6 @@
 package server.actors;
 
 import java.awt.Dimension;
-import java.awt.Point;
 
 import server.room.battle.BattleListener;
 import constants.Constants;
@@ -11,7 +10,7 @@ public class RaptorSkill extends Skill {
 
     private static final Dimension SIZE = new Dimension(48, 48);
     private static final int DAMAGE = 45;
-    public static final int COOLDOWN = 7;
+    public static final int COOLDOWN = 7000;
 
     public RaptorSkill(BattleListener room, Position location, Spaceship source) {
         super(room, location, SIZE, source, DAMAGE, 0, Constants.RAPTOR_SKILL);

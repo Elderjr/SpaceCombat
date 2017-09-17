@@ -3,63 +3,82 @@ package client.gameScenes;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import client.input.Input;
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import constants.Constants;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.security.CodeSource;
+import java.util.zip.ZipInputStream;
+import javafx.scene.image.Image;
 
 public final class LoadingScene extends GameScene {
 
-    private static final int EXTERNAL_FILES = 14;
+    private static final int EXTERNAL_FILES = 50;
     private static final Font LOADING_FONT = Font.font("Times New Roman", FontWeight.BOLD, 48);
     private Thread loadThread;
     private int totalFiledLoaded;
     private int currentPercentage;
+    private boolean done;
 
     public LoadingScene(GameContext context) {
         super(context);
         this.totalFiledLoaded = 0;
         this.currentPercentage = 0;
+        this.done = false;
         initThread();
     }
 
     public void initThread() {
         this.loadThread = new Thread(new Runnable() {
-            private void loadSprite(String type, int team) {
-                ExternalFileLoader.getInstance().getSprite(type, team);
+            private void loadSprite(String spritesheet) {
+                ExternalFileLoader.getInstance().getSprite(spritesheet);
                 totalFiledLoaded++;
                 calculeCurrentPercentage();
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(LoadingScene.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
 
-            private void loadImage(String imageName) {
-                ExternalFileLoader.getInstance().getImage(imageName);
+            private void loadImage(String image) {
+                ExternalFileLoader.getInstance().getImage(image);
                 totalFiledLoaded++;
                 calculeCurrentPercentage();
             }
 
             @Override
             public void run() {
-                loadSprite(Constants.ASSAULTER_SKILL, Constants.BLUE_TEAM);
-                loadSprite(Constants.ASSAULTER_SKILL, Constants.RED_TEAM);
-                loadSprite(Constants.RAPTOR_SKILL, Constants.BLUE_TEAM);
-                loadSprite(Constants.RAPTOR_SKILL, Constants.RED_TEAM);
-                loadSprite(Constants.SUPPORTER_SKILL, Constants.BLUE_TEAM);
-                loadSprite(Constants.SUPPORTER_SKILL, Constants.RED_TEAM);
-                loadSprite(Constants.SHOT, Constants.BLUE_TEAM);
-                loadSprite(Constants.SHOT, Constants.RED_TEAM);
-                loadSprite(Constants.SPACESHIP_ASSAULTER, Constants.BLUE_TEAM);
-                loadSprite(Constants.SPACESHIP_ASSAULTER, Constants.RED_TEAM);
-                loadSprite(Constants.SPACESHIP_RAPTOR, Constants.BLUE_TEAM);
-                loadSprite(Constants.SPACESHIP_RAPTOR, Constants.RED_TEAM);
-                loadSprite(Constants.SPACESHIP_SUPPORTER, Constants.BLUE_TEAM);
-                loadSprite(Constants.SPACESHIP_SUPPORTER, Constants.RED_TEAM);
+                try (InputStream in = LoadingScene.class.getResourceAsStream("/client/images");
+                        BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+                    String resource;
+                    while ((resource = br.readLine()) != null) {
+                        if(resource.endsWith(".png")){
+                            System.out.println("Loading image: "+resource);
+                            loadImage(resource);
+                        }
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(LoadingScene.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                try (InputStream in = getClass().getResourceAsStream("/client/images/spritesheets");
+                        BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+                    String resource;
+                    while ((resource = br.readLine()) != null) {
+                        if(resource.endsWith(".png")){
+                            String spritesheetName = resource.replace(".png", "");
+                            System.out.println("Loading spritesheet: "+spritesheetName);
+                            loadSprite(spritesheetName);
+                        }
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(LoadingScene.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                done = true;
             }
         });
         this.loadThread.start();
@@ -85,7 +104,7 @@ public final class LoadingScene extends GameScene {
     @Override
     public void update(Input input) {
         super.update(input);
-        if (totalFiledLoaded == EXTERNAL_FILES) {
+        if (done) {
             this.loadThread.stop();
             changeScene(new MainScene(getContext()));
         }

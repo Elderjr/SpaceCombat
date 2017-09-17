@@ -5,7 +5,7 @@
  */
 package client.gui;
 
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import java.util.Collection;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;

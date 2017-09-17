@@ -15,7 +15,7 @@ import client.gui.ImageLabel;
 import client.input.Input;
 import javafx.scene.canvas.GraphicsContext;
 import client.network.ClientNetwork;
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import client.sprite.Sprite;
 import client.util.Util;
 import constants.Constants;
@@ -57,7 +57,7 @@ public final class BattleScene extends LoadDataScene {
     private ImageLabel skillReady;
 
     public BattleScene(GameContext context, SimpleRoom room) {
-        super(context, ExternalFileLoader.getInstance().getImage("client/images/battleBackground.png"), 10);
+        super(context, ExternalFileLoader.getInstance().getImage("battleBackground.png"), 10);
         this.animations = new HashMap<>();
         this.room = room;
         this.ping = 0;
@@ -67,8 +67,8 @@ public final class BattleScene extends LoadDataScene {
 
     public void initComponents() {
         this.hpBar = new HpBar(37, 53);
-        this.skillReady = new ImageLabel(249, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
-        this.shootReady = new ImageLabel(345, 78, ExternalFileLoader.getInstance().getImage("client/images/ready.png"));
+        this.skillReady = new ImageLabel(249, 78, ExternalFileLoader.getInstance().getImage("ready.png"));
+        this.shootReady = new ImageLabel(345, 78, ExternalFileLoader.getInstance().getImage("ready.png"));
         addComponents(this.hpBar, this.shootReady, this.skillReady);
     }
 

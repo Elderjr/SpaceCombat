@@ -5,7 +5,7 @@
  */
 package client.gui;
 
-import client.sprite.ExternalFileLoader;
+import client.input.ExternalFileLoader;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -36,11 +36,11 @@ public class LobbyUserPanel extends Component {
         super(x, y);
         this.team = team;
         if (this.team == Constants.BLUE_TEAM) {
-            this.panelReady = ExternalFileLoader.getInstance().getImage("client/images/bluePanel_ready.png");
-            this.panelNotReady = ExternalFileLoader.getInstance().getImage("client/images/bluePanel_notReady.png");
+            this.panelReady = ExternalFileLoader.getInstance().getImage("bluePanel_ready.png");
+            this.panelNotReady = ExternalFileLoader.getInstance().getImage("bluePanel_notReady.png");
         } else {
-            this.panelReady = ExternalFileLoader.getInstance().getImage("client/images/redPanel_ready.png");
-            this.panelNotReady = ExternalFileLoader.getInstance().getImage("client/images/redPanel_notReady.png");
+            this.panelReady = ExternalFileLoader.getInstance().getImage("redPanel_ready.png");
+            this.panelNotReady = ExternalFileLoader.getInstance().getImage("redPanel_notReady.png");
         }
         initAnimations();
     }
