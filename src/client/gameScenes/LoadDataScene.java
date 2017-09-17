@@ -71,5 +71,6 @@ public abstract class LoadDataScene extends GameScene{
                 }
             }
         });
+        this.thread.start();
     }
 }
