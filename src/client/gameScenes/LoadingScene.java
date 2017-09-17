@@ -1,5 +1,6 @@
 package client.gameScenes;
 
+import client.ClientResource;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import client.input.Input;
@@ -52,7 +53,7 @@ public final class LoadingScene extends GameScene {
 
             @Override
             public void run() {
-                try (InputStream in = LoadingScene.class.getClass().getResourceAsStream("/client/images");
+                try (InputStream in = ClientResource.class.getResourceAsStream("images");
                         BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
                     String resource;
                     while ((resource = br.readLine()) != null) {
@@ -65,7 +66,7 @@ public final class LoadingScene extends GameScene {
                     Logger.getLogger(LoadingScene.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
-                try (InputStream in = getClass().getResourceAsStream("../images/spritesheets");
+                try (InputStream in = ClientResource.class.getResourceAsStream("images/spritesheets");
                         BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
                     String resource;
                     while ((resource = br.readLine()) != null) {
