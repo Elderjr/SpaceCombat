@@ -52,7 +52,7 @@ public final class LoadingScene extends GameScene {
 
             @Override
             public void run() {
-                try (InputStream in = LoadingScene.class.getResourceAsStream("/client/images");
+                try (InputStream in = LoadingScene.class.getClass().getResourceAsStream("/client/images");
                         BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
                     String resource;
                     while ((resource = br.readLine()) != null) {
@@ -65,7 +65,7 @@ public final class LoadingScene extends GameScene {
                     Logger.getLogger(LoadingScene.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
-                try (InputStream in = getClass().getResourceAsStream("/client/images/spritesheets");
+                try (InputStream in = getClass().getResourceAsStream("../images/spritesheets");
                         BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
                     String resource;
                     while ((resource = br.readLine()) != null) {
