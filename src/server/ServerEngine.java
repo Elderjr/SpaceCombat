@@ -73,8 +73,7 @@ public class ServerEngine implements IServer {
         System.out.println("Register requested: " + username + " " + password);
         try {
             User user = UserDAO.registerUser(username, password);
-            addLoggedUser(user);
-            return user;
+            return login(user.getUsername(), password);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -86,11 +85,7 @@ public class ServerEngine implements IServer {
         System.out.println("Login requested: " + username + " " + password);
         try {
             User user = UserDAO.login(username, password);
-            if (user != null) {
-                if (this.loggedUsers.containsKey(user.getId())) {
-                    disconnectUser(user);
-                    this.loggedUsers.remove(user.getId());
-                }
+            if (user != null && !this.loggedUsers.containsKey(user.getId())) {
                 addLoggedUser(user);
                 return user;
             }
