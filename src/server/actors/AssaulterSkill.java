@@ -10,7 +10,7 @@ public class AssaulterSkill extends Skill implements Moviment {
     private static final Dimension SIZE = new Dimension(32, 32);
     private static final double SPEED = 0.8;
     private static final int DAMAGE = 35;
-    public static final int COOLDOWN = 5000; //4s
+    public static final int COOLDOWN = 5000; //5s
 
     public AssaulterSkill(BattleListener room, Position location, Spaceship source, int currentDirection) {
         super(room, location, SIZE, source, DAMAGE, currentDirection, Constants.ASSAULTER_SKILL);

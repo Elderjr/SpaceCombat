@@ -100,7 +100,7 @@ public class SpaceshipTests {
         Spaceship spaceshipB = createSpaceship(Constants.SPACESHIP_ASSAULTER, Constants.RED_TEAM);
         Skill shotB = spaceshipB.shoot();
         spaceshipA.receiveDamage(shotB);
-        assertEquals(false, spaceshipA.getHP() != spaceshipA.getMaxHP());
+        assertEquals(true, spaceshipA.getHP() != spaceshipA.getMaxHP());
         spaceshipA.receiveHeal(shotB);
         assertEquals(true, spaceshipA.getHP() == spaceshipA.getMaxHP());
     }
