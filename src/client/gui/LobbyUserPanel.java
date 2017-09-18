@@ -46,7 +46,14 @@ public class LobbyUserPanel extends Component {
     }
 
     public void setLobbyUser(LobbyUser lobbyUser) {
-        this.lobbyUser = lobbyUser;
+        if (this.lobbyUser != null) {
+            synchronized (this.lobbyUser) {
+                this.lobbyUser = lobbyUser;
+            }
+        } else {
+            this.lobbyUser = lobbyUser;
+        }
+
     }
 
     private final void initAnimations() {
@@ -66,20 +73,22 @@ public class LobbyUserPanel extends Component {
     @Override
     public void render(GraphicsContext gc) {
         if (this.lobbyUser != null) {
-            gc.setFont(DEFAULT_FONT);
-            if (this.lobbyUser.isConfirmed()) {
-                gc.drawImage(this.panelReady, getX(), getY());
-            } else {
-                gc.drawImage(this.panelNotReady, getX(), getY());
-            }
-            gc.setFill(Color.WHITE);
-            gc.fillText(this.lobbyUser.getUser().getUsername(), getX() + 10, getY() + 15);
-            if (this.lobbyUser.getSpaceshipSelected().equalsIgnoreCase(Constants.SPACESHIP_ASSAULTER)) {
-                this.assaulterSpaceship.render(gc);
-            } else if (this.lobbyUser.getSpaceshipSelected().equalsIgnoreCase(Constants.SPACESHIP_RAPTOR)) {
-                this.raptorSpaceship.render(gc);
-            } else if (this.lobbyUser.getSpaceshipSelected().equalsIgnoreCase(Constants.SPACESHIP_SUPPORTER)) {
-                this.supporterSpaceship.render(gc);
+            synchronized (this.lobbyUser) {
+                gc.setFont(DEFAULT_FONT);
+                if (this.lobbyUser.isConfirmed()) {
+                    gc.drawImage(this.panelReady, getX(), getY());
+                } else {
+                    gc.drawImage(this.panelNotReady, getX(), getY());
+                }
+                gc.setFill(Color.WHITE);
+                gc.fillText(this.lobbyUser.getUser().getUsername(), getX() + 10, getY() + 15);
+                if (this.lobbyUser.getSpaceshipSelected().equalsIgnoreCase(Constants.SPACESHIP_ASSAULTER)) {
+                    this.assaulterSpaceship.render(gc);
+                } else if (this.lobbyUser.getSpaceshipSelected().equalsIgnoreCase(Constants.SPACESHIP_RAPTOR)) {
+                    this.raptorSpaceship.render(gc);
+                } else if (this.lobbyUser.getSpaceshipSelected().equalsIgnoreCase(Constants.SPACESHIP_SUPPORTER)) {
+                    this.supporterSpaceship.render(gc);
+                }
             }
         } else {
             gc.drawImage(this.panelNotReady, getX(), getY());

@@ -167,28 +167,33 @@ public final class LobbyScene extends LoadDataScene {
 
     @Override
     public void loadData() throws RemoteException, NotLoggedException {
-        this.data = ClientNetwork.getInstance().getLobbyData(this.room.getId());
+        LobbyData buffer = ClientNetwork.getInstance().getLobbyData(this.room.getId());
+        if(buffer != null){
+            this.data = buffer;
+        }
     }
 
     @Override
-    public void processLoadedData(){
+    public void processLoadedData() {
         updateLobbyUsers();
     }
-    
+
     private void updateLobbyUsers() {
-        for (int i = 0; i < this.bluePanels.length; i++) {
-            this.bluePanels[i].setLobbyUser(null);
-            this.redPanels[i].setLobbyUser(null);
-        }
-        int index = 0;
-        for (LobbyUser lobbyUser : this.data.getBlueTeam()) {
-            this.bluePanels[index].setLobbyUser(lobbyUser);
-            index++;
-        }
-        index = 0;
-        for (LobbyUser lobbyUser : this.data.getRedTeam()) {
-            this.redPanels[index].setLobbyUser(lobbyUser);
-            index++;
+        if (this.data != null) {
+            for (int i = 0; i < this.bluePanels.length; i++) {
+                this.bluePanels[i].setLobbyUser(null);
+                this.redPanels[i].setLobbyUser(null);
+            }
+            int index = 0;
+            for (LobbyUser lobbyUser : this.data.getBlueTeam()) {
+                this.bluePanels[index].setLobbyUser(lobbyUser);
+                index++;
+            }
+            index = 0;
+            for (LobbyUser lobbyUser : this.data.getRedTeam()) {
+                this.redPanels[index].setLobbyUser(lobbyUser);
+                index++;
+            }
         }
     }
 

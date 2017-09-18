@@ -71,7 +71,10 @@ public final class BattleScene extends LoadDataScene {
 
     @Override
     public void loadData() throws RemoteException, NotLoggedException {
-        this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
+        BattleData buffer = ClientNetwork.getInstance().getBattleData(this.room.getId());
+        if(buffer != null){
+            this.data = buffer;
+        }
     }
 
     @Override
@@ -84,27 +87,29 @@ public final class BattleScene extends LoadDataScene {
     }
 
     private void updateAnimations(HashMap<Long, SimpleActor> simpleActors) {
-        for (SimpleActor simpleActor : simpleActors.values()) {
-            if (this.animations.containsKey(simpleActor.getId())) {
-                Animation animation = this.animations.get(simpleActor.getId());
-                animation.updateLocation(simpleActor.getLocation().getX() - simpleActor.getSize().getWidth() / 2 + 25, simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 + 110);
-                animation.setSpriteDirection(simpleActor.getDirection());
-            } else {
-                Sprite sprite = ExternalFileLoader.getInstance().
-                        getSprite(simpleActor.getActorType(), simpleActor.getTeam());
-                Animation animation = new Animation(simpleActor.getLocation().getX() - simpleActor.getSize().getWidth() / 2 + 25,
-                        simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 + 110,
-                        sprite);
-                animation.setSpriteDirection(simpleActor.getDirection());
-                this.animations.put(simpleActor.getId(), animation);
+        synchronized (this.animations) {
+            for (SimpleActor simpleActor : simpleActors.values()) {
+                if (this.animations.containsKey(simpleActor.getId())) {
+                    Animation animation = this.animations.get(simpleActor.getId());
+                    animation.updateLocation(simpleActor.getLocation().getX() - simpleActor.getSize().getWidth() / 2 + 25, simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 + 110);
+                    animation.setSpriteDirection(simpleActor.getDirection());
+                } else {
+                    Sprite sprite = ExternalFileLoader.getInstance().
+                            getSprite(simpleActor.getActorType(), simpleActor.getTeam());
+                    Animation animation = new Animation(simpleActor.getLocation().getX() - simpleActor.getSize().getWidth() / 2 + 25,
+                            simpleActor.getLocation().getY() - simpleActor.getSize().getHeight() / 2 + 110,
+                            sprite);
+                    animation.setSpriteDirection(simpleActor.getDirection());
+                    this.animations.put(simpleActor.getId(), animation);
+                }
             }
-        }
-        Iterator<Long> keysIterator = this.animations.keySet().iterator();
-        Long id = null;
-        while (keysIterator.hasNext()) {
-            id = keysIterator.next();
-            if (!simpleActors.containsKey(id)) {
-                keysIterator.remove();
+            Iterator<Long> keysIterator = this.animations.keySet().iterator();
+            Long id = null;
+            while (keysIterator.hasNext()) {
+                id = keysIterator.next();
+                if (!simpleActors.containsKey(id)) {
+                    keysIterator.remove();
+                }
             }
         }
     }
@@ -116,8 +121,10 @@ public final class BattleScene extends LoadDataScene {
         gc.setFill(Color.YELLOW);
         gc.setFont(PING_FONT);
         gc.fillText("ping: " + getPing() + "ms", 20, 15);
-        for (Animation animation : this.animations.values()) {
-            animation.render(gc);
+        synchronized (this.animations) {
+            for (Animation animation : this.animations.values()) {
+                animation.render(gc);
+            }
         }
         if (data != null) {
             gc.setFill(Color.WHITE);

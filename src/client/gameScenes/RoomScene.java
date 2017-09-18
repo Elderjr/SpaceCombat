@@ -1,4 +1,4 @@
-    /*
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -131,35 +131,37 @@ public final class RoomScene extends LoadDataScene {
             int cont = 0;
             int x = 30;
             int y = 100;
-            for (int i = init; i < end; i++) {
-                this.pageButtons[index] = null;
-                if (i < roomData.getRooms().size()) {
-                    SimpleRoom room = roomData.getRooms().get(i);
-                    this.pageButtons[index] = new RoomButton(x, y, room, new ActionPerfomed() {
-                        @Override
-                        public void doAction() {
-                            try {
-                                if (room.getMaxPlayersPerTeam() * 2 != room.getTotalPlayers()
-                                        && room.getState() == constants.Constants.WAITING) {
-                                    ClientNetwork.getInstance().enterRoom(room.getId());
-                                    changeScene(new LobbyScene(getContext(), room));
+            synchronized (this.pageButtons) {
+                for (int i = init; i < end; i++) {
+                    this.pageButtons[index] = null;
+                    if (i < roomData.getRooms().size()) {
+                        SimpleRoom room = roomData.getRooms().get(i);
+                        this.pageButtons[index] = new RoomButton(x, y, room, new ActionPerfomed() {
+                            @Override
+                            public void doAction() {
+                                try {
+                                    if (room.getMaxPlayersPerTeam() * 2 != room.getTotalPlayers()
+                                            && room.getState() == constants.Constants.WAITING) {
+                                        ClientNetwork.getInstance().enterRoom(room.getId());
+                                        changeScene(new LobbyScene(getContext(), room));
+                                    }
+                                } catch (RemoteException ex) {
+                                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                                } catch (NotLoggedException ex) {
+                                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                                 }
-                            } catch (RemoteException ex) {
-                                changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-                            } catch (NotLoggedException ex) {
-                                changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
                             }
+                        });
+                        cont++;
+                        if (cont % 2 == 0) {
+                            x = 30;
+                            y += this.pageButtons[index].getHeight() + 15;
+                        } else {
+                            x += this.pageButtons[index].getWidth();
                         }
-                    });
-                    cont++;
-                    if (cont % 2 == 0) {
-                        x = 30;
-                        y += this.pageButtons[index].getHeight() + 15;
-                    } else {
-                        x += this.pageButtons[index].getWidth();
                     }
+                    index++;
                 }
-                index++;
             }
             this.currentPage = page;
         }
@@ -192,9 +194,11 @@ public final class RoomScene extends LoadDataScene {
                 }
             }
         }
-        for (RoomButton bt : this.pageButtons) {
-            if (bt != null) {
-                bt.render(gc);
+        synchronized (this.pageButtons) {
+            for (RoomButton bt : this.pageButtons) {
+                if (bt != null) {
+                    bt.render(gc);
+                }
             }
         }
         gc.setFont(NUMBER_PAGE_FONT);
@@ -221,11 +225,14 @@ public final class RoomScene extends LoadDataScene {
 
     @Override
     public void loadData() throws RemoteException, NotLoggedException {
-        this.roomData = ClientNetwork.getInstance().getRooms();
+        RoomData buffer = ClientNetwork.getInstance().getRooms();
+        if(buffer != null){
+            this.roomData = buffer;
+        }
     }
-    
+
     @Override
-    public void processLoadedData(){
+    public void processLoadedData() {
         updatePageButtons(this.currentPage);
     }
 }
