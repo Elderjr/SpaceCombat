@@ -41,21 +41,17 @@ public final class RoomScene extends LoadDataScene {
 
     private static final int ROOMS_PER_PAGE = 4;
     private final User user;
+    private final RoomButton pageButtons[];
     private GeneralStatistics generalStatistics;
     private RoomData roomData;
-    private RoomButton pageButtons[];
-    private long lastUpdate;
-    private long ping;
     private int currentPage;
 
     public RoomScene(GameContext context) {
-        super(context, ExternalFileLoader.getInstance().getImage("background.png"), 1000);
+        super(context, ExternalFileLoader.getInstance().getImage("background.png"), 1000, 1000);
         initComponents();
         this.user = ClientNetwork.getInstance().getUser();
         this.pageButtons = new RoomButton[ROOMS_PER_PAGE];
         this.currentPage = 1;
-        this.lastUpdate = 0;
-        this.ping = 0;
         try {
             this.generalStatistics = ClientNetwork.getInstance().getGeneralStatistics();
         } catch (RemoteException ex) {
@@ -128,7 +124,6 @@ public final class RoomScene extends LoadDataScene {
 
     public void updatePageButtons(int page) {
         if (this.roomData != null) {
-
             int init = (page - 1) * ROOMS_PER_PAGE;
             int end = init + ROOMS_PER_PAGE;
             int index = 0;
@@ -175,7 +170,7 @@ public final class RoomScene extends LoadDataScene {
         renderComponents(gc);
         gc.setFill(Color.YELLOW);
         gc.setFont(PING_FONT);
-        gc.fillText("ping: " + this.ping + "ms", 20, 15);
+        gc.fillText("ping: " + getPing() + "ms", 20, 15);
         gc.setFill(Color.WHITESMOKE);
         gc.setFont(DEFAULT_FONT);
         gc.fillText("User: [" + this.user.getUsername() + "]", 335, 60);
@@ -221,16 +216,11 @@ public final class RoomScene extends LoadDataScene {
                 }
             }
         }
+        updatePageButtons(this.currentPage);
     }
 
     @Override
     public void loadData() throws RemoteException, NotLoggedException {
-        if (System.currentTimeMillis() - this.lastUpdate >= 1000) {
-            long pingAux = System.currentTimeMillis();
-            this.roomData = ClientNetwork.getInstance().getRooms();
-            this.ping = System.currentTimeMillis() - pingAux;
-            updatePageButtons(this.currentPage);
-            this.lastUpdate = System.currentTimeMillis();
-        }
+        this.roomData = ClientNetwork.getInstance().getRooms();
     }
 }

@@ -21,18 +21,27 @@ public abstract class LoadDataScene extends GameScene{
     private static final int TOLERANCE = 10;
     private Thread thread;
     private long fetchTime;
+    private long pingTime;
+    private long ping;
+    private long lastPing;
     private int errorsCount;
     
-    public LoadDataScene(GameContext context, long fetchTime) {
+    public LoadDataScene(GameContext context, long fetchTime, long pingTime) {
         super(context);
         this.fetchTime = fetchTime;
+        this.pingTime = pingTime;
+        this.lastPing = 0;
+        this.ping = 0;
         this.errorsCount = 0;
         initThread();
     }
     
-    public LoadDataScene(GameContext context, Image background, long fetchTime) {
+    public LoadDataScene(GameContext context, Image background, long fetchTime, long pingTime) {
         super(context, background);
         this.fetchTime = fetchTime;
+        this.pingTime = pingTime;
+        this.lastPing = 0;
+        this.ping = 0;
         this.errorsCount = 0;
         initThread();
     }
@@ -43,6 +52,10 @@ public abstract class LoadDataScene extends GameScene{
     public void changeScene(GameScene scene){
         super.changeScene(scene);
         this.thread.stop();
+    }
+    
+    public long getPing(){
+        return this.ping;
     }
     
     private void incrementErrorCount(){
@@ -58,7 +71,14 @@ public abstract class LoadDataScene extends GameScene{
             public void run() {
                 while(true){
                     try {
-                        loadData();
+                        if(System.currentTimeMillis() - lastPing >= pingTime){
+                            long pingAux = System.currentTimeMillis();
+                            loadData();
+                            ping = System.currentTimeMillis() - pingAux;
+                            lastPing = System.currentTimeMillis();
+                        }else{
+                            loadData();
+                        }
                         errorsCount = 0;
                     } catch (RemoteException ex) {
                         System.out.println("Connection down: " + ex.getMessage());

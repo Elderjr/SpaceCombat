@@ -42,17 +42,13 @@ public final class LobbyScene extends LoadDataScene {
     private final long matchTime;
     private LobbyData data;
     private Thread roomThread;
-    private long ping;
-    private long lastPing;
 
     public LobbyScene(GameContext context, SimpleRoom room) {
-        super(context, ExternalFileLoader.getInstance().getImage("background.png"), 10);
+        super(context, ExternalFileLoader.getInstance().getImage("background.png"), 10, 1000);
         this.room = room;
         this.matchTime = room.getMathTime() / 60000;
         this.bluePanels = new LobbyUserPanel[5];
         this.redPanels = new LobbyUserPanel[5];
-        this.ping = 0;
-        this.lastPing = 0;
         initLobbyUserPanels();
         initComponents();
     }
@@ -170,22 +166,7 @@ public final class LobbyScene extends LoadDataScene {
 
     @Override
     public void loadData() throws RemoteException, NotLoggedException {
-        LobbyData buffer;
-        if (System.currentTimeMillis() - this.lastPing >= 1000) {
-            long pingAux = System.currentTimeMillis();
-            buffer = ClientNetwork.getInstance().getLobbyData(this.room.getId());
-            this.ping = System.currentTimeMillis() - pingAux;
-            this.lastPing = System.currentTimeMillis();
-        } else {
-            buffer = ClientNetwork.getInstance().getLobbyData(this.room.getId());
-        }
-        if (this.data != null) {
-            synchronized (this.data) {
-                this.data = buffer;
-            }
-        } else {
-            this.data = buffer;
-        }
+        this.data = ClientNetwork.getInstance().getLobbyData(this.room.getId());
     }
 
     private void updateLobbyUsers() {
@@ -210,7 +191,7 @@ public final class LobbyScene extends LoadDataScene {
         super.render(gc);
         gc.setFill(Color.YELLOW);
         gc.setFont(PING_FONT);
-        gc.fillText("ping: " + this.ping + "ms", 20, 15);
+        gc.fillText("ping: " + getPing() + "ms", 20, 15);
         gc.setStroke(Color.WHITE);
         gc.setFill(Color.WHITE);
         gc.setFont(TITLE_FONT);
@@ -227,12 +208,10 @@ public final class LobbyScene extends LoadDataScene {
     public void update(Input input) {
         super.update(input);
         if (data != null) {
-            synchronized (data) {
-                if (data.isAllReady(room.getMaxPlayersPerTeam())) {
-                    changeScene(new BattleScene(getContext(), room));
-                } else {
-                    updateLobbyUsers();
-                }
+            if (data.isAllReady(room.getMaxPlayersPerTeam())) {
+                changeScene(new BattleScene(getContext(), room));
+            } else {
+                updateLobbyUsers();
             }
         }
     }

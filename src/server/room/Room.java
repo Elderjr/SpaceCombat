@@ -71,11 +71,13 @@ public class Room {
     }
 
     public void removeUser(User user) {
-        this.waitingManager.removeUser(user.getId());
-        if(this.battleManager != null){
+        if(this.state == Constants.WAITING){
+            this.waitingManager.removeUser(user.getId());
+            this.simpleRoom.decrementTotalPlayers();
+        }else if(this.state == Constants.PLAYING){
             this.battleManager.removeUser(user.getId());
+            this.simpleRoom.decrementTotalPlayers();
         }
-        this.simpleRoom.decrementTotalPlayers();
     }
 
     public void startBattle(HashMap<Long, LobbyUser> blueTeam, HashMap<Long, LobbyUser> redTeam) {

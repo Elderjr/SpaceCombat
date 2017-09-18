@@ -48,8 +48,6 @@ public final class BattleScene extends LoadDataScene {
     private final HashMap<Long, Animation> animations;
     private BattleData data;
     private Thread battleThread;
-    private long ping;
-    private long lastPing;
 
     //Components
     private HpBar hpBar;
@@ -57,11 +55,9 @@ public final class BattleScene extends LoadDataScene {
     private ImageLabel skillReady;
 
     public BattleScene(GameContext context, SimpleRoom room) {
-        super(context, ExternalFileLoader.getInstance().getImage("battleBackground.png"), 10);
+        super(context, ExternalFileLoader.getInstance().getImage("battleBackground.png"), 10, 1000);
         this.animations = new HashMap<>();
         this.room = room;
-        this.ping = 0;
-        this.lastPing = 0;
         initComponents();
     }
 
@@ -74,18 +70,7 @@ public final class BattleScene extends LoadDataScene {
 
     @Override
     public void loadData() throws RemoteException, NotLoggedException {
-        if (System.currentTimeMillis() - this.lastPing >= 1000) {
-            long pingAux = System.currentTimeMillis();
-            this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
-            this.ping = System.currentTimeMillis() - pingAux;
-            this.lastPing = System.currentTimeMillis();
-        } else {
-            this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
-        }
-        if (this.data != null) {
-            this.hpBar.setMaxHP(this.data.getMaxHp());
-            this.hpBar.setCurrentHP(this.data.getMyHp());
-        }
+        this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
     }
 
     private void updateAnimations(HashMap<Long, SimpleActor> simpleActors) {
@@ -120,7 +105,7 @@ public final class BattleScene extends LoadDataScene {
         renderComponents(gc);
         gc.setFill(Color.YELLOW);
         gc.setFont(PING_FONT);
-        gc.fillText("ping: " + this.ping + "ms", 20, 15);
+        gc.fillText("ping: " + getPing() + "ms", 20, 15);
         for (Animation animation : this.animations.values()) {
             animation.render(gc);
         }
@@ -179,6 +164,7 @@ public final class BattleScene extends LoadDataScene {
         processKeysPressed(input);
         if (data != null) {
             if (data.getMatchTime() > 0) {
+                this.hpBar.setMaxHP(this.data.getMaxHp());
                 this.hpBar.setCurrentHP(this.data.getMyHp());
                 this.shootReady.setVisible(this.data.canUseShot());
                 this.skillReady.setVisible(this.data.canUseSkill());
