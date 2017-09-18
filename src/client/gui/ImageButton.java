@@ -17,11 +17,11 @@ public class ImageButton extends Button{
     private final Image defaultImage;
     private final Image onClick;
     
-    public ImageButton(int x, int y, Image defaultImage, Image onClick, ActionPerfomed action) {
+    public ImageButton(double x, double y, Image defaultImage, Image onClick, ActionPerfomed action) {
         super(x, y, action);
         this.defaultImage = defaultImage;
         this.onClick = onClick;
-        setSize((int) defaultImage.getWidth(), (int) defaultImage.getHeight());
+        setSize(defaultImage.getWidth(), defaultImage.getHeight());
     }
     
     @Override

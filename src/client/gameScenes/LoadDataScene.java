@@ -11,13 +11,12 @@ import java.util.logging.Logger;
 import javafx.scene.image.Image;
 import server.exceptions.NotLoggedException;
 
-
 /**
  *
  * @author elderjr
  */
-public abstract class LoadDataScene extends GameScene{
-    
+public abstract class LoadDataScene extends GameScene {
+
     private static final int TOLERANCE = 10;
     private Thread thread;
     private long fetchTime;
@@ -25,7 +24,7 @@ public abstract class LoadDataScene extends GameScene{
     private long ping;
     private long lastPing;
     private int errorsCount;
-    
+
     public LoadDataScene(GameContext context, long fetchTime, long pingTime) {
         super(context);
         this.fetchTime = fetchTime;
@@ -35,7 +34,7 @@ public abstract class LoadDataScene extends GameScene{
         this.errorsCount = 0;
         initThread();
     }
-    
+
     public LoadDataScene(GameContext context, Image background, long fetchTime, long pingTime) {
         super(context, background);
         this.fetchTime = fetchTime;
@@ -45,38 +44,40 @@ public abstract class LoadDataScene extends GameScene{
         this.errorsCount = 0;
         initThread();
     }
-    
+
     public abstract void loadData() throws RemoteException, NotLoggedException;
-    
+
+    public abstract void processLoadedData();
+
     @Override
-    public void changeScene(GameScene scene){
+    public void changeScene(GameScene scene) {
         super.changeScene(scene);
         this.thread.stop();
     }
-    
-    public long getPing(){
+
+    public long getPing() {
         return this.ping;
     }
-    
-    private void incrementErrorCount(){
+
+    private void incrementErrorCount() {
         this.errorsCount++;
-        if(this.errorsCount == TOLERANCE){
+        if (this.errorsCount == TOLERANCE) {
             changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
         }
     }
-    
-    public void initThread(){
+
+    public void initThread() {
         this.thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true){
+                while (true) {
                     try {
-                        if(System.currentTimeMillis() - lastPing >= pingTime){
+                        if (System.currentTimeMillis() - lastPing >= pingTime) {
                             long pingAux = System.currentTimeMillis();
                             loadData();
                             ping = System.currentTimeMillis() - pingAux;
                             lastPing = System.currentTimeMillis();
-                        }else{
+                        } else {
                             loadData();
                         }
                         errorsCount = 0;
@@ -85,9 +86,15 @@ public abstract class LoadDataScene extends GameScene{
                         incrementErrorCount();
                     } catch (NotLoggedException ex) {
                         changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
-                    } catch(Exception ex){
+                    } catch (Exception ex) {
                         System.out.println("An unexpected error occured: " + ex.getMessage());
                         incrementErrorCount();
+                    }
+                    processLoadedData();
+                    try {
+                        Thread.sleep(fetchTime);
+                    } catch (InterruptedException ex) {
+                        System.out.println("Interrupted Exception: " + ex.getMessage());
                     }
                 }
             }

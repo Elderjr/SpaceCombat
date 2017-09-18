@@ -169,6 +169,11 @@ public final class LobbyScene extends LoadDataScene {
         this.data = ClientNetwork.getInstance().getLobbyData(this.room.getId());
     }
 
+    @Override
+    public void processLoadedData(){
+        updateLobbyUsers();
+    }
+    
     private void updateLobbyUsers() {
         for (int i = 0; i < this.bluePanels.length; i++) {
             this.bluePanels[i].setLobbyUser(null);
@@ -210,8 +215,6 @@ public final class LobbyScene extends LoadDataScene {
         if (data != null) {
             if (data.isAllReady(room.getMaxPlayersPerTeam())) {
                 changeScene(new BattleScene(getContext(), room));
-            } else {
-                updateLobbyUsers();
             }
         }
     }

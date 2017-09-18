@@ -1,4 +1,4 @@
-/*
+    /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -216,11 +216,15 @@ public final class RoomScene extends LoadDataScene {
                 }
             }
         }
-        updatePageButtons(this.currentPage);
     }
 
     @Override
     public void loadData() throws RemoteException, NotLoggedException {
         this.roomData = ClientNetwork.getInstance().getRooms();
+    }
+    
+    @Override
+    public void processLoadedData(){
+        updatePageButtons(this.currentPage);
     }
 }

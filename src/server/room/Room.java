@@ -89,8 +89,7 @@ public class Room {
         this.setState(Constants.DONE);
         this.doneAt = System.currentTimeMillis();
         server.ServerEngine.getInstance().updateStatistics(this);
-        server.ServerEngine.getInstance().removeRoomFromData(this);
-        System.out.println("done");
+        server.ServerEngine.getInstance().removeRoomFromData(this);        
     }
     
     public boolean update(long time) {

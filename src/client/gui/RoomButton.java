@@ -26,11 +26,11 @@ public class RoomButton extends Button{
          FontPosture.REGULAR, 25);
     private static final Image ROOM_BUTTON = ExternalFileLoader.getInstance().getImage("room.png");
     private final long time;
-    private SimpleRoom room;
+    private final SimpleRoom room;
     
-    public RoomButton(int x, int y,SimpleRoom room,ActionPerfomed action) {
+    public RoomButton(double x, double y, SimpleRoom room, ActionPerfomed action) {
         super(x, y, action);
-        this.setSize((int) ROOM_BUTTON.getWidth(), (int) ROOM_BUTTON.getHeight());
+        this.setSize(ROOM_BUTTON.getWidth(), ROOM_BUTTON.getHeight());
         this.room = room;
         this.time = room.getMathTime() / 60000;
     }

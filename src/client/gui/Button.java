@@ -3,26 +3,27 @@ package client.gui;
 
 public abstract class Button extends Component{
 
-    private int width;
-    private int height;
+    private double width;
+    private double height;
     private boolean pressed;
     private final ActionPerfomed action;
 
-    public Button(int x, int y, ActionPerfomed action) {
+    public Button(double x, double y, ActionPerfomed action) {
         super(x, y);
         this.action = action;
+        this.pressed = false;
     }
 
-    protected final void setSize(int width, int height) {
+    protected final void setSize(double width, double height) {
         this.width = width;
         this.height = height;
     }
     
-    public final int getWidth(){
+    public final double getWidth(){
         return this.width;
     }
     
-    public final int getHeight(){
+    public final double getHeight(){
         return this.height;
     }
     

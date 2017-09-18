@@ -73,6 +73,15 @@ public final class BattleScene extends LoadDataScene {
         this.data = ClientNetwork.getInstance().getBattleData(this.room.getId());
     }
 
+    @Override
+    public void processLoadedData() {
+        this.hpBar.setMaxHP(this.data.getMaxHp());
+        this.hpBar.setCurrentHP(this.data.getMyHp());
+        this.shootReady.setVisible(this.data.canUseShot());
+        this.skillReady.setVisible(this.data.canUseSkill());
+        updateAnimations(data.getActors());
+    }
+
     private void updateAnimations(HashMap<Long, SimpleActor> simpleActors) {
         for (SimpleActor simpleActor : simpleActors.values()) {
             if (this.animations.containsKey(simpleActor.getId())) {
@@ -162,25 +171,16 @@ public final class BattleScene extends LoadDataScene {
     public void update(Input input) {
         super.update(input);
         processKeysPressed(input);
-        if (data != null) {
-            if (data.getMatchTime() > 0) {
-                this.hpBar.setMaxHP(this.data.getMaxHp());
-                this.hpBar.setCurrentHP(this.data.getMyHp());
-                this.shootReady.setVisible(this.data.canUseShot());
-                this.skillReady.setVisible(this.data.canUseSkill());
-                updateAnimations(data.getActors());
-            } else {
-                try {
-                    BattleStatistic statistics = ClientNetwork.getInstance().getBattleStatistic(room.getId());
-                    changeScene(new StatisticScene(getContext(), statistics));
-                } catch (RemoteException ex) {
-                    changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
-                    System.err.println("Connection down: " + ex.getMessage());
-                } catch (NotLoggedException ex) {
-                    changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
-                }
+        if (data != null && data.getMatchTime() <= 0) {
+            try {
+                BattleStatistic statistics = ClientNetwork.getInstance().getBattleStatistic(room.getId());
+                changeScene(new StatisticScene(getContext(), statistics));
+            } catch (RemoteException ex) {
+                changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
+                System.err.println("Connection down: " + ex.getMessage());
+            } catch (NotLoggedException ex) {
+                changeScene(new MainScene(getContext(), MainScene.NOTLOGGED_ERROR));
             }
         }
     }
-
 }
