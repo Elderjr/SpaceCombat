@@ -62,16 +62,10 @@ public class ServerEngine implements IServer {
         }
     }
 
-    public boolean addLoggedUser(User user) {
-        try {
-            GeneralStatistics userStatistic = UserDAO.getUserStatistics(user.getId());
-            this.loggedUsers.put(user.getId(), new LoggedUser(user, userStatistic));
-            this.roomsData.addUser(user);
-            return true;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return false;
-        }
+    public void addLoggedUser(User user) throws SQLException {
+        GeneralStatistics userStatistic = UserDAO.getUserStatistics(user.getId());
+        this.loggedUsers.put(user.getId(), new LoggedUser(user, userStatistic));
+        this.roomsData.addUser(user);
     }
 
     @Override
@@ -79,12 +73,9 @@ public class ServerEngine implements IServer {
         System.out.println("Register requested: " + username + " " + password);
         try {
             User user = UserDAO.registerUser(username, password);
-            boolean success = addLoggedUser(user);
-            if (success) {
-                return user;
-            }
+            addLoggedUser(user);
+            return user;
         } catch (SQLException ex) {
-            System.out.println("Register Fail");
             ex.printStackTrace();
         }
         return null;
@@ -95,18 +86,17 @@ public class ServerEngine implements IServer {
         System.out.println("Login requested: " + username + " " + password);
         try {
             User user = UserDAO.login(username, password);
-            if (user != null && !loggedUsers.containsKey(user.getId())) {
-                System.out.println("Login success");
-                boolean success = addLoggedUser(user);
-                if (success) {
-                    return user;
+            if (user != null) {
+                if (this.loggedUsers.containsKey(user.getId())) {
+                    disconnectUser(user);
+                    this.loggedUsers.remove(user.getId());
                 }
+                addLoggedUser(user);
+                return user;
             }
-            return user;
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        System.out.println("retornei nulo");
         return null;
     }
 

@@ -32,7 +32,6 @@ public abstract class LoadDataScene extends GameScene {
         this.lastPing = 0;
         this.ping = 0;
         this.errorsCount = 0;
-        initThread();
     }
 
     public LoadDataScene(GameContext context, Image background, long fetchTime, long pingTime) {
@@ -42,7 +41,6 @@ public abstract class LoadDataScene extends GameScene {
         this.lastPing = 0;
         this.ping = 0;
         this.errorsCount = 0;
-        initThread();
     }
 
     public abstract void loadData() throws RemoteException, NotLoggedException;
@@ -52,7 +50,9 @@ public abstract class LoadDataScene extends GameScene {
     @Override
     public void changeScene(GameScene scene) {
         super.changeScene(scene);
-        this.thread.stop();
+        if(this.thread != null){
+            this.thread.stop();
+        }
     }
 
     public long getPing() {
@@ -66,7 +66,7 @@ public abstract class LoadDataScene extends GameScene {
         }
     }
 
-    public void initThread() {
+    public final void startLoadThread() {
         this.thread = new Thread(new Runnable() {
             @Override
             public void run() {

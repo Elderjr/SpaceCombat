@@ -32,7 +32,7 @@ public final class StatisticScene extends GameScene {
 
     private static final Font PING_FONT = Font.font("Serif", FontWeight.EXTRA_BOLD,
             FontPosture.REGULAR, 15);
-    private BattleStatistic statistic;
+    private final BattleStatistic statistic;
     private long ping;
     private long lastPing;
     

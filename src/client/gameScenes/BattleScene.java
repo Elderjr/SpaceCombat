@@ -59,6 +59,7 @@ public final class BattleScene extends LoadDataScene {
         this.animations = new HashMap<>();
         this.room = room;
         initComponents();
+        startLoadThread();
     }
 
     public void initComponents() {

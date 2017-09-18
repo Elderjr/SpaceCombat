@@ -54,6 +54,7 @@ public final class RoomScene extends LoadDataScene {
         this.currentPage = 1;
         try {
             this.generalStatistics = ClientNetwork.getInstance().getGeneralStatistics();
+            startLoadThread();
         } catch (RemoteException ex) {
             changeScene(new MainScene(getContext(), MainScene.CONNECTION_ERROR));
         } catch (NotLoggedException ex) {

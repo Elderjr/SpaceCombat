@@ -51,6 +51,7 @@ public final class LobbyScene extends LoadDataScene {
         this.redPanels = new LobbyUserPanel[5];
         initLobbyUserPanels();
         initComponents();
+        startLoadThread();
     }
 
     public void initLobbyUserPanels() {
